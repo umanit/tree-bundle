@@ -3,67 +3,67 @@ services:
     umanit.tree.doctrine.node_listener:
         class: Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineTreeNodeListener
         arguments:
-            - %umanit_tree.locale%
+            - '%umanit_tree.locale%'
         tags:
-            - { name: doctrine.event_listener, event: postUpdate }
-            - { name: doctrine.event_listener, event: postPersist }
-            - { name: doctrine.event_listener, event: preRemove }
-            - { name: doctrine.event_listener, event: postFlush }
+            - { name: 'doctrine.event_listener', event: postUpdate }
+            - { name: 'doctrine.event_listener', event: postPersist }
+            - { name: 'doctrine.event_listener', event: preRemove }
+            - { name: 'doctrine.event_listener', event: postFlush }
 
     # Listener to redirect to the right controller
     umanit.tree.listener.route_listener:
         class: Umanit\Bundle\TreeBundle\Listener\RouteListener
         arguments:
-            - @doctrine
-            - %umanit_tree.controllers_by_class%
-            - %umanit_tree.locale%
+            - '@doctrine'
+            - '%umanit_tree.controllers_by_class%'
+            - '%umanit_tree.locale%'
         tags:
-            - { name: kernel.event_listener, event: kernel.request, priority: -10 }
+            - { name: 'kernel.event_listener', event:' kernel.request', priority: -10 }
 
     # Router for nodes
     umanit.tree.router:
         class: Umanit\Bundle\TreeBundle\Router\NodeRouter
         arguments:
-            - @doctrine
-            - @router
-            - @request_stack
+            - '@doctrine'
+            - '@router'
+            - '@request_stack'
 
     # Helpers twig for links
     umanit.tree.twig.extension.link:
         class: Umanit\Bundle\TreeBundle\Twig\Extension\LinkExtension
         arguments:
-            - @doctrine
-            - @umanit.tree.router
+            - '@doctrine'
+            - '@umanit.tree.router'
         tags:
-            - { name: twig.extension }
+            - { name: 'twig.extension' }
 
     # Helpers twig for SEO
     umanit.tree.twig.extension.seo:
         class: Umanit\Bundle\TreeBundle\Twig\Extension\SeoExtension
         arguments:
-            - @request_stack
-            - @translator.default
-            - %umanit_tree.seo%
+            - '@request_stack'
+            - '@translator.default'
+            - '%umanit_tree.seo%'
         tags:
-            - { name: twig.extension }
+            - { name: 'twig.extension' }
 
     # Helpers twig for SEO
     umanit.tree.twig.extension.breadcrumb:
         class: Umanit\Bundle\TreeBundle\Twig\Extension\BreadcrumbExtension
         arguments:
-            - @request_stack
-            - @translator.default
-            - %umanit_tree.breadcrumb%
-            - @umanit.tree.router
-            - @doctrine
+            - '@request_stack'
+            - '@translator.default'
+            - '%umanit_tree.breadcrumb%'
+            - '@umanit.tree.router'
+            - '@doctrine'
         tags:
-            - { name: twig.extension }
+            - { name: 'twig.extension' }
 
     # Link form type
     umanit.tree.form.type.link:
         class: Umanit\Bundle\TreeBundle\Form\Type\LinkType
         arguments:
-            - @doctrine
-            - @translator.default
+            - '@doctrine'
+            - '@translator.default'
         tags:
-            - { name: form.type, alias: umanit_link_type }
+            - { name: 'form.type', alias: umanit_link_type }
