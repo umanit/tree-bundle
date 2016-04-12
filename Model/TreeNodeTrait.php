@@ -2,6 +2,8 @@
 
 namespace Umanit\Bundle\TreeBundle\Model;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
  * Tree node trait
  */
@@ -11,6 +13,34 @@ trait TreeNodeTrait
      * @var mixed[]
      */
     protected $parents;
+
+    /**
+     * @var string
+     * @ORM\Column(name="title", type="string", length=255)
+     */
+    protected $locale = 'unknown';
+
+    /**
+     * Return the document locale
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
+     * Set the locale of the document
+     *
+     * @param string $locale
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
 
     /**
      * {@inheritDoc}

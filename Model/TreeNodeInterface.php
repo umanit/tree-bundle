@@ -29,4 +29,11 @@ interface TreeNodeInterface
      * @return bool
      */
     public function createRootNodeByDefault();
+
+    /**
+     * Returns locale of the node
+     *
+     * @return string
+     */
+    public function getLocale();
 }

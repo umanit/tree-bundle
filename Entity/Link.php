@@ -29,7 +29,6 @@ class Link
     /**
      * @var string
      * @ORM\Column(name="uri", type="text", nullable=true)
-     * @Gedmo\Translatable()
      * @Assert\Url()
      */
     protected $externalLink;

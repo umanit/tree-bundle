@@ -18,7 +18,7 @@
         "symfony/framework-bundle": ">=2.3"
     },
     "minimum-stability": "dev",
-    "target-dir": "Umanit/TreeBundle",
+    "target-dir": "umanit/tree-bundle",
     "autoload": {
         "psr-4": { "Umanit\\TreeBundle": "" }
     }

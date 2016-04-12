@@ -28,21 +28,18 @@ class SeoMetadata
     /**
      * @var string
      * @ORM\Column(name="title", type="string", length=255, nullable=true)
-     * @Gedmo\Translatable
      */
     protected $title;
 
     /**
      * @var string
      * @ORM\Column(name="description", type="text", nullable=true)
-     * @Gedmo\Translatable
      */
     protected $description;
 
     /**
      * @var string
      * @ORM\Column(name="keywords", type="text",  nullable=true)
-     * @Gedmo\Translatable
      */
     protected $keywords;
 
