@@ -20,6 +20,6 @@
     "minimum-stability": "dev",
     "target-dir": "Umanit/TreeBundle",
     "autoload": {
-        "psr-4": { "Umanit\\TreeBundle": "" }
+        "psr-0": { "Umanit\\TreeBundle": "" }
     }
 }
