@@ -9,10 +9,22 @@ umanit_tree:
     prefix:   /
 ```
 
-Register the bundle to your `app/AppKernel.php`
+Register the bundle and doctrine extension to your `app/AppKernel.php`
 
 ```php           
     new Umanit\Bundle\TreeBundle\UmanitTreeBundle(),
+    new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
+```
+
+Set doctrine extension config, at least like this one :
+```yaml
+stof_doctrine_extensions:
+    default_locale: %locale%
+    translation_fallback: true
+    orm:
+        default:
+            tree: true
+            sluggable: true
 ```
 
 Update your database schema to add our model

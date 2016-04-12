@@ -103,7 +103,7 @@ class DoctrineTreeNodeListener
                     $manager->flush();
                 }
             }
-            
+
             $manager->flush();
             $this->registerParents($entity, $manager, $treeNodes);
         }
@@ -138,19 +138,21 @@ class DoctrineTreeNodeListener
         $entities = $this->entitiesToRemove;
         $this->entitiesToRemove = array();
 
-        foreach ($entities as $entity) {
-            $nodes = $manager->getRepository('UmanitTreeBundle:Node')->findBy(array(
-                'className' => $entity['name'],
-                'classId'   => $entity['id'],
-                'locale'    => $entity['locale']
-            ));
+        if (!empty($this->entitiesToRemove)) {
+            foreach ($entities as $entity) {
+                $nodes = $manager->getRepository('UmanitTreeBundle:Node')->findBy(array(
+                    'className' => $entity['name'],
+                    'classId'   => $entity['id'],
+                    'locale'    => $entity['locale']
+                ));
 
-            foreach ($nodes as $node) {
-                $manager->remove($node);
+                foreach ($nodes as $node) {
+                    $manager->remove($node);
+                }
             }
-        }
 
-        $manager->flush();
+            $manager->flush();
+        }
     }
 
     /**
