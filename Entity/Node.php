@@ -32,7 +32,8 @@ class Node
 
     /**
      * @var string
-     * @ORM\Column(name="path", type="text", nullable=true)
+     * 
+     * @ORM\Column(name="path", type="string", length=255, nullable=true)
      * @Gedmo\TreePath(separator="/", appendId=false)
      */
     protected $path;
