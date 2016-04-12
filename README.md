@@ -15,6 +15,11 @@ Register the bundle to your `app/AppKernel.php`
     new Umanit\Bundle\TreeBundle\UmanitTreeBundle(),
 ```
 
+Update your database schema to add our model
+```
+bin/console doctrine:schema:update --force
+```
+
 ## Create a new node type
 
 You can now easily manage a new node type
