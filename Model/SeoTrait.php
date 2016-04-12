@@ -41,4 +41,28 @@ trait SeoTrait
 
         return $this;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSeoTitle()
+    {
+        return $this->seoMetadata->getTitle();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSeoDescription()
+    {
+        return $this->seoMetadata->getDescription();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSeoKeywords()
+    {
+        return $this->seoMetadata->getKeywords();
+    }
 }
