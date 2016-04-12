@@ -9,22 +9,10 @@ umanit_tree:
     prefix:   /
 ```
 
-Register the bundle and doctrine extension to your `app/AppKernel.php`
+Register the bundle to your `app/AppKernel.php`
 
 ```php           
     new Umanit\Bundle\TreeBundle\UmanitTreeBundle(),
-    new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
-```
-
-Set doctrine extension config, at least like this one :
-```yaml
-stof_doctrine_extensions:
-    default_locale: %locale%
-    translation_fallback: true
-    orm:
-        default:
-            tree: true
-            sluggable: true
 ```
 
 Update your database schema to add our model
@@ -32,6 +20,20 @@ Update your database schema to add our model
 bin/console doctrine:schema:update --force
 ```
 
+Now, you have to create the root node. The default object is RootEntity, but you can override it in configuration (param
+`umanit_tree.root_class`).
+
+To create the root node, execute the following command
+
+```
+bin/console umanit:tree:initialize
+```
+
 ## Create a new node type
 
-You can now easily manage a new node type
+You can now easily manage a new node type :
+
+- Create an entity
+- Implements `Umanit\Bundle\TreeBundle\Model\TreeNodeInterface` and `Umanit\Bundle\TreeBundle\Model\SeoInterface`
+- You can now use the `Umanit\Bundle\TreeBundle\Model\TreeNodeTrait` and `Umanit\Bundle\TreeBundle\Model\SeoTrait` to have
+a default implementation for most of the methods to implement

@@ -67,7 +67,7 @@ class RouteListener
         } else {
             // Search for a node in the current locale
             $node = $repository->findOneBy(array(
-                'path'   => substr($path, 1) . '/',
+                'path'   => $path . '/',
                 'locale' => $locale
             ));
         }
@@ -75,7 +75,7 @@ class RouteListener
         // Redirect to the node in the default locale if node not found
         if (!$node && ($locale !== $this->defaultLocale)) {
             $node = $repository->findOneBy(array(
-                'path'   => substr($path, 1) . '/',
+                'path'   => $path . '/',
                 'locale' => $this->defaultLocale
             ));
         }

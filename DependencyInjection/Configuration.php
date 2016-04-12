@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('locale')->defaultValue('%locale%')->end()
+                ->scalarNode('root_class')->defaultValue('\Umanit\Bundle\TreeBundle\Entity\RootEntity')->end()
                 ->arrayNode('controllers_by_class')->info('Defines a controller to call by class')
                     ->prototype('array')
                         ->children()
