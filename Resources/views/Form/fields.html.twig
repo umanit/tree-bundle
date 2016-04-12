@@ -1,0 +1,20 @@
+{# We are advizing to use a select2 #}
+{% block umanit_link_type_widget %}
+    {% spaceless %}
+            {% for child in form.children %}
+                {% if form.children|length > 1 %}
+                    <div style="display:inline-block; width: 45%; margin-right: 5px; vertical-align:top;">
+                {% endif %}
+                    {{ form_label(child) }}
+                    {{ form_widget(child) }}
+                    {{ form_errors(child) }}
+                {% if form.children|length > 1 %}
+                    </div>
+                {% endif %}
+
+                {% if loop.index == 1 and form.children|length > 1 %}
+                    <div style="display:inline-block; width: 6%; vertical-align: bottom; text-align: center; font-size: 15px;">{{ 'or'|trans([], 'UmanitTreeBundle') }}</div>
+                {% endif %}
+            {% endfor %}
+    {% endspaceless %}
+{% endblock %}
