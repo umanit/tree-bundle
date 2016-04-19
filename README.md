@@ -53,6 +53,29 @@ The 4 methods of TreeNodeInterface are :
 You can manage some SEO options such as title, description and keywords with the `Umanit\Bundle\TreeBundle\Model\SeoInterface`
 and use the `Umanit\Bundle\TreeBundle\Model\SeoTrait` to automatically add an attribute "seoMetadata" to your entity
 
+## Create a link selector
+
+In order to create links to one or more nodes (or external links), it's possible !
+
+In your entity that will have the link, adds a relation with the entity `Umanit\Bundle\TreeBundle\Entity\Link`.
+
+In your forms, you can materialize the relation with the `Umanit\Bundle\TreeBundle\Form\Type\LinkType`. By default, you'll have 2 fields, "internal link" (a textfield) and "external link" (a select). By default, the select will be empty. You have to populate it by giving the models allowed. You can keep only one field with the options : `allow_internal: false` or `allow_external: false`. Note : only one field can be filled at the same time.
+
+### Usage example :
+
+```php
+$builder
+    ->add('link', 'umanit_link_type_translatable', array(
+        'label' => 'Link',
+        'models' => array(
+            'Page'    => 'Umanit\AppBundle\Entity\Page',
+            'Article' => 'Umanit\AppBundle\Entity\Article'
+        ),
+        'allow_external' => false
+    ))
+;
+```
+
 ## Twig helpers
 
 - `get_seo_title(default = "", override = false)`
@@ -71,3 +94,41 @@ an entity. You can add additional links with the "elements" parameter. An array 
 - `get_path(object)`
 
 Returns the route for the given entity (if the entity implements TreeNodeInterface)
+
+- `get_path_from_node(node)`
+
+Returns the route for the given node (instance of `Umanit\Bundle\TreeBundle\Entity\Node`)
+
+- `get_path_link(link)`
+
+Returns the path for the given link instance (instance of `Umanit\Bundle\TreeBundle\Entity\Link`).
+
+- `is_external_link(link)`
+
+Returns true if the given link targets an external URL (instance of `Umanit\Bundle\TreeBundle\Entity\Link`).
+
+## Configuration reference
+
+```
+umanit_tree:
+    locale:               '%locale%'                                    # Default locale to use
+    root_class:           \Umanit\Bundle\TreeBundle\Entity\RootEntity   # Class for the root node. If you have a homepage object, put it there
+
+    # Defines a controller to call by class. Foreach entity ("class"), set a controller and method to call
+    controllers_by_class:
+        class:                ~ # Required
+        controller:           ~ # Required
+
+
+    # Seo default values and translation domain
+    seo:
+        default_title:        'Umanit Tree'
+        default_description:  'Umanit tree bundle'
+        default_keywords:     'umanit, web, bundle, symfony2'
+        translation_domain:   'messages'
+
+    # Root node and translation domain for breadcrumb elements
+    breadcrumb:
+        root_name:            'Home'
+        translation_domain:   'messages'
+```
