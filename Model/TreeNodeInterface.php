@@ -10,6 +10,7 @@ use Umanit\Bundle\CmsBundle\Entity\Node;
 interface TreeNodeInterface
 {
     const ROOT_NODE_PATH = 'umanit-root-node/';
+    const UNKNOWN_LOCALE = 'unknown';
 
     /**
      * @return string

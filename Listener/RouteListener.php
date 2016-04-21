@@ -65,19 +65,8 @@ class RouteListener
                 'path'   => TreeNodeInterface::ROOT_NODE_PATH
             ));
         } else {
-            // Search for a node in the current locale
-            $node = $repository->findOneBy(array(
-                'path'   => $path . '/',
-                'locale' => $locale
-            ));
-        }
-
-        // Redirect to the node in the default locale if node not found
-        if (!$node && ($locale !== $this->defaultLocale)) {
-            $node = $repository->findOneBy(array(
-                'path'   => $path . '/',
-                'locale' => $this->defaultLocale
-            ));
+            // Search for an other node
+            $node = $repository->getByPath($path, $locale);
         }
 
         if ($node) {

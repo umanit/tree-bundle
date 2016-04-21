@@ -15,7 +15,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *     @ORM\Index(name="search_idx_2", columns={"className", "classId", "locale"}),
  *     @ORM\Index(name="search_idx_3", columns={"className", "classId"})
  * })
- * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\MaterializedPathRepository")
+ * @ORM\Entity(repositoryClass="Umanit\Bundle\TreeBundle\Repository\NodeRepository")
  * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
  * @Gedmo\Tree(type="materializedPath")
  */

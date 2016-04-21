@@ -138,18 +138,19 @@ class NodeRouter
             );
         }
 
-        $query = array(
-            'className' => $className,
-            'classId'   => $classId,
-            'locale'    => $locale ? $locale : $this->requestStack->getCurrentRequest()->getLocale(),
-            'parent'    => $defaultParent
-        );
-
+        $parent = $defaultParent;
         if (!is_null($referenceNode) && $root === false) {
-            $query['parent'] = $referenceNode;
+            $parent = $referenceNode;
         }
 
-        if ((!$node = $manager->findOneBy($query)) && (!is_null($referenceNode))) {
+        $node = $manager->searchNode(
+            $className,
+            $classId,
+            $parent,
+            $locale ? $locale : $this->requestStack->getCurrentRequest()->getLocale()
+        );
+
+        if (!$node && !is_null($referenceNode)) {
             $node = $this->buildNode($className, $classId, $referenceNode->getParent(), false, $locale);
         }
 

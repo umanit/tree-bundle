@@ -17,7 +17,7 @@
         "gedmo/doctrine-extensions": "~2.3",
         "symfony/framework-bundle": ">=2.3"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "target-dir": "Umanit/Bundle/TreeBundle",
     "autoload": {
         "psr-0": { "Umanit\\Bundle\\TreeBundle": "" }

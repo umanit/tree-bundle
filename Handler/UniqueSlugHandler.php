@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Gedmo\Sluggable\SluggableListener;
 use Gedmo\Sluggable\Mapping\Event\SluggableAdapter;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Umanit\Bundle\TreeBundle\Entity\Node;
 
 class UniqueSlugHandler implements SlugHandlerInterface
 {
@@ -75,17 +76,20 @@ class UniqueSlugHandler implements SlugHandlerInterface
      */
     public function onSlugCompletion(SluggableAdapter $ea, array &$config, $object, &$slug)
     {
-        $index      = 1;
-        $repository = $this->om->getRepository(get_class($object));
+        $index = 1;
 
-        $originalSlug = $slug;
-        while ($retrieved = $repository->findOneBy(array('slug' => $slug, 'parent' => $object->getParent(), 'locale' => $object->getLocale()))) {
-            if ($object->getId() == $retrieved->getId()) {
-                break;
+        if ($object instanceof Node) {
+            $repository = $this->om->getRepository(get_class($object));
+
+            $originalSlug = $slug;
+            while ($retrieved = $repository->getBySlug($slug, $object->getParent(), $object->getLocale())) {
+                if ($object->getId() == $retrieved->getId()) {
+                    break;
+                }
+
+                $slug = $originalSlug . '-' . $index;
+                $index++;
             }
-
-            $slug = $originalSlug . '-' . $index;
-            $index++;
         }
     }
 

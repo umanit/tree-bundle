@@ -3,6 +3,7 @@
 namespace Umanit\Bundle\TreeBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
+use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 
 /**
  * Tree node trait
@@ -18,7 +19,7 @@ trait TreeNodeTrait
      * @var string
      * @ORM\Column(name="title", type="string", length=255)
      */
-    protected $locale = 'unknown';
+    protected $locale = TreeNodeInterface::UNKNOWN_LOCALE;
 
     /**
      * Return the document locale
