@@ -61,7 +61,6 @@ class UniqueSlugHandler implements SlugHandlerInterface
      */
     public function postSlugBuild(SluggableAdapter $ea, array &$config, $object, &$slug)
     {
-
     }
 
     /**
@@ -82,7 +81,7 @@ class UniqueSlugHandler implements SlugHandlerInterface
             $repository = $this->om->getRepository(get_class($object));
 
             $originalSlug = $slug;
-            while ($retrieved = $repository->getBySlug($slug, $object->getParent(), $object->getLocale())) {
+            while ($retrieved = $repository->getBySlug($slug, $object->getLocale())) {
                 if ($object->getId() == $retrieved->getId()) {
                     break;
                 }
@@ -109,6 +108,5 @@ class UniqueSlugHandler implements SlugHandlerInterface
      */
     public static function validate(array $options, ClassMetadata $meta)
     {
-
     }
 }

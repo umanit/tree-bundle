@@ -52,7 +52,7 @@ class DoctrineTreeNodeListener
                     ->setNodeName($entity->getTreeNodeName())
                     ->setClassName($className)
                     ->setClassId($entity->getId())
-                    ->setLocale($this->locale)
+                    ->setLocale($entity->getLocale())
                 ;
 
                 $manager->persist($node);

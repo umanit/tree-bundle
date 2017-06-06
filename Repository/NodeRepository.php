@@ -27,10 +27,12 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
         $qbv = $this->getEntityManager()->createQueryBuilder();
 
         if ($locale !== TreeNodeInterface::UNKNOWN_LOCALE) {
-            $qb->andWhere($qbv->expr()->orX(
-                $qbv->expr()->eq('n.locale', $locale),
-                $qbv->expr()->eq('n.locale', TreeNodeInterface::UNKNOWN_LOCALE)
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->eq('n.locale', ':locale'),
+                $qb->expr()->eq('n.locale', ':unknow_locale')
             ));
+            $qb->setParameter('locale', $locale);
+            $qb->setParameter('unknow_locale', TreeNodeInterface::UNKNOWN_LOCALE);
         } else {
             $qb->andWhere('n.locale = :locale');
             $qb->setParameter('locale', TreeNodeInterface::UNKNOWN_LOCALE);
@@ -52,7 +54,7 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
      * Returns a node that match the given path for the given locale (if a locale is set, the "UNKNOWN_LOCALE" will be
      * added to the query)
      *
-     * @param  string $slug   Slug to search
+     * @param  string $path   Slug to search
      * @param  string $locale Locale of the object searched
      *
      * @return Node|null
@@ -61,17 +63,17 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
     {
         $qb = $this
             ->createQueryBuilder('n')
-            ->where('n.slug = :slug')
-            ->setParameter('slug', $slug)
+            ->where('n.path = :path')
+            ->setParameter('path', $path)
         ;
 
-        $qbv = $this->getEntityManager()->createQueryBuilder();
-
         if ($locale !== TreeNodeInterface::UNKNOWN_LOCALE) {
-            $qb->andWhere($qbv->expr()->orX(
-                $qbv->expr()->eq('n.locale', $locale),
-                $qbv->expr()->eq('n.locale', TreeNodeInterface::UNKNOWN_LOCALE)
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->eq('n.locale', ':locale'),
+                $qb->expr()->eq('n.locale', ':unknow_locale')
             ));
+            $qb->setParameter('locale', $locale);
+            $qb->setParameter('unknow_locale', TreeNodeInterface::UNKNOWN_LOCALE);
         } else {
             $qb->andWhere('n.locale = :locale');
             $qb->setParameter('locale', TreeNodeInterface::UNKNOWN_LOCALE);

@@ -116,8 +116,9 @@ umanit_tree:
 
     # Defines a controller to call by class. Foreach entity ("class"), set a controller and method to call
     controllers_by_class:
-        class:                ~ # Required
-        controller:           ~ # Required
+        -
+            class:                ~ # Required. Ex. : AppBundle\Entity\Page
+            controller:           ~ # Required. Ex. : AppBundle:Page:show
 
 
     # Seo default values and translation domain

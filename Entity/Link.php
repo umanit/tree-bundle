@@ -12,7 +12,6 @@ use Symfony\Component\Validator\Context\ExecutionContext;
  *
  * @ORM\Table(name="treebundle_link")
  * @ORM\Entity()
- * @Gedmo\TranslationEntity(class="Umanit\Bundle\TreeBundle\Entity\Translation\LinkTranslation")
  * @Assert\Callback(methods={"validateNotBoth"})
  */
 class Link
@@ -38,11 +37,6 @@ class Link
      * @ORM\Column(name="internalUri", type="text", nullable=true)
      */
     protected $internalLink;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Umanit\Bundle\TreeBundle\Entity\Translation\LinkTranslation", mappedBy="object", cascade={"persist", "remove"})
-     */
-    protected $translations;
 
     /**
      * Assert that externalLink and internalLink are not filled
@@ -127,48 +121,6 @@ class Link
     public function setInternalLink($internalLink)
     {
         $this->internalLink = $internalLink;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of Translations
-     *
-     * @return array
-     */
-    public function getTranslations()
-    {
-        return $this->translations;
-    }
-
-    /**
-     * Set the value of Translations
-     *
-     * @param array $translations
-     * @return self
-     */
-    public function setTranslations($translations)
-    {
-        $this->translations = $translations;
-        foreach ($this->translations as &$translation) {
-            $translation->setObject($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add a Translation
-     *
-     * @param mixed $translation
-     * @return self
-     */
-    public function addTranslation($translation)
-    {
-        if (!$this->translations->contains($translation)) {
-            $this->translations[] = $translation;
-            $translation->setObject($this);
-        }
 
         return $this;
     }

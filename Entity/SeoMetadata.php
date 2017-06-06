@@ -12,7 +12,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * @ORM\Table(name="treebundle_seometadata")
  * @ORM\Entity()
  * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- * @Gedmo\TranslationEntity(class="Umanit\Bundle\TreeBundle\Entity\Translation\SeoMetadataTranslation")
  */
 class SeoMetadata
 {
@@ -42,15 +41,6 @@ class SeoMetadata
      * @ORM\Column(name="keywords", type="text",  nullable=true)
      */
     protected $keywords;
-
-    /**
-     * @ORM\OneToMany(
-     *   targetEntity="Umanit\Bundle\TreeBundle\Entity\Translation\SeoMetadataTranslation",
-     *   mappedBy="object",
-     *   cascade={"persist", "remove"}
-     * )
-     */
-    private $translations;
 
     /**
      * Get the value of Title
@@ -120,50 +110,6 @@ class SeoMetadata
     public function setKeywords($keywords)
     {
         $this->keywords = $keywords;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of Translations
-     *
-     * @return SeoMetadataTranslation[]
-     */
-    public function getTranslations()
-    {
-        return $this->translations;
-    }
-
-    /**
-     * Set the value of Translations
-     *
-     * @param SeoMetadataTranslation[] $translations
-     *
-     * @return self
-     */
-    public function setTranslations($translations)
-    {
-        $this->translations = $translations;
-        foreach ($this->translations as &$translation) {
-            $translation->setObject($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add a translation
-     *
-     * @param SeoMetadataTranslation $t
-     *
-     * @return self
-     */
-    public function addTranslation(SeoMetadataTranslation $t)
-    {
-        if (!$this->translations->contains($t)) {
-            $this->translations[] = $t;
-            $t->setObject($this);
-        }
 
         return $this;
     }

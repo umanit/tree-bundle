@@ -18,7 +18,7 @@ services:
             - '%umanit_tree.controllers_by_class%'
             - '%umanit_tree.locale%'
         tags:
-            - { name: 'kernel.event_listener', event:' kernel.request', priority: -10 }
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: -10 }
 
     # Router for nodes
     umanit.tree.router:

@@ -17,7 +17,7 @@ trait TreeNodeTrait
 
     /**
      * @var string
-     * @ORM\Column(name="locale", type="string", length=6)
+     * @ORM\Column(name="locale", type="string", length=7)
      */
     protected $locale = TreeNodeInterface::UNKNOWN_LOCALE;
 
