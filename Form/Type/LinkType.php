@@ -4,6 +4,7 @@ namespace Umanit\Bundle\TreeBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
@@ -97,6 +98,18 @@ class LinkType extends AbstractType
             }
         });
     }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'data_class' => 'Umanit\Bundle\TreeBundle\Entity\Link',
+            'models' => array(),
+            'allow_internal' => true,
+            'allow_external' => true,
+            'translation_domain' => 'UmanitTreeBundle'
+        ));
+    }
+
 
     /**
      * @param OptionsResolverInterface $resolver
