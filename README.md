@@ -15,8 +15,58 @@ umanit_tree:
 
 Register the bundle to your `app/AppKernel.php`
 
-```php           
+```php
     new Umanit\Bundle\TreeBundle\UmanitTreeBundle(),
+```
+
+Add Gedmo configuration in your services.yml
+
+```yaml
+services:
+    # Doctrine Extension listeners to handle behaviors
+    gedmo.listener.tree:
+        class: Gedmo\Tree\TreeListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.translatable:
+        class: Gedmo\Translatable\TranslatableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+            - [ setDefaultLocale, [ %locale% ] ]
+            - [ setTranslationFallback, [ false ] ]
+
+    gedmo.listener.timestampable:
+        class: Gedmo\Timestampable\TimestampableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.sluggable:
+        class: Gedmo\Sluggable\SluggableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.sortable:
+        class: Gedmo\Sortable\SortableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
+    gedmo.listener.loggable:
+        class: Gedmo\Loggable\LoggableListener
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+        calls:
+            - [ setAnnotationReader, [ "@annotation_reader" ] ]
 ```
 
 Update your database schema to add our model
@@ -99,7 +149,7 @@ Returns the route for the given entity (if the entity implements TreeNodeInterfa
 
 Returns the route for the given node (instance of `Umanit\Bundle\TreeBundle\Entity\Node`)
 
-- `get_path_link(link)`
+- `get_path_from_link(link)`
 
 Returns the path for the given link instance (instance of `Umanit\Bundle\TreeBundle\Entity\Link`).
 
@@ -109,7 +159,7 @@ Returns true if the given link targets an external URL (instance of `Umanit\Bund
 
 ## Configuration reference
 
-```
+```yaml
 umanit_tree:
     locale:               '%locale%'                                    # Default locale to use
     root_class:           \Umanit\Bundle\TreeBundle\Entity\RootEntity   # Class for the root node. If you have a homepage object, put it there
