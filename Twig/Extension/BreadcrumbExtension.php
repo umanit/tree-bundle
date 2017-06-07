@@ -73,7 +73,7 @@ class BreadcrumbExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_Function('get_breadcrumb', 'getBreadcrumb')
+            new \Twig_Function('get_breadcrumb', [$this, 'getBreadcrumb'])
         );
     }
 

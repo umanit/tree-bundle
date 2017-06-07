@@ -42,9 +42,9 @@ class SeoExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_Function('get_seo_title', 'getSeoTitle'),
-            new \Twig_Function('get_seo_description', 'getSeoDescription'),
-            new \Twig_Function('get_seo_keywords', 'getSeoKeywords')
+            new \Twig_Function('get_seo_title', [$this, 'getSeoTitle']),
+            new \Twig_Function('get_seo_description', [$this, 'getSeoDescription']),
+            new \Twig_Function('get_seo_keywords', [$this, 'getSeoKeywords'])
         );
     }
 

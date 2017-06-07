@@ -36,11 +36,11 @@ class LinkExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_Function('get_path_from_link', 'getPathLink'),
-            new \Twig_Function('is_external_link', 'isExternalLink'),
-            new \Twig_Function('get_path_from_node', 'getNodePath'),
-            new \Twig_Function('get_path', 'getPath'),
-            new \Twig_Function('clear_path_cache', 'clearCache')
+            new \Twig_Function('get_path_from_link', [$this, 'getPathLink']),
+            new \Twig_Function('is_external_link', [$this, 'isExternalLink']),
+            new \Twig_Function('get_path_from_node', [$this, 'getNodePath']),
+            new \Twig_Function('get_path', [$this, 'getPath']),
+            new \Twig_Function('clear_path_cache', [$this, 'clearCache'])
         );
     }
 
