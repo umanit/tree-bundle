@@ -48,14 +48,14 @@ trait TreeNodeTrait
      */
     public function getParents()
     {
-        return is_array($this->parents) ? $this->parents : array();
+        return empty($this->parents) ? array() : $this->parents;
     }
 
     /**
      * Set parents node
      * @param mixed[] $parents
      */
-    public function setParents(array $parents)
+    public function setParents($parents)
     {
         $this->parents = $parents;
     }

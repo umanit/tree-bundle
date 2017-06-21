@@ -57,6 +57,8 @@ class DoctrineTreeNodeListener
 
                 $manager->persist($node);
                 $manager->flush($node);
+            } else {
+                $node = array();
             }
 
             $this->registerParents($entity, $manager, $node);
@@ -80,7 +82,6 @@ class DoctrineTreeNodeListener
                 'classId'   => $entity->getId(),
                 'locale'    => $entity->getLocale()
             ));
-
             if (empty($treeNodes)) {
                 $this->postPersist($args);
                 return;
@@ -165,39 +166,59 @@ class DoctrineTreeNodeListener
     {
         $parents = $entity->getParents();
 
+        $nodeKeep = array();
         // Entity parents
         foreach ($parents as $parent) {
+            $node = null;
             if ($parent instanceof TreeNodeInterface) {
-                $nodes = $manager->getRepository('UmanitTreeBundle:Node')->findOneBy(array(
-                    'className' => $manager->getClassMetadata(get_class($parent))->getName(),
-                    'classId'   => $parent->getId(),
-                    'locale'    => $treeNode->getLocale()
-                ));
+                $node = $manager->getRepository('UmanitTreeBundle:Node')->findOneBy(
+                    array(
+                        'className' => $manager->getClassMetadata(get_class($parent))->getName(),
+                        'classId' => $parent->getId(),
+                        'locale' => $entity->getLocale()
+                    )
+                );
+            } elseif ($parent instanceof Node) {
+                $node = $parent;
+            }
 
-                // Nodes from the parent
-                if (!empty($node)) {
-                    foreach ($treeNodes as $treeNode) {
-                        // Checks if we already have this parent
-                        $nodeExists = false;
+            // Nodes from the parent
+            if (!empty($node) && empty($treeNodes)) {
+                $newNode = new Node();
+                $newNode
+                    ->setNodeName($entity->getTreeNodeName())
+                    ->setClassName($manager->getClassMetadata(get_class($entity))->getName())
+                    ->setClassId($entity->getId())
+                    ->setLocale($node->getLocale())
+                    ->setParent($node)
+                ;
 
-                        if ($treeNode->getParent() && $treeNode->getParent()->getId() == $node->getId()) {
-                            $nodeExists = true;
-                            break;
-                        }
+                $manager->persist($newNode);
+                $manager->flush($newNode);
+            } elseif (!empty($node)) {
+                foreach ($treeNodes as $treeNode) {
+                    // Checks if we already have this parent
+                    $nodeExists = false;
 
-                        // If not, we create it
-                        if (!$nodeExists) {
-                            $newNode = new Node();
-                            $newNode
-                                ->setNodeName($entity->getTreeNodeName())
-                                ->setClassName($manager->getClassMetadata(get_class($entity))->getName())
-                                ->setClassId($entity->getId())
-                                ->setLocale($node->getLocale())
-                                ->setParent($node)
-                            ;
+                    if ($treeNode->getParent() && $treeNode->getParent()->getId() == $node->getId()) {
+                        $nodeExists = true;
+                        $nodeKeep[] = $treeNode->getParent()->getId();
+                        break;
+                    }
 
-                            $manager->persist($newNode);
-                        }
+                    // If not, we create it
+                    if (!$nodeExists) {
+                        $newNode = new Node();
+                        $newNode
+                            ->setNodeName($entity->getTreeNodeName())
+                            ->setClassName($manager->getClassMetadata(get_class($entity))->getName())
+                            ->setClassId($entity->getId())
+                            ->setLocale($node->getLocale())
+                            ->setParent($node)
+                        ;
+
+                        $manager->persist($newNode);
+                        $manager->flush($newNode);
                     }
                 }
             }
@@ -211,13 +232,12 @@ class DoctrineTreeNodeListener
                 || (!$treeNode->getParent() && ($entity->createRootNodeByDefault()
                     || !$entity->getParents()))
                 || ($treeNode->getPath() == TreeNodeInterface::ROOT_NODE_PATH)
-
+                || in_array($treeNode->getParent()->getId(), $nodeKeep)
             ) {
-                return;
+                continue;
             }
-
             $manager->remove($treeNode);
-            $manager->flush();
+            $manager->flush($treeNode);
         }
     }
 }

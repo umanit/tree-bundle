@@ -18,3 +18,9 @@
             {% endfor %}
     {% endspaceless %}
 {% endblock %}
+
+{% block umanit_node_type_widget %}
+    {{ form_label(child) }}
+    {{ form_widget(child) }}
+    {{ form_errors(child) }}
+{% endblock %}
