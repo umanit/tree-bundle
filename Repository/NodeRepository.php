@@ -103,11 +103,16 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
             ->createQueryBuilder('n')
             ->where('n.className = :className')
             ->andWhere('n.classId = :classId')
-            ->andWhere('n.parent = :parent')
             ->setParameter('className', $className)
             ->setParameter('classId', $classId)
-            ->setParameter('parent', $parent)
         ;
+
+        if (empty($parent)) {
+            $qb->andWhere('n.parent is null');
+        } else  {
+            $qb->andWhere('n.parent = :parent')
+                ->setParameter('parent', $parent);
+        }
 
         $qbv = $this->getEntityManager()->createQueryBuilder();
 
