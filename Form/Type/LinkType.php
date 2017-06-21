@@ -66,7 +66,7 @@ class LinkType extends AbstractType
                 $data[$displayName] = array();
 
                 foreach ($entities as $entity) {
-                    $data[$displayName][$entity->getId(). ';' . get_class($entity)] = $entity->__toString();
+                    $data[$displayName][$entity->__toString()] = $entity->getId(). ';' . get_class($entity);
                 }
             }
 
