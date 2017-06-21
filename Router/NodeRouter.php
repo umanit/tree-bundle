@@ -185,7 +185,7 @@ class NodeRouter
         }
 
         return $this->router->generate('umanit.tree.default', array(
-            'path' => substr($node->getPath(), 0, strlen($node->getPath())-1)
+            'path' => substr($node->getPath(), 1)
         ), $absolute);
     }
 }
