@@ -8,11 +8,11 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
 {
     /**
      * Returns a node that match the given slug for the given locale (if a locale is set, the "UNKNOWN_LOCALE" will be
-     * added to the query)
+     * added to the query).
      *
-     * @param  string $slug   Slug to search
-     * @param  string $locale Locale of the object searched
-     * @param  mixed  $parent Parent of the object
+     * @param string $slug   Slug to search
+     * @param string $locale Locale of the object searched
+     * @param mixed  $parent Parent of the object
      *
      * @return Node|null
      */
@@ -52,10 +52,10 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
 
     /**
      * Returns a node that match the given path for the given locale (if a locale is set, the "UNKNOWN_LOCALE" will be
-     * added to the query)
+     * added to the query).
      *
-     * @param  string $path   Slug to search
-     * @param  string $locale Locale of the object searched
+     * @param string $path   Slug to search
+     * @param string $locale Locale of the object searched
      *
      * @return Node|null
      */
@@ -88,12 +88,12 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
 
     /**
      * Search a node for the given class name and class identifier (if a locale is set, the "UNKNOWN_LOCALE" will be
-     * added to the query)
+     * added to the query).
      *
-     * @param  string $className Class full namespace
-     * @param  int    $classId   Class identifier
-     * @param  Node   $parent    Node parent of the current node
-     * @param  string $locale    Locale of the content
+     * @param string $className Class full namespace
+     * @param int    $classId   Class identifier
+     * @param Node   $parent    Node parent of the current node
+     * @param string $locale    Locale of the content
      *
      * @return Node|null
      */
@@ -109,7 +109,7 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
 
         if (empty($parent)) {
             $qb->andWhere('n.parent is null');
-        } else  {
+        } else {
             $qb->andWhere('n.parent = :parent')
                 ->setParameter('parent', $parent);
         }
@@ -117,10 +117,13 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
         $qbv = $this->getEntityManager()->createQueryBuilder();
 
         if ($locale !== TreeNodeInterface::UNKNOWN_LOCALE) {
-            $qb->andWhere($qbv->expr()->orX(
-                $qbv->expr()->eq('n.locale', $locale),
-                $qbv->expr()->eq('n.locale', TreeNodeInterface::UNKNOWN_LOCALE)
+            $qb->andWhere($qb->expr()->orX(
+                $qb->expr()->eq('n.locale', ':locale'),
+                $qb->expr()->eq('n.locale', ':unknow_locale')
             ));
+
+            $qb->setParameter('locale', $locale);
+            $qb->setParameter('unknow_locale', TreeNodeInterface::UNKNOWN_LOCALE);
         } else {
             $qb->andWhere('n.locale = :locale');
             $qb->setParameter('locale', TreeNodeInterface::UNKNOWN_LOCALE);
