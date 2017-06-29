@@ -232,7 +232,7 @@ class DoctrineTreeNodeListener
                 || (!$treeNode->getParent() && ($entity->createRootNodeByDefault()
                     || !$entity->getParents()))
                 || ($treeNode->getPath() == TreeNodeInterface::ROOT_NODE_PATH)
-                || in_array($treeNode->getParent()->getId(), $nodeKeep)
+                || (!empty($treeNode->getParent()) && in_array($treeNode->getParent()->getId(), $nodeKeep))
             ) {
                 continue;
             }
