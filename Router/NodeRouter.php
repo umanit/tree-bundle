@@ -55,18 +55,26 @@ class NodeRouter
      * @param bool  $root         Use root node as reference
      * @param bool  $absolute     Absolute URL or not
      * @param bool  $locale       Locale to use
+     * @param array $parameters   URL parameters
      *
      * @return string
      */
-    public function getPath($object, $parentObject = null, $root = false, $absolute = false, $locale = null)
-    {
+    public function getPath(
+        $object,
+        $parentObject = null,
+        $root = false,
+        $absolute = false,
+        $locale = null,
+        $parameters = []
+    ) {
         return $object ? $this->getPathClass(
             $this->doctrine->getManager()->getClassMetadata(get_class($object))->getName(),
             $object->getId(),
             $parentObject,
             $root,
             $absolute,
-            $locale
+            $locale,
+            $parameters
         ) : '#';
     }
 
@@ -79,11 +87,19 @@ class NodeRouter
      * @param bool   $root         Use root node as reference
      * @param bool   $absolute     Absolute URL or not
      * @param bool   $locale       Locale to use
+     * @param array  $parameters   URL parameters
      *
      * @return string
      */
-    public function getPathClass($className, $classId, $parentObject = null, $root = false, $absolute = false, $locale = null)
-    {
+    public function getPathClass(
+        $className,
+        $classId,
+        $parentObject = null,
+        $root = false,
+        $absolute = false,
+        $locale = null,
+        $parameters = []
+    ) {
         $referenceNode = $this->requestStack->getCurrentRequest()->attributes->get('contentNode', null);
         if ($referenceNode === null || $referenceNode->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
             $referenceNode = null;
@@ -101,7 +117,7 @@ class NodeRouter
 
         $node = $this->buildNode($className, $classId, $referenceNode, $root, $locale);
 
-        return is_null($node) ? '#' : $this->getPathByNode($node, $absolute);
+        return is_null($node) ? '#' : $this->getPathByNode($node, $absolute, $parameters);
     }
 
     /**
@@ -173,22 +189,23 @@ class NodeRouter
     /**
      * Returns the relative path to access the given node.
      *
-     * @param Node $node
-     * @param bool $absolute Absolute URL or not
+     * @param Node  $node
+     * @param bool  $absolute   Absolute URL or not
+     * @param array $parameters URL parameters
      *
      * @return string
      */
-    public function getPathByNode(Node $node, $absolute = false)
+    public function getPathByNode(Node $node, $absolute = false, $parameters = [])
     {
         // Root page
         if ($node->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
-            return $this->router->generate('umanit.tree.default', array(
+            return $this->router->generate('umanit.tree.default', array_merge(array(
                 'path' => '',
-            ));
+            ), $parameters));
         }
 
-        return $this->router->generate('umanit.tree.default', array(
+        return $this->router->generate('umanit.tree.default', array_merge(array(
             'path' => substr($node->getPath(), 1),
-        ), $absolute);
+        ), $parameters), $absolute);
     }
 }

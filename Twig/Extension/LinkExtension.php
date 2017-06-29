@@ -20,8 +20,9 @@ class LinkExtension extends \Twig_Extension
     protected $router;
 
     /**
-     * Constuctor
-     * @param Registry $doctrine
+     * Constuctor.
+     *
+     * @param Registry   $doctrine
      * @param NodeRouter $router
      */
     public function __construct(Registry $doctrine, NodeRouter $router)
@@ -31,7 +32,7 @@ class LinkExtension extends \Twig_Extension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
@@ -40,13 +41,15 @@ class LinkExtension extends \Twig_Extension
             new \Twig_Function('is_external_link', [$this, 'isExternalLink']),
             new \Twig_Function('get_path_from_node', [$this, 'getNodePath']),
             new \Twig_Function('get_path', [$this, 'getPath']),
-            new \Twig_Function('clear_path_cache', [$this, 'clearCache'])
+            new \Twig_Function('clear_path_cache', [$this, 'clearCache']),
         );
     }
 
     /**
-     * Returns path for the given Link
+     * Returns path for the given Link.
+     *
      * @param Link $link
+     *
      * @return string
      */
     public function getPathLink(Link $link)
@@ -62,8 +65,10 @@ class LinkExtension extends \Twig_Extension
 
     /**
      * Check if the link is external.
+     *
      * @param Link $link
-     * @return boolean
+     *
+     * @return bool
      */
     public function isExternalLink(Link $link)
     {
@@ -71,30 +76,37 @@ class LinkExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the path of the given node
-     * @param Node $node
+     * Returns the path of the given node.
+     *
+     * @param Node  $node
+     * @param bool  $absolute   Absolute URL
+     * @param array $parameters URL parameters
+     *
      * @return string
      */
-    public function getNodePath(Node $node)
+    public function getNodePath(Node $node, $absolute = false, $parameters = [])
     {
-        return $this->router->getPathByNode($node);
+        return $this->router->getPathByNode($node, $absolute, $parameters);
     }
 
     /**
-     * Get path for the given object (proxy to the service)
+     * Get path for the given object (proxy to the service).
+     *
      * @param mixed $object       Entity searched
      * @param mixed $parentObject Object parent from which we want to get the nodes
      * @param bool  $root         Use root node as reference
-     * @param bool  $absolute     URL absolue ou non
+     * @param bool  $absolute     Absolute URL
+     * @param array $parameters   URL parameters
+     *
      * @return string
      */
-    public function getPath($object, $parentObject = null, $root = false, $absolute = false)
+    public function getPath($object, $parentObject = null, $root = false, $absolute = false, $parameters = [])
     {
-        return $this->router->getPath($object, $parentObject, $root, $absolute);
+        return $this->router->getPath($object, $parentObject, $root, $absolute, $parameters);
     }
 
     /**
-     * Clear router's paths cache
+     * Clear router's paths cache.
      */
     public function clearCache()
     {
@@ -102,7 +114,7 @@ class LinkExtension extends \Twig_Extension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

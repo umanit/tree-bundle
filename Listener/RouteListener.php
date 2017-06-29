@@ -61,9 +61,7 @@ class RouteListener
 
         // Root node
         if ($path === '/') {
-            $node = $repository->findOneBy(array(
-                'path'   => TreeNodeInterface::ROOT_NODE_PATH
-            ));
+            $node = $repository->getByPath(TreeNodeInterface::ROOT_NODE_PATH, $locale);
         } else {
             // Search for an other node
             $node = $repository->getByPath($path, $locale);

@@ -141,11 +141,11 @@ If you set override to true, the value of the "default" parameter will be always
 Returns the breadcrumb (array of name/link). It will parse all parents of the current entity if the route is managed by
 an entity. You can add additional links with the "elements" parameter. An array of name/link.
 
-- `get_path(object)`
+- `get_path(object, parentObject = null, root = false, absolute = false, parameters = [)`
 
 Returns the route for the given entity (if the entity implements TreeNodeInterface)
 
-- `get_path_from_node(node)`
+- `get_path_from_node(node, absolute = false, parameters = [])`
 
 Returns the route for the given node (instance of `Umanit\Bundle\TreeBundle\Entity\Node`)
 
