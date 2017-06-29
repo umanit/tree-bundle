@@ -103,6 +103,40 @@ The 4 methods of TreeNodeInterface are :
 You can manage some SEO options such as title, description and keywords with the `Umanit\Bundle\TreeBundle\Model\SeoInterface`
 and use the `Umanit\Bundle\TreeBundle\Model\SeoTrait` to automatically add an attribute "seoMetadata" to your entity
 
+## Create a Parent Node selector
+
+### Usage example :
+
+```php
+$builder
+    ->add(
+        'parents',
+        \Umanit\Bundle\TreeBundle\Form\Type\TreeNodeType::class,
+        array(
+            'required'     => false,
+            'by_reference' => false,
+        )
+    )
+;
+```
+
+## Create SEO Metadata Form
+
+### Usage example :
+
+```php
+$builder
+    ->add(
+        'seoMetadata',
+        \Umanit\Bundle\TreeBundle\Form\Type\SeoMetadataType::class,
+        array(
+            'required'     => false,
+        )
+    )
+;
+```
+
+
 ## Create a link selector
 
 In order to create links to one or more nodes (or external links), it's possible !

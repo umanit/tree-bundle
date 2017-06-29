@@ -2,3 +2,6 @@ link.internal: Lien vers page interne
 link.external: Lien vers page externe
 or: OU
 error.link.both_filled: Vous devez remplir page interne OU lien externe, et non les deux
+seo.title: Titre
+seo.description: Description
+seo.keywords: Mots clés
