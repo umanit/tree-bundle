@@ -63,8 +63,8 @@ class SeoExtension extends \Twig_Extension
         }
 
         if ($contentObject = $this->request->attributes->get('contentObject', null)) {
-            if ($contentObject instanceof SeoInterface) {
-                return $contentObject->getSeoTitle() ?: $this->translator->trans(
+            if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoTitle())) {
+                return $this->translator->trans(
                     $this->configuration['default_title'],
                     array(),
                     $this->configuration['translation_domain']
@@ -94,8 +94,8 @@ class SeoExtension extends \Twig_Extension
         }
 
         if ($contentObject = $this->request->attributes->get('contentObject', null)) {
-            if ($contentObject instanceof SeoInterface) {
-                return $contentObject->getSeoDescription() ?: $this->translator->trans(
+            if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoDescription())) {
+                return $this->translator->trans(
                     $this->configuration['default_description'],
                     array(),
                     $this->configuration['translation_domain']
@@ -125,8 +125,8 @@ class SeoExtension extends \Twig_Extension
         }
 
         if ($contentObject = $this->request->attributes->get('contentObject', null)) {
-            if ($contentObject instanceof SeoInterface) {
-                return $contentObject->getSeoKeywords() ?: $this->translator->trans(
+            if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoKeywords())) {
+                return $this->translator->trans(
                     $this->configuration['default_keywords'],
                     array(),
                     $this->configuration['translation_domain']

@@ -47,7 +47,7 @@ trait SeoTrait
      */
     public function getSeoTitle()
     {
-        return $this->seoMetadata->getTitle();
+        return $this->seoMetadata == null ? '' : $this->seoMetadata->getTitle();
     }
 
     /**
@@ -55,7 +55,7 @@ trait SeoTrait
      */
     public function getSeoDescription()
     {
-        return $this->seoMetadata->getDescription();
+        return $this->seoMetadata == null ? '' : $this->seoMetadata->getDescription();
     }
 
     /**
@@ -63,6 +63,6 @@ trait SeoTrait
      */
     public function getSeoKeywords()
     {
-        return $this->seoMetadata->getKeywords();
+        return $this->seoMetadata == null ? '' : $this->seoMetadata->getKeywords();
     }
 }

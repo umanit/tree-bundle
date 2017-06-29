@@ -76,3 +76,9 @@ services:
             - ['setTranslator', ['@translator.default']]
         tags:
             - { name: 'form.type', alias: umanit_node_type }
+
+    # Link form type
+    umanit.tree.form.type.link:
+        class: Umanit\Bundle\TreeBundle\Form\Type\SeoMetadataType
+        tags:
+            - { name: 'form.type', alias: umanit_seo_metadata_type }
