@@ -43,6 +43,12 @@ class SeoMetadata
     protected $keywords;
 
     /**
+     * @var string
+     * @ORM\Column(name="url", type="string", length=511, nullable=true)
+     */
+    protected $url;
+
+    /**
      * Get the value of Title
      *
      * @return string
@@ -136,5 +142,21 @@ class SeoMetadata
         $this->id = $id;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 }
