@@ -10,8 +10,6 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\CallbackValidator;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormError;
 
 class LinkType extends AbstractType
@@ -32,12 +30,12 @@ class LinkType extends AbstractType
      */
     public function __construct(Registry $doctrine, Translator $translator)
     {
-        $this->doctrine = $doctrine;
+        $this->doctrine   = $doctrine;
         $this->translator = $translator;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -50,8 +48,8 @@ class LinkType extends AbstractType
             $builder
                 ->add('externalLink', 'text', array(
                     'translation_domain' => $options['translation_domain'],
-                    'label' => 'link.external',
-                    'required' => false
+                    'label'              => $options['label_external'],
+                    'required'           => false,
                 ))
             ;
         }
@@ -60,23 +58,27 @@ class LinkType extends AbstractType
             $data = array();
 
             foreach ($options['models'] as $displayName => $classPath) {
-                $repo = $this->doctrine->getRepository($classPath);
-                $entities = $repo->findAll();
+                $repo     = $this->doctrine->getRepository($classPath);
+                $filters  = isset($options['query_filters'][$classPath])
+                    ? $options['query_filters'][$classPath]
+                    : []
+                ;
+                $entities = $repo->findBy($filters);
 
                 $data[$displayName] = array();
 
                 foreach ($entities as $entity) {
-                    $data[$displayName][$entity->__toString()] = $entity->getId(). ';' . get_class($entity);
+                    $data[$displayName][$entity->__toString()] = $entity->getId().';'.get_class($entity);
                 }
             }
 
             $builder
                 ->add('internalLink', 'choice', array(
-                    'label'   => 'link.internal',
+                    'label'              => $options['label_internal'],
                     'translation_domain' => $options['translation_domain'],
-                    'choices' => $data,
-                    'attr' => array('class' => 'umanit-form-select2'),
-                    'required' => false
+                    'choices'            => $data,
+                    'attr'               => array('class' => 'umanit-form-select2'),
+                    'required'           => false,
                 ))
             ;
         }
@@ -102,14 +104,16 @@ class LinkType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Umanit\Bundle\TreeBundle\Entity\Link',
-            'models' => array(),
-            'allow_internal' => true,
-            'allow_external' => true,
-            'translation_domain' => 'UmanitTreeBundle'
+            'data_class'         => 'Umanit\Bundle\TreeBundle\Entity\Link',
+            'models'             => array(),
+            'query_filters'      => array(),
+            'allow_internal'     => true,
+            'allow_external'     => true,
+            'translation_domain' => 'UmanitTreeBundle',
+            'label_internal'     => 'link.internal',
+            'label_external'     => 'link.external',
         ));
     }
-
 
     /**
      * @param OptionsResolverInterface $resolver
@@ -117,16 +121,19 @@ class LinkType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Umanit\Bundle\TreeBundle\Entity\Link',
-            'models' => array(),
-            'allow_internal' => true,
-            'allow_external' => true,
-            'translation_domain' => 'UmanitTreeBundle'
+            'data_class'         => 'Umanit\Bundle\TreeBundle\Entity\Link',
+            'models'             => array(),
+            'query_filters'      => array(),
+            'allow_internal'     => true,
+            'allow_external'     => true,
+            'translation_domain' => 'UmanitTreeBundle',
+            'label_internal'     => 'link.internal',
+            'label_external'     => 'link.external',
         ));
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

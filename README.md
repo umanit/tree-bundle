@@ -145,15 +145,22 @@ In your entity that will have the link, adds a relation with the entity `Umanit\
 
 In your forms, you can materialize the relation with the `Umanit\Bundle\TreeBundle\Form\Type\LinkType`. By default, you'll have 2 fields, "internal link" (a textfield) and "external link" (a select). By default, the select will be empty. You have to populate it by giving the models allowed. You can keep only one field with the options : `allow_internal: false` or `allow_external: false`. Note : only one field can be filled at the same time.
 
+You can define labels with `label_internal` and `label_external`
+
 ### Usage example :
 
 ```php
 $builder
     ->add('link', 'umanit_link_type_translatable', array(
         'label' => 'Link',
+        // List of content types available
         'models' => array(
             'Page'    => 'Umanit\AppBundle\Entity\Page',
             'Article' => 'Umanit\AppBundle\Entity\Article'
+        ),
+        // Filters for some content types (if needed)
+        query_filters = array(
+            'Umanit\AppBundle\Entity\Page' => ['locale' => 'en']
         ),
         'allow_external' => false
     ))
