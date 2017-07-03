@@ -62,7 +62,7 @@ class SeoExtension extends \Twig_Extension
             return $default;
         }
 
-        if ($contentObject = $this->request->attributes->get('contentObject', null)) {
+        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
             if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoTitle())) {
                 return $contentObject->getSeoTitle();
             }
@@ -89,7 +89,7 @@ class SeoExtension extends \Twig_Extension
             return $default;
         }
 
-        if ($contentObject = $this->request->attributes->get('contentObject', null)) {
+        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
             if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoDescription())) {
                 return $contentObject->getSeoDescription();
             }
@@ -116,7 +116,7 @@ class SeoExtension extends \Twig_Extension
             return $default;
         }
 
-        if ($contentObject = $this->request->attributes->get('contentObject', null)) {
+        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
             if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoKeywords())) {
                 return $contentObject->getSeoKeywords();
             }

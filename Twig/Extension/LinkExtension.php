@@ -70,9 +70,9 @@ class LinkExtension extends \Twig_Extension
      *
      * @return bool
      */
-    public function isExternalLink(Link $link)
+    public function isExternalLink($link)
     {
-        return $link->getExternalLink() ? true : false;
+        return !empty($link) && $link->getExternalLink() ? true : false;
     }
 
     /**

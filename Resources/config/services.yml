@@ -10,6 +10,16 @@ services:
             - { name: 'doctrine.event_listener', event: preRemove }
             - { name: 'doctrine.event_listener', event: postFlush }
 
+    # Listener doctrine for node modifications
+    umanit.tree.doctrine.node_history_listener:
+        class: Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineNodeHistoryListener
+        arguments:
+            - '%umanit_tree.locale%'
+        tags:
+            - { name: 'doctrine.event_listener', event: postUpdate }
+            - { name: 'doctrine.event_listener', event: postPersist }
+            - { name: 'doctrine.event_listener', event: postRemove }
+
     # Listener to redirect to the right controller
     umanit.tree.listener.route_listener:
         class: Umanit\Bundle\TreeBundle\Listener\RouteListener
@@ -19,6 +29,15 @@ services:
             - '%umanit_tree.locale%'
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.request', priority: -10 }
+
+    # Listener to redirect to object (for SEO)
+    umanit.tree.listener.route_seo_listener:
+        class: Umanit\Bundle\TreeBundle\Listener\SEOUrlListener
+        arguments:
+            - '@doctrine'
+            - '@umanit.tree.router'
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.request', priority: -11 }
 
     # Router for nodes
     umanit.tree.router:
