@@ -23,6 +23,13 @@ class SeoMetadataType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('url', 'text', array(
+                'translation_domain' => $options['translation_domain'],
+                'label' => 'seo.url',
+                'required' => false
+            ))
+        ;
+        $builder
             ->add('title', 'text', array(
                 'translation_domain' => $options['translation_domain'],
                 'label' => 'seo.title',

@@ -45,6 +45,14 @@ trait SeoTrait
     /**
      * {@inheritdoc}
      */
+    public function getSeoUrl()
+    {
+        return $this->seoMetadata == null ? '' : $this->seoMetadata->getUrl();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSeoTitle()
     {
         return $this->seoMetadata == null ? '' : $this->seoMetadata->getTitle();

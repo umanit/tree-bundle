@@ -2,6 +2,7 @@ link.internal: Internal page
 link.external: External link
 or: OR
 error.link.both_filled: Internal page and external link can't be filled together
+seo.url: Url
 seo.title: Title
 seo.description: Description
 seo.keywords: Keywords
