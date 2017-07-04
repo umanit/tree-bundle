@@ -8,6 +8,12 @@ namespace Umanit\Bundle\TreeBundle\Model;
 interface SeoInterface
 {
     /**
+     * Returns page Url
+     * @return string
+     */
+    public function getSeoUrl();
+
+    /**
      * Returns page title
      * @return string
      */
