@@ -64,8 +64,13 @@ class SEOUrlListener
 
                 $request = $event->getRequest();
 
-                if ($request->getRequestUri() != $url) {
-                    $event->setResponse(new RedirectResponse($url, 301));
+                if ($request->getPathInfo() != $url) {
+                    $event->setResponse(
+                        new RedirectResponse(
+                            str_replace($request->getPathInfo(), $url, $request->getRequestUri()),
+                            301
+                        )
+                    );
                     $event->stopPropagation();
                 }
             }
