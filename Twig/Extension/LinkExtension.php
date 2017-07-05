@@ -58,9 +58,13 @@ class LinkExtension extends \Twig_Extension
             return $link->getExternalLink();
         }
 
-        list($classId, $className) = explode(';', $link->getInternalLink());
+        if ($link->getInternalLink()) {
+            list($classId, $className) = explode(';', $link->getInternalLink());
 
-        return $this->router->getPathClass($className, $classId);
+            return $this->router->getPathClass($className, $classId);
+        }
+
+        return '#';
     }
 
     /**
