@@ -106,7 +106,7 @@ class LinkExtension extends \Twig_Extension
      */
     public function getPath($object, $parentObject = null, $root = false, $absolute = false, $parameters = [])
     {
-        return $this->router->getPath($object, $parentObject, $root, $absolute, $parameters);
+        return $this->router->getPath($object, $parentObject, $root, $absolute, null, $parameters);
     }
 
     /**
