@@ -214,6 +214,7 @@ umanit_tree:
 
     # Seo default values and translation domain
     seo:
+        redirect_301:         true   # Redirect old URLs to new one
         default_title:        'Umanit Tree'
         default_description:  'Umanit tree bundle'
         default_keywords:     'umanit, web, bundle, symfony2'

@@ -30,15 +30,6 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.request', priority: -10 }
 
-    # Listener to redirect to object (for SEO)
-    umanit.tree.listener.route_seo_listener:
-        class: Umanit\Bundle\TreeBundle\Listener\SEOUrlListener
-        arguments:
-            - '@doctrine'
-            - '@umanit.tree.router'
-        tags:
-            - { name: 'kernel.event_listener', event: 'kernel.request', priority: -11 }
-
     # Router for nodes
     umanit.tree.router:
         class: Umanit\Bundle\TreeBundle\Router\NodeRouter
