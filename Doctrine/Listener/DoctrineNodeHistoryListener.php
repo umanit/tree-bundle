@@ -95,11 +95,11 @@ class DoctrineNodeHistoryListener
                 'classId'   => $entity->getClassId(),
                 'locale'    => $entity->getLocale()
             ));
-            if (!empty($treeNodes)) {
+            if (empty($treeNodes)) {
                 $nodes = $manager->getRepository('UmanitTreeBundle:NodeHistory')->findBy(array(
-                    'className' => $entity['name'],
-                    'classId'   => $entity['id'],
-                    'locale'    => $entity['locale']
+                    'className' => $entity->getClassName(),
+                    'classId'   => $entity->getClassId(),
+                    'locale'    => $entity->getLocale()
                 ));
 
                 foreach ($nodes as $node) {
