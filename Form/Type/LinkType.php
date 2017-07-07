@@ -68,7 +68,8 @@ class LinkType extends AbstractType
                 $data[$displayName] = array();
 
                 foreach ($entities as $entity) {
-                    $data[$displayName][$entity->__toString()] = $entity->getId().';'.get_class($entity);
+                    $clazz = $this->doctrine->getManager()->getClassMetadata(get_class($entity))->getName();
+                    $data[$displayName][$entity->__toString()] = $entity->getId().';'.$clazz;
                 }
             }
 
