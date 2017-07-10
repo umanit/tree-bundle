@@ -4,6 +4,7 @@ services:
         class: Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineTreeNodeListener
         arguments:
             - '%umanit_tree.locale%'
+            - '@event_dispatcher'
         tags:
             - { name: 'doctrine.event_listener', event: postUpdate }
             - { name: 'doctrine.event_listener', event: postPersist }

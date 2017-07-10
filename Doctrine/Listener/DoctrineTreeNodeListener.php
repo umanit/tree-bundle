@@ -5,8 +5,11 @@ namespace Umanit\Bundle\TreeBundle\Doctrine\Listener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Umanit\Bundle\TreeBundle\Entity\Node;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Umanit\Bundle\TreeBundle\Event\NodeParentRegisterEvent;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineTreeNodeListener
 {
@@ -23,13 +26,19 @@ class DoctrineTreeNodeListener
     protected $entitiesToRemove;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
+
+    /**
      * Constructor.
      *
      * @param string $locale Default locale
      */
-    public function __construct($locale)
+    public function __construct($locale, EventDispatcherInterface $eventDispatcher)
     {
         $this->locale           = $locale;
+        $this->eventDispatcher  = $eventDispatcher;
         $this->entitiesToRemove = array();
     }
 
@@ -171,8 +180,17 @@ class DoctrineTreeNodeListener
     private function registerParents($entity, $manager, $treeNodes)
     {
         $parents = $entity->getParents();
+        if ($parents instanceof ArrayCollection) {
+            $parents = $parents->toArray();
+        }
+
+        $event = new NodeParentRegisterEvent($entity, $parents);
+        $this->eventDispatcher->dispatch(NodeParentRegisterEvent::NAME, $event);
+
+        $parents = $event->getParents();
 
         $nodeKeep = array();
+
         // Entity parents
         foreach ($parents as $parent) {
             $node = null;

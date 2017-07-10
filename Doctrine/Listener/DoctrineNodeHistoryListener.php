@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: vgraillot
  * Date: 03/07/2017
- * Time: 15:16
+ * Time: 15:16.
  */
 
 namespace Umanit\Bundle\TreeBundle\Doctrine\Listener;
@@ -11,8 +11,6 @@ namespace Umanit\Bundle\TreeBundle\Doctrine\Listener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Umanit\Bundle\TreeBundle\Entity\Node;
 use Umanit\Bundle\TreeBundle\Entity\NodeHistory;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\PostFlushEventArgs;
 
 class DoctrineNodeHistoryListener
 {
@@ -23,6 +21,7 @@ class DoctrineNodeHistoryListener
 
     /**
      * Constructor.
+     *
      * @param string $locale Default locale
      */
     public function __construct($locale)
@@ -31,7 +30,8 @@ class DoctrineNodeHistoryListener
     }
 
     /**
-     * Add a tree node to object if instanceof TreeNodeInterface
+     * Add a tree node to object if instanceof TreeNodeInterface.
+     *
      * @param LifecycleEventArgs $args
      */
     public function postPersist(LifecycleEventArgs $args)
@@ -56,12 +56,13 @@ class DoctrineNodeHistoryListener
 
     /**
      * Modify the tree node object if instanceof TreeNodeInterface
-     * and the node is updated
+     * and the node is updated.
+     *
      * @param LifecycleEventArgs $args
      */
     public function postUpdate(LifecycleEventArgs $args)
     {
-        $entity = $args->getObject();
+        $entity  = $args->getObject();
         $manager = $args->getEntityManager();
 
         if ($entity instanceof Node) {
@@ -70,22 +71,24 @@ class DoctrineNodeHistoryListener
                 'path'      => $entity->getPath(),
                 'className' => $entity->getClassName(),
                 'classId'   => $entity->getClassId(),
-                'locale'    => $entity->getLocale()
+                'locale'    => $entity->getLocale(),
             ));
             if (empty($treeNodes)) {
                 $this->postPersist($args);
+
                 return;
             }
         }
     }
 
     /**
-     * Delete all NodeHistory
+     * Delete all NodeHistory.
+     *
      * @param LifecycleEventArgs $args
      */
     public function postRemove(LifecycleEventArgs $args)
     {
-        $entity = $args->getObject();
+        $entity  = $args->getObject();
         $manager = $args->getEntityManager();
 
         if ($entity instanceof Node) {
@@ -93,13 +96,13 @@ class DoctrineNodeHistoryListener
             $treeNodes = $manager->getRepository('UmanitTreeBundle:Node')->findBy(array(
                 'className' => $entity->getClassName(),
                 'classId'   => $entity->getClassId(),
-                'locale'    => $entity->getLocale()
+                'locale'    => $entity->getLocale(),
             ));
             if (empty($treeNodes)) {
                 $nodes = $manager->getRepository('UmanitTreeBundle:NodeHistory')->findBy(array(
                     'className' => $entity->getClassName(),
                     'classId'   => $entity->getClassId(),
-                    'locale'    => $entity->getLocale()
+                    'locale'    => $entity->getLocale(),
                 ));
 
                 foreach ($nodes as $node) {
