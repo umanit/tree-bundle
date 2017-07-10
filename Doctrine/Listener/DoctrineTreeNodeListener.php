@@ -8,7 +8,7 @@ use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 use Umanit\Bundle\TreeBundle\Event\NodeParentRegisterEvent;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DoctrineTreeNodeListener
@@ -180,7 +180,7 @@ class DoctrineTreeNodeListener
     private function registerParents($entity, $manager, $treeNodes)
     {
         $parents = $entity->getParents();
-        if ($parents instanceof ArrayCollection) {
+        if ($parents instanceof Collection) {
             $parents = $parents->toArray();
         }
 

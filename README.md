@@ -120,67 +120,6 @@ $builder
 ;
 ```
 
-## Add/Modify parents to node with event
-
-You can subscribe to event `umanit.node.parent_register` in order to alter the parents of an entity. Example :
-
-```php
-<?php
-
-namespace AppBundle\EventSubscriber;
-
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Umanit\Bundle\TreeBundle\Event\NodeParentRegisterEvent;
-use AppBundle\Entity\MyEntity;
-
-class NodeParentRegisterSubscriber implements EventSubscriberInterface
-{
-    /**
-     * @var ManagerRegistry
-     */
-    private $doctrine;
-
-    /**
-     * @param ManagerRegistry $doctrine
-     */
-    public function __construct(ManagerRegistry $doctrine)
-    {
-        $this->doctrine = $doctrine;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedEvents()
-    {
-        return [
-            NodeParentRegisterEvent::NAME => 'onRegisterParent',
-        ];
-    }
-
-    /**
-     * @param NodeParentRegisterEvent $event
-     */
-    public function onRegisterParent(NodeParentRegisterEvent $event)
-    {
-        $entity  = $event->getEntity();
-        $parents = $event->getParents();
-
-        if ($entity instanceof MyEntity) {
-            $myEntities = $this
-                ->doctrine
-                ->getRepository('AppBundle\Entity\Printer')
-                ->findPrinterPerMyEntity($entity, $entity->getLocale())
-            ;
-
-            $event->setParents(array_merge($parents, $myEntities));
-        }
-    }
-}
-
-```
-
 ## Create SEO Metadata Form
 
 ### Usage example :

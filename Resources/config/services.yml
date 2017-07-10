@@ -70,6 +70,12 @@ services:
         tags:
             - { name: 'twig.extension' }
 
+    # Helper for nodes
+    umanit.tree.node_helper:
+        class: Umanit\Bundle\TreeBundle\Helper\NodeHelper
+        arguments:
+            - '@doctrine'
+
     # Link form type
     umanit.tree.form.type.link:
         class: Umanit\Bundle\TreeBundle\Form\Type\LinkType
