@@ -124,7 +124,7 @@ $builder
 
 You can subscribe to event `umanit.node.parent_register` in order to alter the parents of an entity. Example :
 
-```
+```php
 <?php
 
 namespace AppBundle\EventSubscriber;
