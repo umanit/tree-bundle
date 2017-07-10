@@ -22,7 +22,7 @@ class UniqueSlugHandler implements SlugHandlerInterface
     private $sluggable;
 
     /**
-     * Construct the slug handler
+     * Construct the slug handler.
      *
      * @param SluggableListener $sluggable
      */
@@ -34,15 +34,13 @@ class UniqueSlugHandler implements SlugHandlerInterface
     /**
      * Callback on slug handlers before the decision
      * is made whether or not the slug needs to be
-     * recalculated
+     * recalculated.
      *
      * @param SluggableAdapter $ea
      * @param array            $config
      * @param object           $object
      * @param string           $slug
-     * @param boolean          $needToChangeSlug
-     *
-     * @return void
+     * @param bool             $needToChangeSlug
      */
     public function onChangeDecision(SluggableAdapter $ea, array &$config, $object, &$slug, &$needToChangeSlug)
     {
@@ -50,28 +48,24 @@ class UniqueSlugHandler implements SlugHandlerInterface
     }
 
     /**
-     * Callback on slug handlers right after the slug is built
+     * Callback on slug handlers right after the slug is built.
      *
      * @param SluggableAdapter $ea
      * @param array            $config
      * @param object           $object
      * @param string           $slug
-     *
-     * @return void
      */
     public function postSlugBuild(SluggableAdapter $ea, array &$config, $object, &$slug)
     {
     }
 
     /**
-     * Callback for slug handlers on slug completion
+     * Callback for slug handlers on slug completion.
      *
      * @param SluggableAdapter $ea
      * @param array            $config
      * @param object           $object
      * @param string           $slug
-     *
-     * @return void
      */
     public function onSlugCompletion(SluggableAdapter $ea, array &$config, $object, &$slug)
     {
@@ -81,19 +75,19 @@ class UniqueSlugHandler implements SlugHandlerInterface
             $repository = $this->om->getRepository(get_class($object));
 
             $originalSlug = $slug;
-            while ($retrieved = $repository->getBySlug($slug, $object->getLocale())) {
+            while ($retrieved = $repository->getBySlug($slug, $object->getLocale(), $object->getParent())) {
                 if ($object->getId() == $retrieved->getId()) {
                     break;
                 }
 
-                $slug = $originalSlug . '-' . $index;
-                $index++;
+                $slug = $originalSlug.'-'.$index;
+                ++$index;
             }
         }
     }
 
     /**
-     * @return boolean whether or not this handler has already urlized the slug
+     * @return bool whether or not this handler has already urlized the slug
      */
     public function handlesUrlization()
     {
@@ -101,7 +95,7 @@ class UniqueSlugHandler implements SlugHandlerInterface
     }
 
     /**
-     * Validate handler options
+     * Validate handler options.
      *
      * @param array         $options
      * @param ClassMetadata $meta

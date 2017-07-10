@@ -5,7 +5,6 @@ namespace Umanit\Bundle\TreeBundle\Doctrine\Listener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Umanit\Bundle\TreeBundle\Entity\Node;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
-use Umanit\Bundle\TreeBundle\Model\TranslationNodeInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
@@ -17,13 +16,15 @@ class DoctrineTreeNodeListener
     protected $locale;
 
     /**
-     * Entities to delete
+     * Entities to delete.
+     *
      * @var TreeNodeInterface[]
      */
     protected $entitiesToRemove;
 
     /**
      * Constructor.
+     *
      * @param string $locale Default locale
      */
     public function __construct($locale)
@@ -33,7 +34,8 @@ class DoctrineTreeNodeListener
     }
 
     /**
-     * Add a tree node to object if instanceof TreeNodeInterface
+     * Add a tree node to object if instanceof TreeNodeInterface.
+     *
      * @param LifecycleEventArgs $args
      */
     public function postPersist(LifecycleEventArgs $args)
@@ -67,12 +69,13 @@ class DoctrineTreeNodeListener
 
     /**
      * Modify the tree node object if instanceof TreeNodeInterface
-     * and the node is updated
+     * and the node is updated.
+     *
      * @param LifecycleEventArgs $args
      */
     public function postUpdate(LifecycleEventArgs $args)
     {
-        $entity = $args->getObject();
+        $entity  = $args->getObject();
         $manager = $args->getEntityManager();
 
         if ($entity instanceof TreeNodeInterface) {
@@ -80,10 +83,11 @@ class DoctrineTreeNodeListener
             $treeNodes = $manager->getRepository('UmanitTreeBundle:Node')->findBy(array(
                 'className' => $manager->getClassMetadata(get_class($entity))->getName(),
                 'classId'   => $entity->getId(),
-                'locale'    => $entity->getLocale()
+                'locale'    => $entity->getLocale(),
             ));
             if (empty($treeNodes)) {
                 $this->postPersist($args);
+
                 return;
             }
 
@@ -101,42 +105,43 @@ class DoctrineTreeNodeListener
                     $treeNode->setNodeName($nodeName);
 
                     $manager->persist($treeNode);
-                    $manager->flush();
+                    $manager->flush($treeNode);
                 }
             }
 
-            $manager->flush();
             $this->registerParents($entity, $manager, $treeNodes);
         }
     }
 
     /**
-     * Register all the nodes that will need to be remove
+     * Register all the nodes that will need to be remove.
+     *
      * @param LifecycleEventArgs $args
      */
     public function preRemove(LifecycleEventArgs $args)
     {
-        $entity = $args->getObject();
+        $entity  = $args->getObject();
         $manager = $args->getEntityManager();
 
         if ($entity instanceof TreeNodeInterface) {
             $this->entitiesToRemove[] = array(
                 'id'     => $entity->getId(),
                 'locale' => $entity->getLocale(),
-                'name'   => $manager->getClassMetadata(get_class($entity))->getName()
+                'name'   => $manager->getClassMetadata(get_class($entity))->getName(),
             );
         }
     }
 
     /**
-     * Deletes all treenodes related to an entity
+     * Deletes all treenodes related to an entity.
+     *
      * @param LifecycleEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
     {
         $manager = $args->getEntityManager();
 
-        $entities = $this->entitiesToRemove;
+        $entities               = $this->entitiesToRemove;
         $this->entitiesToRemove = array();
 
         if (!empty($this->entitiesToRemove)) {
@@ -144,7 +149,7 @@ class DoctrineTreeNodeListener
                 $nodes = $manager->getRepository('UmanitTreeBundle:Node')->findBy(array(
                     'className' => $entity['name'],
                     'classId'   => $entity['id'],
-                    'locale'    => $entity['locale']
+                    'locale'    => $entity['locale'],
                 ));
 
                 foreach ($nodes as $node) {
@@ -157,10 +162,11 @@ class DoctrineTreeNodeListener
     }
 
     /**
-     * Register new parents added to a node
-     * @param mixed         $entity     Entity that is registered
-     * @param EntityManager $manager    Entity manager for ORM
-     * @param Node[]        $treeNodes  Tree node associated to the parent
+     * Register new parents added to a node.
+     *
+     * @param mixed         $entity    Entity that is registered
+     * @param EntityManager $manager   Entity manager for ORM
+     * @param Node[]        $treeNodes Tree node associated to the parent
      */
     private function registerParents($entity, $manager, $treeNodes)
     {
@@ -174,8 +180,8 @@ class DoctrineTreeNodeListener
                 $node = $manager->getRepository('UmanitTreeBundle:Node')->findOneBy(
                     array(
                         'className' => $manager->getClassMetadata(get_class($parent))->getName(),
-                        'classId' => $parent->getId(),
-                        'locale' => $entity->getLocale()
+                        'classId'   => $parent->getId(),
+                        'locale'    => $entity->getLocale(),
                     )
                 );
             } elseif ($parent instanceof Node) {
@@ -225,17 +231,16 @@ class DoctrineTreeNodeListener
         }
 
         // Delete nodes not used anymore
-
         foreach ($treeNodes as $treeNode) {
             // Delete root node ?
             if (!$treeNode->getManaged()
-                || (!$treeNode->getParent() && ($entity->createRootNodeByDefault()
-                    || !$entity->getParents()))
+                || (!$treeNode->getParent() && ($entity->createRootNodeByDefault() || !$entity->getParents()))
                 || ($treeNode->getPath() == TreeNodeInterface::ROOT_NODE_PATH)
                 || (!empty($treeNode->getParent()) && in_array($treeNode->getParent()->getId(), $nodeKeep))
             ) {
                 continue;
             }
+
             $manager->remove($treeNode);
             $manager->flush($treeNode);
         }
