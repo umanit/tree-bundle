@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Node
+ * Node.
  *
  * @ORM\Table(name="treebundle_node", indexes={
  *     @ORM\Index(name="search_idx_slug", columns={"slug"}),
@@ -115,7 +115,7 @@ class Node
     }
 
     /**
-     * Get the value of Id
+     * Get the value of Id.
      *
      * @return int
      */
@@ -125,7 +125,7 @@ class Node
     }
 
     /**
-     * Set the value of Id
+     * Set the value of Id.
      *
      * @param int $id
      *
@@ -139,7 +139,7 @@ class Node
     }
 
     /**
-     * Get the value of Parent
+     * Get the value of Parent.
      *
      * @return Node
      */
@@ -149,7 +149,7 @@ class Node
     }
 
     /**
-     * Set the value of Parent
+     * Set the value of Parent.
      *
      * @param Node $parent
      *
@@ -163,7 +163,7 @@ class Node
     }
 
     /**
-     * Remove parent
+     * Remove parent.
      *
      * @return self
      */
@@ -175,7 +175,7 @@ class Node
     }
 
     /**
-     * Get the value of Children
+     * Get the value of Children.
      *
      * @return Node[]
      */
@@ -185,7 +185,7 @@ class Node
     }
 
     /**
-     * Set the value of Children
+     * Set the value of Children.
      *
      * @param Node[] $children
      *
@@ -199,7 +199,7 @@ class Node
     }
 
     /**
-     * Remove a child
+     * Remove a child.
      *
      * @param Node[] $child
      *
@@ -213,7 +213,7 @@ class Node
     }
 
     /**
-     * Clear the value of Children
+     * Clear the value of Children.
      *
      * @return self
      */
@@ -225,7 +225,7 @@ class Node
     }
 
     /**
-     * Get the value of Class
+     * Get the value of Class.
      *
      * @return string Object class
      */
@@ -235,7 +235,7 @@ class Node
     }
 
     /**
-     * Set the value of Class
+     * Set the value of Class.
      *
      * @param string $className
      *
@@ -249,7 +249,7 @@ class Node
     }
 
     /**
-     * Get the value of Path
+     * Get the value of Path.
      *
      * @return string
      */
@@ -259,7 +259,7 @@ class Node
     }
 
     /**
-     * Set the value of Path
+     * Set the value of Path.
      *
      * @param string $path
      *
@@ -273,7 +273,7 @@ class Node
     }
 
     /**
-     * Get the value of Level
+     * Get the value of Level.
      *
      * @return int
      */
@@ -283,7 +283,7 @@ class Node
     }
 
     /**
-     * Set the value of Level
+     * Set the value of Level.
      *
      * @param int $level
      *
@@ -297,7 +297,7 @@ class Node
     }
 
     /**
-     * Get the value of Slug
+     * Get the value of Slug.
      *
      * @return string
      */
@@ -307,7 +307,7 @@ class Node
     }
 
     /**
-     * Set the value of Slug
+     * Set the value of Slug.
      *
      * @param string $slug
      *
@@ -321,7 +321,7 @@ class Node
     }
 
     /**
-     * Get the value of Node Name
+     * Get the value of Node Name.
      *
      * @return string
      */
@@ -331,7 +331,7 @@ class Node
     }
 
     /**
-     * Set the value of Node Name
+     * Set the value of Node Name.
      *
      * @param string $nodeName
      *
@@ -345,7 +345,7 @@ class Node
     }
 
     /**
-     * Get the value of Locale
+     * Get the value of Locale.
      *
      * @return string
      */
@@ -355,7 +355,7 @@ class Node
     }
 
     /**
-     * Set the value of Locale
+     * Set the value of Locale.
      *
      * @param string $locale
      *
@@ -369,7 +369,7 @@ class Node
     }
 
     /**
-     * Get the value of Class Id
+     * Get the value of Class Id.
      *
      * @return int Object Id
      */
@@ -379,7 +379,7 @@ class Node
     }
 
     /**
-     * Set the value of Class Id
+     * Set the value of Class Id.
      *
      * @param int $classId Object Id
      *
@@ -393,7 +393,7 @@ class Node
     }
 
     /**
-     * Get the value of Managed
+     * Get the value of Managed.
      *
      * @return bool
      */
@@ -403,7 +403,7 @@ class Node
     }
 
     /**
-     * Set the value of Managed
+     * Set the value of Managed.
      *
      * @param bool $managed
      *
@@ -415,5 +415,4 @@ class Node
 
         return $this;
     }
-
 }

@@ -3,8 +3,7 @@ services:
     umanit.tree.doctrine.node_listener:
         class: Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineTreeNodeListener
         arguments:
-            - '%umanit_tree.locale%'
-            - '@event_dispatcher'
+            - '@umanit.tree.node_helper'
         tags:
             - { name: 'doctrine.event_listener', event: postUpdate }
             - { name: 'doctrine.event_listener', event: postPersist }
@@ -74,7 +73,9 @@ services:
     umanit.tree.node_helper:
         class: Umanit\Bundle\TreeBundle\Helper\NodeHelper
         arguments:
+            - '%umanit_tree.locale%'
             - '@doctrine'
+            - '@event_dispatcher'
 
     # Link form type
     umanit.tree.form.type.link:
