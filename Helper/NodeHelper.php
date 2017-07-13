@@ -68,6 +68,16 @@ class NodeHelper
             return;
         }
 
+        $parents = $entity->getParents();
+        if ($parents instanceof Collection) {
+            $parents = $parents->toArray();
+        }
+
+        $event = new NodeParentRegisterEvent($entity, $parents);
+        $this->eventDispatcher->dispatch(NodeParentRegisterEvent::NAME, $event);
+
+        $parents = $event->getParents();
+
         // Check if an entity changed its name
         foreach ($treeNodes as $treeNode) {
             // ROOT NODE CANNOT CHANGE ITS NAME
@@ -86,7 +96,7 @@ class NodeHelper
             }
         }
 
-        $this->registerParents($entity, $treeNodes);
+        $this->registerParents($entity, $treeNodes, $parents);
     }
 
     /**
@@ -140,8 +150,18 @@ class NodeHelper
         $manager   = $this->doctrine->getManager();
         $className = $this->doctrine->getManager()->getClassMetadata(get_class($entity))->getName();
 
+        $parents = $entity->getParents();
+        if ($parents instanceof Collection) {
+            $parents = $parents->toArray();
+        }
+
+        $event = new NodeParentRegisterEvent($entity, $parents);
+        $this->eventDispatcher->dispatch(NodeParentRegisterEvent::NAME, $event);
+
+        $parents = $event->getParents();
+
         // Root node or not ?
-        if ($entity->createRootNodeByDefault() || !$entity->getParents()) {
+        if ($entity->createRootNodeByDefault() || empty($parents)) {
             // Principal node name
             $node = new Node();
             $node
@@ -158,7 +178,7 @@ class NodeHelper
             $nodes = array();
         }
 
-        $this->registerParents($entity, $nodes);
+        $this->registerParents($entity, $nodes, $parents);
     }
 
     /**
@@ -166,20 +186,11 @@ class NodeHelper
      *
      * @param mixed  $entity    Entity that is registered
      * @param Node[] $treeNodes Tree node associated to the parent
+     * @param array  $parents   Parents to register
      */
-    private function registerParents(TreeNodeInterface $entity, $treeNodes)
+    private function registerParents(TreeNodeInterface $entity, $treeNodes, array $parents)
     {
         $manager = $this->doctrine->getManager();
-
-        $parents = $entity->getParents();
-        if ($parents instanceof Collection) {
-            $parents = $parents->toArray();
-        }
-
-        $event = new NodeParentRegisterEvent($entity, $parents);
-        $this->eventDispatcher->dispatch(NodeParentRegisterEvent::NAME, $event);
-
-        $parents = $event->getParents();
 
         $nodeKeep = array();
 
