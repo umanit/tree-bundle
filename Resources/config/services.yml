@@ -5,10 +5,10 @@ services:
         arguments:
             - '@umanit.tree.node_helper'
         tags:
-            - { name: 'doctrine.event_listener', event: postUpdate }
-            - { name: 'doctrine.event_listener', event: postPersist }
-            - { name: 'doctrine.event_listener', event: preRemove }
-            - { name: 'doctrine.event_listener', event: postFlush }
+            - { name: 'doctrine.event_listener', event: postUpdate, priority: -10}
+            - { name: 'doctrine.event_listener', event: postPersist, priority: -10 }
+            - { name: 'doctrine.event_listener', event: preRemove, priority: -10 }
+            - { name: 'doctrine.event_listener', event: postFlush, priority: -10 }
 
     # Listener doctrine for node modifications
     umanit.tree.doctrine.node_history_listener:
@@ -16,9 +16,9 @@ services:
         arguments:
             - '%umanit_tree.locale%'
         tags:
-            - { name: 'doctrine.event_listener', event: postUpdate }
-            - { name: 'doctrine.event_listener', event: postPersist }
-            - { name: 'doctrine.event_listener', event: postRemove }
+            - { name: 'doctrine.event_listener', event: postUpdate, priority: -20 }
+            - { name: 'doctrine.event_listener', event: postPersist, priority: -20 }
+            - { name: 'doctrine.event_listener', event: postRemove, priority: -20 }
 
     # Listener to redirect to the right controller
     umanit.tree.listener.route_listener:

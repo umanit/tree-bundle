@@ -6,6 +6,8 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Umanit\Bundle\TreeBundle\Entity\Node;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Umanit\Bundle\TreeBundle\Event\NodeUpdatedEvent;
+use Umanit\Bundle\TreeBundle\Event\NodeBeforeUpdateEvent;
 use Umanit\Bundle\TreeBundle\Event\NodeParentRegisterEvent;
 use Doctrine\Common\Collections\Collection;
 
@@ -55,6 +57,9 @@ class NodeHelper
     {
         $manager = $this->doctrine->getManager();
 
+        $event = new NodeBeforeUpdateEvent($entity);
+        $this->eventDispatcher->dispatch(NodeBeforeUpdateEvent::NAME, $event);
+
         // Get tree nodes
         $treeNodes = $manager->getRepository('UmanitTreeBundle:Node')->findBy(array(
             'className' => $manager->getClassMetadata(get_class($entity))->getName(),
@@ -97,6 +102,9 @@ class NodeHelper
         }
 
         $this->registerParents($entity, $treeNodes, $parents);
+
+        $event = new NodeUpdatedEvent($entity);
+        $this->eventDispatcher->dispatch(NodeUpdatedEvent::NAME, $event);
     }
 
     /**
@@ -150,6 +158,9 @@ class NodeHelper
         $manager   = $this->doctrine->getManager();
         $className = $this->doctrine->getManager()->getClassMetadata(get_class($entity))->getName();
 
+        $event = new NodeBeforeUpdateEvent($entity);
+        $this->eventDispatcher->dispatch(NodeBeforeUpdateEvent::NAME, $event);
+
         $parents = $entity->getParents();
         if ($parents instanceof Collection) {
             $parents = $parents->toArray();
@@ -161,7 +172,7 @@ class NodeHelper
         $parents = $event->getParents();
 
         // Root node or not ?
-        if ($entity->createRootNodeByDefault() || empty($parents)) {
+        if ($entity->createRootNodeByDefault()) {
             // Principal node name
             $node = new Node();
             $node
@@ -179,6 +190,9 @@ class NodeHelper
         }
 
         $this->registerParents($entity, $nodes, $parents);
+
+        $event = new NodeUpdatedEvent($entity);
+        $this->eventDispatcher->dispatch(NodeUpdatedEvent::NAME, $event);
     }
 
     /**
@@ -253,7 +267,7 @@ class NodeHelper
         foreach ($treeNodes as $treeNode) {
             // Delete root node ?
             if (!$treeNode->getManaged()
-                || (!$treeNode->getParent() && ($entity->createRootNodeByDefault() || !$entity->getParents()))
+                || (!$treeNode->getParent() && $entity->createRootNodeByDefault())
                 || ($treeNode->getPath() == TreeNodeInterface::ROOT_NODE_PATH)
                 || (!empty($treeNode->getParent()) && in_array($treeNode->getParent()->getId(), $nodeKeep))
             ) {

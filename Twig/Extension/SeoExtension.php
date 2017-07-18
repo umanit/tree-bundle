@@ -24,7 +24,8 @@ class SeoExtension extends \Twig_Extension
     protected $translator;
 
     /**
-     * Constuctor
+     * Constuctor.
+     *
      * @param RequestStack $request       Current request
      * @param Translator   $translator    Translation service
      * @param array        $configuration SEO configuration from umanit_tree key
@@ -37,19 +38,19 @@ class SeoExtension extends \Twig_Extension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
         return array(
             new \Twig_Function('get_seo_title', [$this, 'getSeoTitle']),
             new \Twig_Function('get_seo_description', [$this, 'getSeoDescription']),
-            new \Twig_Function('get_seo_keywords', [$this, 'getSeoKeywords'])
+            new \Twig_Function('get_seo_keywords', [$this, 'getSeoKeywords']),
         );
     }
 
     /**
-     * Returns SEO title of the page. Puts the default value if not given
+     * Returns SEO title of the page. Puts the default value if not given.
      *
      * @param string $default  Default title for the page
      * @param int    $override Set default value if override is set to true
@@ -76,7 +77,7 @@ class SeoExtension extends \Twig_Extension
     }
 
     /**
-     * Returns SEO description of the page. Puts the default value if not given
+     * Returns SEO description of the page. Puts the default value if not given.
      *
      * @param string $default  Default title for the page
      * @param int    $override Set default value if override is set to true
@@ -103,7 +104,7 @@ class SeoExtension extends \Twig_Extension
     }
 
     /**
-     * Returns SEO keywords of the page. Puts the default value if not given
+     * Returns SEO keywords of the page. Puts the default value if not given.
      *
      * @param string $default  Default title for the page
      * @param int    $override Set default value if override is set to true
@@ -130,7 +131,7 @@ class SeoExtension extends \Twig_Extension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

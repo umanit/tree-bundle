@@ -6,20 +6,24 @@ use Umanit\Bundle\TreeBundle\Entity\SeoMetadata;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Contains data usable for SEO
+ * Contains data usable for SEO.
  */
 trait SeoTrait
 {
     /**
      * @var SeoMetadata
      *
-     * @ORM\OneToOne(targetEntity="Umanit\Bundle\TreeBundle\Entity\SeoMetadata", cascade={"persist", "remove"})
+     * @ORM\OneToOne(
+     *      targetEntity="Umanit\Bundle\TreeBundle\Entity\SeoMetadata",
+     *      cascade={"persist", "remove"},
+     *      fetch="EAGER"
+     * )
      * @ORM\JoinColumn(name="seoMetadata", referencedColumnName="id")
      */
     protected $seoMetadata;
 
     /**
-     * Get the value of Seo Metadata
+     * Get the value of Seo Metadata.
      *
      * @return SeoMetadata
      */
@@ -29,7 +33,7 @@ trait SeoTrait
     }
 
     /**
-     * Set the value of Seo Metadata
+     * Set the value of Seo Metadata.
      *
      * @param SeoMetadata $seoMetadata
      *

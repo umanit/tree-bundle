@@ -133,10 +133,8 @@ class NodeRouter
      */
     public function buildNode($className, $classId, $referenceNode, $root, $locale)
     {
-        if (is_null($referenceNode) && $root === false) {
-            if (isset($this->cache[$className.';'.$classId])) {
-                return $this->cache[$className.';'.$classId];
-            }
+        if (isset($this->cache[$className.';'.$classId.($referenceNode ? $referenceNode->getId() : 'null')])) {
+            return $this->cache[$className.';'.$classId.($referenceNode ? $referenceNode->getId() : 'null')];
         }
 
         $manager = $this->doctrine->getRepository('Umanit\Bundle\TreeBundle\Entity\Node');
@@ -167,12 +165,12 @@ class NodeRouter
             $locale ? $locale : $this->requestStack->getCurrentRequest()->getLocale()
         );
 
-        if (!$node && !is_null($referenceNode)) {
-            $node = $this->buildNode($className, $classId, $referenceNode->getParent(), false, $locale);
+        if ($node) {
+            $this->cache[$className.';'.$classId.';'.($referenceNode ? $referenceNode->getId() : 'null')] = $node;
         }
 
-        if (!is_null($referenceNode) && $root === false) {
-            $this->cache[$className.';'.$classId] = $node;
+        if (!$node && !is_null($referenceNode)) {
+            $node = $this->buildNode($className, $classId, $referenceNode->getParent(), false, $locale);
         }
 
         return $node;

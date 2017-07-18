@@ -167,6 +167,15 @@ $builder
 ;
 ```
 
+## Events
+
+You can subscribe to some events in order to alter some behaviors
+
+(in order)
+- `umanit.node.before_update` : Called before any node save for an entity
+- `umanit.node.parent_register` : Allows to add/remove parents to an entity
+- `umanit.node.updated` : Called once an entity saved its nodes and parents
+
 ## Twig helpers
 
 - `get_seo_title(default = "", override = false)`
