@@ -92,12 +92,12 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
      *
      * @param string $className Class full namespace
      * @param int    $classId   Class identifier
-     * @param Node   $parent    Node parent of the current node
+     * @param Node[] $parents   Node parents allowed for the current node
      * @param string $locale    Locale of the content
      *
      * @return Node|null
      */
-    public function searchNode($className, $classId, $parent, $locale = TreeNodeInterface::UNKNOWN_LOCALE)
+    public function searchNode($className, $classId, $parents, $locale = TreeNodeInterface::UNKNOWN_LOCALE)
     {
         $qb = $this
             ->createQueryBuilder('n')
@@ -105,14 +105,8 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
             ->andWhere('n.classId = :classId')
             ->setParameter('className', $className)
             ->setParameter('classId', $classId)
+            ->setMaxResults(1)
         ;
-
-        if (empty($parent)) {
-            $qb->andWhere('n.parent is null');
-        } else {
-            $qb->andWhere('n.parent = :parent')
-                ->setParameter('parent', $parent);
-        }
 
         $qbv = $this->getEntityManager()->createQueryBuilder();
 
@@ -128,6 +122,21 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
             $qb->andWhere('n.locale = :locale');
             $qb->setParameter('locale', TreeNodeInterface::UNKNOWN_LOCALE);
         }
+
+        // Sort to get the most accurate result / Sort on condition is not supported on doctrine
+        if ($parents) {
+            $select = 'CASE ';
+            foreach ($parents as $idx => $parentId) {
+                $select = $select.'WHEN n.parent = '.$parentId.' THEN '.(count($parents) - $idx).' ';
+            }
+
+            $select .= 'ELSE 0 AS HIDDEN parentSort';
+
+            $qb->addSelect($select);
+            $qb->addOrderBy('parentSort', 'desc');
+        }
+
+        $qb->addOrderBy('n.level', 'asc');
 
         try {
             return $qb->getQuery()->getOneOrNullResult();

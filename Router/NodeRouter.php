@@ -133,45 +133,21 @@ class NodeRouter
      */
     public function buildNode($className, $classId, $referenceNode, $root, $locale)
     {
-        if (isset($this->cache[$className.';'.$classId.($referenceNode ? $referenceNode->getId() : 'null')])) {
-            return $this->cache[$className.';'.$classId.($referenceNode ? $referenceNode->getId() : 'null')];
-        }
-
         $manager = $this->doctrine->getRepository('Umanit\Bundle\TreeBundle\Entity\Node');
 
-        $defaultParent = null;
-
-        // Search metadata from the node parsed
-        $object = $this->doctrine->getRepository($className)->find($classId);
-        if ($object && !$object->createRootNodeByDefault() && $object->getParents()) {
-            $defaultParent = $this->buildNode(
-                $this->doctrine->getManager()->getClassMetadata(get_class($object->getParents()[0]))->getName(),
-                $object->getParents()[0]->getId(),
-                null,
-                false,
-                $locale
-            );
-        }
-
-        $parent = $defaultParent;
-        if (!is_null($referenceNode) && $root === false) {
-            $parent = $referenceNode;
+        $parents = [];
+        if ($referenceNode) {
+            do {
+                $parents[] = $referenceNode->getId();
+            } while ($referenceNode = $referenceNode->getParent());
         }
 
         $node = $manager->searchNode(
             $className,
             $classId,
-            $parent,
+            $parents,
             $locale ? $locale : $this->requestStack->getCurrentRequest()->getLocale()
         );
-
-        if ($node) {
-            $this->cache[$className.';'.$classId.';'.($referenceNode ? $referenceNode->getId() : 'null')] = $node;
-        }
-
-        if (!$node && !is_null($referenceNode)) {
-            $node = $this->buildNode($className, $classId, $referenceNode->getParent(), false, $locale);
-        }
 
         return $node;
     }
