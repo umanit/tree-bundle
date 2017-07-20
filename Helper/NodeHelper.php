@@ -141,10 +141,9 @@ class NodeHelper
 
                 foreach ($nodes as $node) {
                     $manager->remove($node);
+                    $manager->flush($node);
                 }
             }
-
-            $manager->flush();
         }
     }
 
@@ -267,7 +266,7 @@ class NodeHelper
         foreach ($treeNodes as $treeNode) {
             // Delete root node ?
             if (!$treeNode->getManaged()
-                || (!$treeNode->getParent() && $entity->createRootNodeByDefault())
+                || (!$treeNode->getParent() && ($entity->createRootNodeByDefault() || empty($parents)))
                 || ($treeNode->getPath() == TreeNodeInterface::ROOT_NODE_PATH)
                 || (!empty($treeNode->getParent()) && in_array($treeNode->getParent()->getId(), $nodeKeep))
             ) {

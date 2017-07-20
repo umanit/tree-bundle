@@ -16,6 +16,13 @@ class DoctrineTreeNodeListener
     protected $nodeHelper;
 
     /**
+     * Nodes to update on flush.
+     *
+     * @var array
+     */
+    protected $nodesToUpdate = [];
+
+    /**
      * Constructor.
      *
      * @param string $locale Default locale
@@ -36,7 +43,7 @@ class DoctrineTreeNodeListener
         $manager = $args->getEntityManager();
 
         if ($entity instanceof TreeNodeInterface) {
-            $this->nodeHelper->updateNodes($entity);
+            $this->nodesToUpdate[] = $entity;
         }
     }
 
@@ -52,7 +59,7 @@ class DoctrineTreeNodeListener
         $manager = $args->getEntityManager();
 
         if ($entity instanceof TreeNodeInterface) {
-            $this->nodeHelper->updateNodes($entity);
+            $this->nodesToUpdate[] = $entity;
         }
     }
 
@@ -78,6 +85,12 @@ class DoctrineTreeNodeListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        $nodesToUpdate       = $this->nodesToUpdate;
+        $this->nodesToUpdate = [];
+        foreach ($nodesToUpdate as $nodeToUpdate) {
+            $this->nodeHelper->updateNodes($nodeToUpdate);
+        }
+
         $this->nodeHelper->flush();
     }
 }
