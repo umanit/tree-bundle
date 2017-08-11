@@ -1,0 +1,189 @@
+{# @TODO : Use the configured layout #}
+{% extends "@UmanitTree/admin/default_layout.html.twig" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="box box-primary">
+                        <div class="box-header">
+                            <h4 class="box-title">
+                                Menu
+                            </h4>
+                            <div class="navbar-collapse">
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li class="dropdown sonata-actions">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Actions <b class="caret"></b></a>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li>
+                                                <a class="sonata-action-element" href="{{ path('tree_admin_menu_add') }}">
+                                                    <i class="fa fa-plus-circle" aria-hidden="true"></i> Ajouter
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <ul class="list-inline text-right">
+                                <li>
+                                    <form action="{{ path("tree_admin_menu_edit") }}" >
+                                        <input type="hidden" name="id" value="" data-node="id">
+                                        <button type="submit" data-node-action="edit" disabled="disabled" class="btn btn-default">
+                                            <i class="fa fa-pencil" aria-hidden="true"></i> Editer
+                                        </button>
+                                    </form>
+                                </li>
+                                <li>
+                                    <form action="{{ path("tree_admin_menu_delete") }}" data-form="delete">
+                                        <input type="hidden" name="id" value="" data-node="id">
+                                        <button type="submit" data-node-action="delete" disabled="disabled" class="btn btn-default">
+                                            <i class="fa fa-times" aria-hidden="true"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                            <div id="tree" class="panel-body fancytree-colorize-hover fancytree-fade-expander umanit-fancytree"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add code to initialize the tree when the document is loaded: -->
+    <script type="text/javascript">
+    $(function() {
+        $("[data-form='delete']").on('submit', function () {
+            return confirm("Êtes-vous sûr de supprimer cet item (et ces enfants) ?");
+        });
+
+        glyph_opts = {
+            map: {
+                doc: "glyphicon glyphicon-file",
+                docOpen: "glyphicon glyphicon-file",
+                checkbox: "glyphicon glyphicon-unchecked",
+                checkboxSelected: "glyphicon glyphicon-check",
+                checkboxUnknown: "glyphicon glyphicon-share",
+                dragHelper: "glyphicon glyphicon-play",
+                dropMarker: "glyphicon glyphicon-arrow-right",
+                error: "glyphicon glyphicon-warning-sign",
+                expanderClosed: "glyphicon glyphicon-menu-right",
+                expanderLazy: "glyphicon glyphicon-menu-right",  // glyphicon-plus-sign
+                expanderOpen: "glyphicon glyphicon-menu-down",  // glyphicon-collapse-down
+                folder: "glyphicon glyphicon-folder-close",
+                folderOpen: "glyphicon glyphicon-folder-open",
+                loading: "glyphicon glyphicon-refresh glyphicon-spin"
+            }
+        };
+        $(function () {
+            // Initialize Fancytree
+            $("#tree").fancytree({
+                extensions: ["glyph", 'dnd'],
+                selectMode: 1,
+                minExpandLevel: 2,
+                source: {url: "{{ path("tree_admin_menu_json") }}", debugDelay: 1000},
+                glyph: glyph_opts,
+                dnd: {
+                    preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+                    preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+                    autoExpandMS: 400,
+                    refreshPositions: true,
+                    draggable: {
+                        appendTo: "body",  // We don't want to clip the helper inside container
+                        // scroll: false,
+                        // containment: "parent",  // $("ul.fancytree-container"),
+                        // cursorAt: { left: 5 },
+                        revert: "invalid"
+                        // revert: function(dropped) {
+                        //   return
+                        // }
+                    },
+                    dragStart: function (node, data) {
+                        // allow dragging `node`:
+                        return true;
+                    },
+                    dragEnter: function (node, data) {
+                        return true;
+                    },
+                    initHelper: function (node, data) {
+                        // Helper was just created: modify markup
+                        var helper = data.ui.helper,
+                            sourceNodes = data.tree.getSelectedNodes();
+
+                        // Store a list of active + all selected nodes
+                        if (!node.isSelected()) {
+                            sourceNodes.unshift(node);
+                        }
+                        helper.data("sourceNodes", sourceNodes);
+                        // Mark selected nodes also as drag source (active node is already)
+                        $(".fancytree-active,.fancytree-selected", tree.$container)
+                            .addClass("fancytree-drag-source");
+                        // Add a counter badge to helper if dragging more than one node
+                        if (sourceNodes.length > 1) {
+                            helper.append($("<span class='fancytree-childcounter'/>")
+                                .text("+" + (sourceNodes.length - 1)));
+                        }
+                        // Prepare an indicator for copy-mode
+                        helper.prepend($("<span class='fancytree-dnd-modifier'/>")
+                            .text("+").hide());
+                    },
+                    updateHelper: function (node, data) {
+                        var tree = node.tree,
+                            copyMode = false;
+
+                        // Show/hide the helper's copy indicator (+)
+                        data.ui.helper.find(".fancytree-dnd-modifier").toggle(copyMode);
+                        // Dim the source node(s) in move-mode
+                        $(".fancytree-drag-source", tree.$container)
+                            .toggleClass("fancytree-drag-remove", !copyMode);
+                    },
+                    dragDrop: function (node, data) {
+                        var sourceNodes = data.ui.helper.data("sourceNodes"),
+                            copyMode = false;
+
+                        if (copyMode) {
+                            $.each(sourceNodes, function (i, o) {
+                                o.copyTo(node, data.hitMode, function (n) {
+                                    delete n.key;
+                                    n.selected = false;
+                                    n.title = "Copy of " + n.title;
+                                });
+                            });
+                        } else {
+                            $.each(sourceNodes, function (i, o) {
+                                console.log(data.hitMode, node.title, o.title, node.key.replace("menu_", ""), o.key.replace("menu_", ""));
+                                $.post(
+                                    "{{ path('tree_admin_menu_move') }}",
+                                    {
+                                        moved_node: o.key.replace("menu_", ""),
+                                        destination_node: node.key.replace("menu_", ""),
+                                        mode: data.hitMode
+                                    },
+                                    function (data) {
+                                        if (data != true) {
+                                            alert('Le menu n\'a pas été mise à jour. Merci de recharger la page et de recommencer');
+                                        }
+                                    }
+                                ).fail(function () {
+                                    alert('Une erreur est survenue. Le menu n\'a pas été mise à jour.');
+                                });
+                                o.moveTo(node, data.hitMode);
+                            });
+                        }
+                    }
+                },
+                activate: function (event, data) {
+                    var node = data.node;
+                    $("[data-node='id']").each(function (index, input) {
+                        input.value = node.key.replace("menu_", "");
+                    });
+                    $("[data-node-action]").attr('disable', true);
+
+                }
+            });
+        });
+    });
+    </script>
+{%  endblock %}

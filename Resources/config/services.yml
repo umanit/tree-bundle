@@ -95,8 +95,14 @@ services:
         tags:
             - { name: 'form.type', alias: umanit_node_type }
 
-    # Link form type
-    umanit.tree.form.type.link:
-        class: Umanit\Bundle\TreeBundle\Form\Type\SeoMetadataType
+    # Menu form type
+    umanit.tree.form.menu_type:
+        class: Umanit\Bundle\TreeBundle\Form\Type\MenuType
+        arguments: ['@doctrine.orm.entity_manager']
         tags:
-            - { name: 'form.type', alias: umanit_seo_metadata_type }
+            - { name: form.type, alias: Umanit\Bundle\TreeBundle\Form\MenuType }
+
+    # Menu injector
+    umanit.tree.event_subscriber.menu_injector_subscriber:
+        class: Umanit\Bundle\TreeBundle\EventSubscriber\MenuInjectorSubscriber
+        arguments: ['@doctrine.orm.entity_manager', '@twig']

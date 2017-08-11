@@ -2,8 +2,6 @@
 
 namespace Umanit\Bundle\TreeBundle\Model;
 
-use Umanit\Bundle\CmsBundle\Entity\Node;
-
 /**
  * Interface to implement to manage nodes
  */
