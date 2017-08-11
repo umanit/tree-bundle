@@ -205,67 +205,56 @@ class NodeHelper
     {
         $manager = $this->doctrine->getManager();
 
-        $nodeKeep = array();
+        $nodeKeep    = array();
+        $nodeParents = $manager->getRepository('UmanitTreeBundle:Node')->findParentsNodesAsArray($parents);
 
-        // Entity parents
-        foreach ($parents as $parent) {
-            $nodes = null;
-            if ($parent instanceof TreeNodeInterface) {
-                $nodes = $manager->getRepository('UmanitTreeBundle:Node')->findBy([
-                    'className' => $manager->getClassMetadata(get_class($parent))->getName(),
-                    'classId'   => $parent->getId(),
-                    'locale'    => $entity->getLocale(),
-                ]);
-            } elseif ($parent instanceof Node) {
-                $nodes = [$parent];
+        // Nodes from the parent
+        if (!empty($nodeParents) && empty($treeNodes)) {
+            foreach ($nodeParents as $node) {
+                $newNode = new Node();
+                $newNode
+                    ->setNodeName($entity->getTreeNodeName())
+                    ->setClassName($manager->getClassMetadata(get_class($entity))->getName())
+                    ->setClassId($entity->getId())
+                    ->setLocale($node['locale'])
+                    ->setParent($manager->getReference(Node::class, $node['id']))
+                ;
+
+                $manager->persist($newNode);
             }
 
-            // Nodes from the parent
-            if (!empty($nodes) && empty($treeNodes)) {
-                foreach ($nodes as $node) {
+            $manager->flush();
+        } elseif (!empty($nodeParents)) {
+            // Checks if we already have this parent
+            $nodeExists = false;
+
+            foreach ($treeNodes as $treeNode) {
+                foreach ($nodeParents as $node) {
+                    if ($treeNode->getParent() && $treeNode->getParent()->getId() == $node['id']) {
+                        $nodeExists = true;
+                        $nodeKeep[] = $treeNode->getParent()->getId();
+                        break;
+                    }
+                }
+            }
+
+            // If not, we create it
+            if (!$nodeExists) {
+                foreach ($nodeParents as $node) {
                     $newNode = new Node();
                     $newNode
                         ->setNodeName($entity->getTreeNodeName())
                         ->setClassName($manager->getClassMetadata(get_class($entity))->getName())
                         ->setClassId($entity->getId())
-                        ->setLocale($node->getLocale())
-                        ->setParent($node)
+                        ->setLocale($node['locale'])
+                        ->setParent($manager->getReference(Node::class, $node['id']))
                     ;
 
                     $manager->persist($newNode);
-                    $manager->flush($newNode);
-                }
-            } elseif (!empty($nodes)) {
-                // Checks if we already have this parent
-                $nodeExists = false;
-
-                foreach ($treeNodes as $treeNode) {
-                    foreach ($nodes as $node) {
-                        if ($treeNode->getParent() && $treeNode->getParent()->getId() == $node->getId()) {
-                            $nodeExists = true;
-                            $nodeKeep[] = $treeNode->getParent()->getId();
-                            break;
-                        }
-                    }
-                }
-
-                // If not, we create it
-                if (!$nodeExists) {
-                    foreach ($nodes as $node) {
-                        $newNode = new Node();
-                        $newNode
-                            ->setNodeName($entity->getTreeNodeName())
-                            ->setClassName($manager->getClassMetadata(get_class($entity))->getName())
-                            ->setClassId($entity->getId())
-                            ->setLocale($node->getLocale())
-                            ->setParent($node)
-                        ;
-
-                        $manager->persist($newNode);
-                        $manager->flush($newNode);
-                    }
                 }
             }
+
+            $manager->flush();
         }
 
         // Delete nodes not used anymore

@@ -3,6 +3,7 @@
 namespace Umanit\Bundle\TreeBundle\Repository;
 
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Umanit\Bundle\TreeBundle\Entity\Node;
 
 class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepository
 {
@@ -143,5 +144,65 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Returns all the nodes related to $parents.
+     *
+     * @param array $parents
+     *
+     * @return array
+     */
+    public function findParentsNodesAsArray($parents)
+    {
+        $parentConditions = [];
+        $nodeConditions   = [];
+        foreach ($parents as $parent) {
+            if ($parent instanceof TreeNodeInterface) {
+                $className = $this->_em->getClassMetadata(get_class($parent))->getName();
+                $locale    = $parent->getLocale();
+
+                if (!isset($parentConditions[$className])) {
+                    $parentConditions[$className] = [];
+                }
+
+                if (!isset($parentConditions[$className][$locale])) {
+                    $parentConditions[$className][$locale] = [];
+                }
+
+                $parentConditions[$className][$locale][] = $parent->getId();
+            } elseif ($parent instanceof Node) {
+                $nodeConditions[] = $parent;
+            }
+        }
+
+        $qb = $this->createQueryBuilder('n');
+
+        // Instance of treeNode interface
+        foreach ($parentConditions as $className => $parentCondition) {
+            foreach ($parentCondition as $locale => $parents) {
+                $uniqueKey = md5($className.$locale); // For parameters
+
+                $qb->orWhere(
+                    $qb->expr()->andX(
+                        $qb->expr()->eq('n.className', ':className'.$uniqueKey),
+                        $qb->expr()->eq('n.locale', ':locale'.$uniqueKey),
+                        $qb->expr()->in('n.classId', ':classId'.$uniqueKey)
+                    )
+                );
+
+                $qb->setParameter(':className'.$uniqueKey, $className);
+                $qb->setParameter(':locale'.$uniqueKey, $locale);
+                $qb->setParameter(':classId'.$uniqueKey, $parents);
+            }
+        }
+
+        // Instance of node
+        if (!empty($nodeConditions)) {
+            $qb->orWhere($qb->expr()->in('n', ':nodes'));
+            $qb->setParameter('nodes', $nodeConditions);
+        }
+
+        return (!empty($parents)) ? $qb->getQuery()->getArrayResult() : [];
     }
 }
