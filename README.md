@@ -207,12 +207,42 @@ Returns the path for the given link instance (instance of `Umanit\Bundle\TreeBun
 
 Returns true if the given link targets an external URL (instance of `Umanit\Bundle\TreeBundle\Entity\Link`).
 
+## Using the menu admin
+
+A CRUD is provided in order to administrate your menus. It's available on the route `tree_admin_menu_dashboard`, /admin/menu.
+
+Start by running `php bin/console assets:install` to get the assets in your web directory.
+
+### Customize the admin layout
+
+The layout can be customized to your needs by setting the `admin_layout` configuration value. 
+
+```yaml
+# config.yml
+umanit_tree:
+    ...
+    admin_layout: ':admin_layout.html.twig' # Default is '@UmanitTree/admin/default_layout.html.twig'
+```
+
+The menu admin has 4 javascript dependencies, you'll need to add them as well. Have a look in the default_layout.html.twig. 
+
+```HTML
+    <!-- @UmanitTree/admin/default_layout.html.twig -->
+    <script src="{{ asset('bundles/umanittree/vendor/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('bundles/umanittree/vendor/js/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('bundles/umanittree/vendor/js/jquery.fancytree-all-deps.min.js') }}"></script>
+    <script src="{{ asset('bundles/umanittree/vendor/js/jquery.fancytree.dnd.js') }}"></script>
+```
+
+TreeBundle ships with those assets, you may indeed use them or feel free to use your own.
+
 ## Configuration reference
 
 ```yaml
 umanit_tree:
     locale:               '%locale%'                                    # Default locale to use
     root_class:           \Umanit\Bundle\TreeBundle\Entity\RootEntity   # Class for the root node. If you have a homepage object, put it there
+    admin_layout:         '@UmanitTree/admin/default_layout.html.twig'  # Default layout for the menu admin section
 
     # Defines a controller to call by class. Foreach entity ("class"), set a controller and method to call
     controllers_by_class:
@@ -233,4 +263,5 @@ umanit_tree:
     breadcrumb:
         root_name:            'Home'
         translation_domain:   'messages'
+
 ```

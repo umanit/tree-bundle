@@ -22,7 +22,7 @@ class UmanitTreeExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        // Set la configuration dans les params
+        // Set configuration into params
         $rootName = 'umanit_tree';
         $container->setParameter($rootName, $config);
         $this->setConfigAsParameters($container, $config, $rootName);

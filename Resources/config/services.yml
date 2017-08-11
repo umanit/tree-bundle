@@ -106,3 +106,10 @@ services:
     umanit.tree.event_subscriber.menu_injector_subscriber:
         class: Umanit\Bundle\TreeBundle\EventSubscriber\MenuInjectorSubscriber
         arguments: ['@doctrine.orm.entity_manager', '@twig']
+
+    # Twig configuration extension
+    umanit.tree.twig.extension.configuration_extension:
+        class: Umanit\Bundle\TreeBundle\Twig\Extension\ConfigurationExtension
+        arguments: ['%umanit_tree.admin_layout%']
+        tags:
+            - { name: 'twig.extension' }

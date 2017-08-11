@@ -49,6 +49,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('translation_domain')->defaultValue('messages')->end()
                     ->end()
                 ->end()
+                ->scalarNode('admin_layout')->defaultValue('@UmanitTree/admin/default_layout.html.twig')->end()
             ->end()
         ;
 
