@@ -217,14 +217,15 @@ Start by running `php bin/console assets:install` to get the assets in your web 
 
 The layout can be customized to your needs by setting the `admin_layout` configuration value. 
 
+Example if you want to use Sonata Admin's layout:
 ```yaml
 # config.yml
 umanit_tree:
     ...
-    admin_layout: ':admin_layout.html.twig' # Default is '@UmanitTree/admin/default_layout.html.twig'
+    admin_layout: '@SonataAdmin/standard_layout.html.twig' # Default is '@UmanitTree/admin/default_layout.html.twig'
 ```
 
-The menu admin has 4 javascript dependencies, you'll need to add them as well. Have a look in the default_layout.html.twig. 
+The menu admin has 4 javascript dependencies, you're ought to include them as well. Have a look in the default_layout.html.twig. 
 
 ```HTML
     <!-- @UmanitTree/admin/default_layout.html.twig -->
