@@ -78,6 +78,7 @@ class TreeNodeType extends AbstractType
                 'class' => 'UmanitTreeBundle:Node',
                 'multiple' => true,
                 'choice_label' => 'path',
+                'exclude_type' => array(),
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('n')
                         ->where('n.path != :path')
@@ -86,6 +87,27 @@ class TreeNodeType extends AbstractType
                 },
             )
         );
+
+        $resolver->setNormalizer('query_builder', function (OptionsResolver $options, $configs) {
+                $er = $options['em']->getRepository($options['class']);
+                $queryBuilder = $er->createQueryBuilder('n')
+                    ->where('n.path != :path')
+                    ->orderBy('n.path', 'ASC')
+                    ->setParameter('path', \Umanit\Bundle\TreeBundle\Model\TreeNodeInterface::ROOT_NODE_PATH);
+                if (!empty($options['exclude_type'])) {
+                    $andX = $queryBuilder->expr()->andX();
+                    foreach ($options['exclude_type'] as $index => $excludeType) {
+                        $andX->add('n.className != :className'.$index);
+                        $queryBuilder->setParameter('className'.$index, $excludeType);
+                    }
+                    $queryBuilder->andWhere($andX);
+                }
+                return $queryBuilder;
+            }
+        );
+
+
+
     }
 
     /**
