@@ -9,9 +9,10 @@ use Gedmo\Mapping\Annotation as Gedmo;
 /**
  * Node.
  *
- * @ORM\Table(name="treebundle_node", indexes={
+ * @ORM\Table(name="treebundle_node",
+ *     uniqueConstraints={@ORM\UniqueConstraint(name="search_idx", columns={"path", "locale"})},
+ *     indexes={
  *     @ORM\Index(name="search_idx_slug", columns={"slug"}),
- *     @ORM\Index(name="search_idx", columns={"path", "locale"}),
  *     @ORM\Index(name="search_idx_2", columns={"className", "classId", "locale"}),
  *     @ORM\Index(name="search_idx_3", columns={"className", "classId"})
  * })
