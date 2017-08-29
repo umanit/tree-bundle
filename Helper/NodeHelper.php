@@ -226,12 +226,11 @@ class NodeHelper
             $manager->flush();
         } elseif (!empty($nodeParents)) {
             // Checks if we already have this parent
-            $nodeExists = false;
+            $nodeKeep = [];
 
             foreach ($treeNodes as $treeNode) {
                 foreach ($nodeParents as $node) {
                     if ($treeNode->getParent() && $treeNode->getParent()->getId() == $node['id']) {
-                        $nodeExists = true;
                         $nodeKeep[] = $treeNode->getParent()->getId();
                         break;
                     }
@@ -239,22 +238,23 @@ class NodeHelper
             }
 
             // If not, we create it
-            if (!$nodeExists) {
+            if (count($nodeKeep) < count($nodeParents)) {
                 foreach ($nodeParents as $node) {
-                    $newNode = new Node();
-                    $newNode
-                        ->setNodeName($entity->getTreeNodeName())
-                        ->setClassName($manager->getClassMetadata(get_class($entity))->getName())
-                        ->setClassId($entity->getId())
-                        ->setLocale($node['locale'])
-                        ->setParent($manager->getReference(Node::class, $node['id']))
-                    ;
+                    if (!in_array($node['id'], $nodeKeep)) {
+                        $newNode = new Node();
+                        $newNode
+                            ->setNodeName($entity->getTreeNodeName())
+                            ->setClassName($manager->getClassMetadata(get_class($entity))->getName())
+                            ->setClassId($entity->getId())
+                            ->setLocale($node['locale'])
+                            ->setParent($manager->getReference(Node::class, $node['id']))
+                        ;
 
-                    $manager->persist($newNode);
+                        $manager->persist($newNode);
+                        $manager->flush($newNode);
+                    }
                 }
             }
-
-            $manager->flush();
         }
 
         // Delete nodes not used anymore
