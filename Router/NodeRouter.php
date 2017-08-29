@@ -106,13 +106,18 @@ class NodeRouter
         }
 
         if (!is_null($parentObject) && $root === false) {
-            $referenceNode = $this->buildNode(
-                $this->doctrine->getManager()->getClassMetadata(get_class($parentObject))->getName(),
-                $parentObject->getId(),
-                null,
-                false,
-                $locale
-            );
+            $classNameParent = $this->doctrine->getManager()->getClassMetadata(get_class($parentObject))->getName();
+            if ($classNameParent === "Umanit\Bundle\TreeBundle\Entity\Node") {
+                $referenceNode = $parentObject;
+            } else {
+                $referenceNode = $this->buildNode(
+                    $classNameParent,
+                    $parentObject->getId(),
+                    null,
+                    false,
+                    $locale
+                );
+            }
         }
 
         $node = $this->buildNode($className, $classId, $referenceNode, $root, $locale);
