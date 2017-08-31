@@ -141,7 +141,7 @@ class NodeRouter
         $manager = $this->doctrine->getRepository('Umanit\Bundle\TreeBundle\Entity\Node');
 
         $parents = [];
-        if ($referenceNode) {
+        if ($referenceNode && !$root) {
             do {
                 $parents[] = $referenceNode->getId();
             } while ($referenceNode = $referenceNode->getParent());

@@ -221,12 +221,10 @@ class NodeHelper
                 ;
 
                 $manager->persist($newNode);
+                $manager->flush($newNode);
             }
-
-            $manager->flush();
         } elseif (!empty($nodeParents)) {
             // Checks if we already have this parent
-            $nodeKeep = [];
 
             foreach ($treeNodes as $treeNode) {
                 foreach ($nodeParents as $node) {
