@@ -9,7 +9,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Twig_Environment;
-use Umanit\Bundle\TreeBundle\Entity\Menu;
 
 class MenuInjectorSubscriber implements EventSubscriberInterface
 {

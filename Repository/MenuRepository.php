@@ -2,7 +2,6 @@
 
 namespace Umanit\Bundle\TreeBundle\Repository;
 
-use Umanit\Bundle\TreeBundle\Entity\Menu;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Umanit\Bundle\TreeBundle\Entity\Link;
@@ -64,7 +63,7 @@ SQL;
     /**
      * Récupération du menu à plat indenté (pour les Select en BO)
      *
-     * @return Menu[]
+     * @return AbstractMenu[]
      */
     public function getIndentMenu()
     {
@@ -272,6 +271,7 @@ SQL;
             if ($alias) {
                 return sprintf('%s.%s', $alias, $colname);
             }
+            return null;
         }, $columnNames));
     }
 }

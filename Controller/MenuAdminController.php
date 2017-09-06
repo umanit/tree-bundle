@@ -3,7 +3,6 @@
 namespace Umanit\Bundle\TreeBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Umanit\Bundle\TreeBundle\Entity\Menu;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -204,7 +203,8 @@ class MenuAdminController extends Controller
      */
     public function addAction(Request $request)
     {
-        $menu = new Menu();
+        $menu = new $this->menuEntityClass();
+
         $form = $this->createForm($this->menuFormClass, $menu);
 
         $form->handleRequest($request);
@@ -223,12 +223,9 @@ class MenuAdminController extends Controller
 
         }
 
-        return $this->render(
-            '@UmanitTree/admin/menu/add.html.twig',
-            [
-                "form" => $form->createView()
-            ]
-        );
+        return $this->render('@UmanitTree/admin/menu/add.html.twig', [
+            "form" => $form->createView(),
+        ]);
     }
 
     /**
