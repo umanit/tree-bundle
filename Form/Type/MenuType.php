@@ -54,6 +54,7 @@ class MenuType extends AbstractType
                 Choicetype::class,
                 [
                     'choices' => [
+                        // @todo AGU : set configurable
                         "Principal"    => 'primary',
                         "Pied de page" => 'footer',
                     ],

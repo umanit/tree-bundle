@@ -54,6 +54,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('admin_layout')->defaultValue('@UmanitTree/admin/default_layout.html.twig')->end()
+                ->scalarNode('menu_form_class')->defaultValue('\Umanit\Bundle\TreeBundle\Form\Type\MenuType')->end()
             ->end()
         ;
 

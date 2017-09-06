@@ -2,22 +2,37 @@
 
 namespace Umanit\Bundle\TreeBundle\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Umanit\Bundle\TreeBundle\Entity\Menu;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Umanit\Bundle\TreeBundle\Form\Type\MenuType;
 
 /**
  * Class MenuAdminController
- * @package Umanit\Bundle\TreeBundle\Controller
  *
  * @Route("/admin/menu")
+ *
+ * @todo AGU : translate comments.
  */
 class MenuAdminController extends Controller
 {
+    /** @var string */
+    protected $menuFormClass;
+
+    /**
+     * @inheritdoc
+     *
+     * @param ContainerInterface|null $container
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        parent::setContainer($container);
+        $this->menuFormClass = $this->getParameter('umanit_tree.menu_form_class');
+    }
+
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      *
@@ -186,7 +201,7 @@ class MenuAdminController extends Controller
     public function addAction(Request $request)
     {
         $menu = new Menu();
-        $form = $this->createForm(MenuType::class, $menu);
+        $form = $this->createForm($this->menuFormClass, $menu);
 
         $form->handleRequest($request);
 
@@ -228,7 +243,7 @@ class MenuAdminController extends Controller
             throw $this->createNotFoundException();
         }
 
-        $form = $this->createForm(MenuType::class, $menu);
+        $form = $this->createForm($this->menuFormClass, $menu);
 
         $form->handleRequest($request);
 

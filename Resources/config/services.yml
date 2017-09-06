@@ -97,10 +97,10 @@ services:
 
     # Menu form type
     umanit.tree.form.menu_type:
-        class: Umanit\Bundle\TreeBundle\Form\Type\MenuType
+        class: '%umanit_tree.menu_form_class%'
         arguments: ['@doctrine.orm.entity_manager', '%umanit_tree.node_types%']
         tags:
-            - { name: form.type, alias: Umanit\Bundle\TreeBundle\Form\MenuType }
+            - { name: form.type, alias: umanit_tree_menu_type }
 
     # Menu injector
     umanit.tree.event_subscriber.menu_injector_subscriber:
