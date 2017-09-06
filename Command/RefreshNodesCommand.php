@@ -24,7 +24,7 @@ class RefreshNodesCommand extends ContainerAwareCommand
     {
         $nodeHelper = $this->getContainer()->get('umanit.tree.node_helper');
 
-        foreach ($this->getContainer()->getParameter('umanit_tree.controllers_by_class') as $controllers) {
+        foreach ($this->getContainer()->getParameter('umanit_tree.node_types') as $controllers) {
             $output->writeln(sprintf('<info>Refresh %s</info>', $controllers['class']));
             $repository = $this->getContainer()->get('doctrine')->getRepository($controllers['class']);
 

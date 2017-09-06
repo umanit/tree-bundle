@@ -25,7 +25,7 @@ services:
         class: Umanit\Bundle\TreeBundle\Listener\RouteListener
         arguments:
             - '@doctrine'
-            - '%umanit_tree.controllers_by_class%'
+            - '%umanit_tree.node_types%'
             - '%umanit_tree.locale%'
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.request', priority: -10 }
@@ -98,7 +98,7 @@ services:
     # Menu form type
     umanit.tree.form.menu_type:
         class: Umanit\Bundle\TreeBundle\Form\Type\MenuType
-        arguments: ['@doctrine.orm.entity_manager']
+        arguments: ['@doctrine.orm.entity_manager', '%umanit_tree.node_types%']
         tags:
             - { name: form.type, alias: Umanit\Bundle\TreeBundle\Form\MenuType }
 
