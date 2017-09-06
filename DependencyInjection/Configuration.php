@@ -23,7 +23,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('locale')->defaultValue('%locale%')->end()
-                ->scalarNode('root_class')->defaultValue('\Umanit\Bundle\TreeBundle\Entity\RootEntity')->end()
+                ->scalarNode('root_class')->defaultValue('Umanit\Bundle\TreeBundle\Entity\RootEntity')->end()
                 ->arrayNode('node_types')->info('Configure each node type')
                     ->prototype('array')
                         ->children()
@@ -54,7 +54,8 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('admin_layout')->defaultValue('@UmanitTree/admin/default_layout.html.twig')->end()
-                ->scalarNode('menu_form_class')->defaultValue('\Umanit\Bundle\TreeBundle\Form\Type\MenuType')->end()
+                ->scalarNode('menu_form_class')->defaultValue('Umanit\Bundle\TreeBundle\Form\Type\MenuType')->end()
+                ->scalarNode('menu_entity_class')->defaultValue('Umanit\Bundle\TreeBundle\Entity\Menu')->end()
             ->end()
         ;
 

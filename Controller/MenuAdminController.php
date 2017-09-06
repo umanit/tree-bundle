@@ -22,6 +22,9 @@ class MenuAdminController extends Controller
     /** @var string */
     protected $menuFormClass;
 
+    /** @var string */
+    protected $menuEntityClass;
+
     /**
      * @inheritdoc
      *
@@ -31,6 +34,7 @@ class MenuAdminController extends Controller
     {
         parent::setContainer($container);
         $this->menuFormClass = $this->getParameter('umanit_tree.menu_form_class');
+        $this->menuEntityClass = $this->getParameter('umanit_tree.menu_entity_class');
     }
 
     /**
@@ -52,7 +56,7 @@ class MenuAdminController extends Controller
      */
     public function getMenuAction()
     {
-        $menuFlat = $this->getDoctrine()->getRepository(Menu::class)->getMenu();
+        $menuFlat = $this->getDoctrine()->getRepository($this->menuEntityClass)->getMenu();
 
         $menu = [];
         $parentId = [];
@@ -143,7 +147,7 @@ class MenuAdminController extends Controller
      */
     public function moveMenuAction(Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(Menu::class);
+        $repository = $this->getDoctrine()->getRepository($this->menuEntityClass);
         $movedNode = intval($request->request->get('moved_node'));
         $destinationNodeId = $request->request->get('destination_node');
         $mode = $request->request->get('mode'); // before, after, over
@@ -238,7 +242,7 @@ class MenuAdminController extends Controller
     public function editAction(Request $request)
     {
         $id = $request->query->get("id", null);
-        $menu = $this->getDoctrine()->getRepository(Menu::class)->find($id);
+        $menu = $this->getDoctrine()->getRepository($this->menuEntityClass)->find($id);
         if ($menu == null) {
             throw $this->createNotFoundException();
         }
@@ -278,7 +282,7 @@ class MenuAdminController extends Controller
     public function deleteAction(Request $request)
     {
         $id = $request->query->get("id", null);
-        $menu = $this->getDoctrine()->getRepository(Menu::class)->find($id);
+        $menu = $this->getDoctrine()->getRepository($this->menuEntityClass)->find($id);
 
         if ($menu !== null) {
             $em = $this->getDoctrine()->getManager();

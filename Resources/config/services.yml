@@ -98,14 +98,20 @@ services:
     # Menu form type
     umanit.tree.form.menu_type:
         class: '%umanit_tree.menu_form_class%'
-        arguments: ['@doctrine.orm.entity_manager', '%umanit_tree.node_types%']
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '%umanit_tree.node_types%'
+            - '%umanit_tree.menu_entity_class%'
         tags:
             - { name: form.type, alias: umanit_tree_menu_type }
 
     # Menu injector
     umanit.tree.event_subscriber.menu_injector_subscriber:
         class: Umanit\Bundle\TreeBundle\EventSubscriber\MenuInjectorSubscriber
-        arguments: ['@doctrine.orm.entity_manager', '@twig']
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@twig'
+            - '%umanit_tree.menu_entity_class%'
 
     # Twig configuration extension
     umanit.tree.twig.extension.configuration_extension:

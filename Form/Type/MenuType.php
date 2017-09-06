@@ -2,8 +2,6 @@
 
 namespace Umanit\Bundle\TreeBundle\Form\Type;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Umanit\Bundle\TreeBundle\Entity\Menu;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -25,15 +23,22 @@ class MenuType extends AbstractType
     private $nodeTypes;
 
     /**
+     * @var string
+     */
+    private $menuEntityClass;
+
+    /**
      * MenuType constructor.
      *
      * @param EntityManagerInterface $em
      * @param array                  $nodeTypes
+     * @param string                 $menuEntityClass
      */
-    public function __construct(EntityManagerInterface $em, array $nodeTypes)
+    public function __construct(EntityManagerInterface $em, array $nodeTypes, $menuEntityClass)
     {
-        $this->em        = $em;
-        $this->nodeTypes = $nodeTypes;
+        $this->em              = $em;
+        $this->nodeTypes       = $nodeTypes;
+        $this->menuEntityClass = $menuEntityClass;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -42,43 +47,31 @@ class MenuType extends AbstractType
         $models = [];
         foreach ($this->nodeTypes as $nodeType) {
             if ($nodeType['menu'] === true) {
-                $explodedFqcn = explode('\\', $nodeType['class']);
+                $explodedFqcn               = explode('\\', $nodeType['class']);
                 $models[end($explodedFqcn)] = $nodeType['class'];
             }
         }
 
         $builder
             ->add('title')
-            ->add(
-                'position',
-                Choicetype::class,
-                [
-                    'choices' => [
-                        // @todo AGU : set configurable
-                        "Principal"    => 'primary',
-                        "Pied de page" => 'footer',
-                    ],
-                ]
-            )
-            ->add(
-                'link',
-                LinkType::class,
-                [
-                    'models'         => $models,
-                    'allow_external' => true,
-                    'required'       => false,
-                ]
-            )
-            ->add(
-                'parent',
-                EntityType::class,
-                [
-                    'class'        => Menu::class,
-                    'choices'      => $this->em->getRepository(Menu::class)->getIndentMenu(),
-                    'choice_label' => 'title',
-                    'required'     => false,
-                ]
-            )
+            ->add('position', Choicetype::class, [
+                'choices' => [
+                    // @todo AGU : set configurable
+                    "Principal"    => 'primary',
+                    "Pied de page" => 'footer',
+                ],
+            ])
+            ->add('link', LinkType::class, [
+                'models'         => $models,
+                'allow_external' => true,
+                'required'       => false,
+            ])
+            ->add('parent', EntityType::class, [
+                'class'        => $this->menuEntityClass,
+                'choices'      => $this->em->getRepository($this->menuEntityClass)->getIndentMenu(),
+                'choice_label' => 'title',
+                'required'     => false,
+            ])
             ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
             ->add('updatedAt', null, [
                 'data'  => new \DateTimeImmutable(),
@@ -93,7 +86,7 @@ class MenuType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Menu::class,
+            'data_class' => $this->menuEntityClass,
         ]);
     }
 }

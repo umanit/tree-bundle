@@ -23,10 +23,16 @@ class MenuInjectorSubscriber implements EventSubscriberInterface
      */
     protected $twig;
 
-    public function __construct(EntityManagerInterface $entityManager, Twig_Environment $twig)
+    /**
+     * @var string
+     */
+    private $menuEntityClass;
+
+    public function __construct(EntityManagerInterface $entityManager, Twig_Environment $twig, $menuEntityClass)
     {
         $this->em = $entityManager;
         $this->twig = $twig;
+        $this->menuEntityClass = $menuEntityClass;
     }
 
     public static function getSubscribedEvents()
@@ -40,7 +46,7 @@ class MenuInjectorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $menuFlat = $this->em->getRepository(Menu::class)->getFrontMenu($event->getRequest()->getLocale());
+        $menuFlat = $this->em->getRepository($this->menuEntityClass)->getFrontMenu($event->getRequest()->getLocale());
         $menu = [];
         $parentId = [];
         $currentMenu = reset($menuFlat);
