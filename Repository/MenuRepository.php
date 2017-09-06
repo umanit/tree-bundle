@@ -23,7 +23,8 @@ class MenuRepository extends \Doctrine\ORM\EntityRepository
     public function getMenu()
     {
         // Build select part
-        $menuSelect       = $this->buildSelectPart('menu');
+        $table            = $this->getClassMetadata()->table['name'];
+        $menuSelect       = $this->buildSelectPart($table);
         $secondMenuSelect = $this->buildSelectPart('c');
 
         $sql = <<<SQL
@@ -32,14 +33,14 @@ with recursive menu_tree as (
     , link_id
     , 1 as level
     , array[priority]::integer[] as path_priority
-   from menu
+   from $table
    where parent_id is null
    union all
    select $secondMenuSelect
     , c.link_id
     , p.level + 1
     , p.path_priority||c.priority
-   from menu c
+   from $table c
      join menu_tree p on c.parent_id = p.id
 )
 SELECT %SELECT%, mt.level
@@ -70,17 +71,18 @@ SQL;
         $cols = $this->getClassMetadata()->columnNames;
         unset($cols['title']);
         // Build select part
-        $menuSelect       = $this->buildSelectPart('menu', $cols);
+        $table            = $this->getClassMetadata()->table['name'];
+        $menuSelect       = $this->buildSelectPart($table, $cols);
         $secondMenuSelect = $this->buildSelectPart('c', $cols);
 
         $sql = <<<SQL
 with recursive menu_tree as (
     select $menuSelect
     , link_id
-    , menu.title::text
+    , $table.title::text
     , 1 as level
     , array[priority]::integer[] as path_priority
-   from menu
+   from $table
    where parent_id is null
    union all
    select $secondMenuSelect
@@ -88,7 +90,7 @@ with recursive menu_tree as (
     , rpad('', p.level * 4, '\xC2\xA0')::text||c.title::text
     , p.level + 1
     , p.path_priority||c.priority
-   from menu c
+   from $table c
      join menu_tree p on c.parent_id = p.id
 )
 SELECT %SELECT%, mt.level
@@ -174,12 +176,13 @@ SQL;
         $case .= ' ELSE ?::int ';
         $paramSQL[] = ++$lastIndex;
 
+        $table = $this->getClassMetadata()->table['name'];
 
         $sql = <<<SQL
 WITH source AS (
-    SELECT * FROM menu
+    SELECT * FROM $table
     WHERE parent_id $parentIdOperatorSQL $parentIdSQL
-    UNION SELECT * FROM menu where id = ?::int
+    UNION SELECT * FROM $table where id = ?::int
 ),
 orderable AS (
 SELECT id, title, $parentIdSQL::int as parent_id,
@@ -188,7 +191,7 @@ CASE id
 END
 as priority FROM source
 ORDER BY priority)
-update menu set parent_id=orderable.parent_id, priority=orderable.priority
+update $table set parent_id=orderable.parent_id, priority=orderable.priority
 FROM orderable
 WHERE menu.id = orderable.id
 SQL;
@@ -210,7 +213,8 @@ SQL;
     public function getFrontMenu($locale)
     {
         // Build select part
-        $menuSelect       = $this->buildSelectPart('menu');
+        $table            = $this->getClassMetadata()->table['name'];
+        $menuSelect       = $this->buildSelectPart($table);
         $secondMenuSelect = $this->buildSelectPart('c');
 
         $sql = <<<SQL
@@ -219,14 +223,14 @@ with recursive menu_tree as (
     , link_id
     , 1 as level
     , array[priority]::integer[] as path_priority
-   from menu
+   from $table
    where parent_id is null and "locale" = :locale
    union all
    select $secondMenuSelect
     , c.link_id
     , p.level + 1
     , p.path_priority||c.priority
-   from menu c
+   from $table c
      join menu_tree p on c.parent_id = p.id
    where c."locale" = :locale
 )
