@@ -53,136 +53,136 @@
     </div>
     <!-- Add code to initialize the tree when the document is loaded: -->
     <script type="text/javascript">
-    $(function() {
-        $("[data-form='delete']").on('submit', function () {
-            return confirm("Êtes-vous sûr de supprimer cet item (et ces enfants) ?");
-        });
+        $(function() {
+            $("[data-form='delete']").on('submit', function () {
+                return confirm("Êtes-vous sûr de supprimer cet item (et ces enfants) ?");
+            });
 
-        glyph_opts = {
-            map: {
-                doc: "glyphicon glyphicon-file",
-                docOpen: "glyphicon glyphicon-file",
-                checkbox: "glyphicon glyphicon-unchecked",
-                checkboxSelected: "glyphicon glyphicon-check",
-                checkboxUnknown: "glyphicon glyphicon-share",
-                dragHelper: "glyphicon glyphicon-play",
-                dropMarker: "glyphicon glyphicon-arrow-right",
-                error: "glyphicon glyphicon-warning-sign",
-                expanderClosed: "glyphicon glyphicon-menu-right",
-                expanderLazy: "glyphicon glyphicon-menu-right",  // glyphicon-plus-sign
-                expanderOpen: "glyphicon glyphicon-menu-down",  // glyphicon-collapse-down
-                folder: "glyphicon glyphicon-folder-close",
-                folderOpen: "glyphicon glyphicon-folder-open",
-                loading: "glyphicon glyphicon-refresh glyphicon-spin"
-            }
-        };
-        $(function () {
-            // Initialize Fancytree
-            $("#tree").fancytree({
-                extensions: ["glyph", 'dnd'],
-                selectMode: 1,
-                minExpandLevel: 2,
-                source: {url: "{{ path("tree_admin_menu_json") }}", debugDelay: 1000},
-                glyph: glyph_opts,
-                dnd: {
-                    preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
-                    preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
-                    autoExpandMS: 400,
-                    refreshPositions: true,
-                    draggable: {
-                        appendTo: "body",  // We don't want to clip the helper inside container
-                        // scroll: false,
-                        // containment: "parent",  // $("ul.fancytree-container"),
-                        // cursorAt: { left: 5 },
-                        revert: "invalid"
-                        // revert: function(dropped) {
-                        //   return
-                        // }
-                    },
-                    dragStart: function (node, data) {
-                        // allow dragging `node`:
-                        return true;
-                    },
-                    dragEnter: function (node, data) {
-                        return true;
-                    },
-                    initHelper: function (node, data) {
-                        // Helper was just created: modify markup
-                        var helper = data.ui.helper,
-                            sourceNodes = data.tree.getSelectedNodes();
-
-                        // Store a list of active + all selected nodes
-                        if (!node.isSelected()) {
-                            sourceNodes.unshift(node);
-                        }
-                        helper.data("sourceNodes", sourceNodes);
-                        // Mark selected nodes also as drag source (active node is already)
-                        $(".fancytree-active,.fancytree-selected", tree.$container)
-                            .addClass("fancytree-drag-source");
-                        // Add a counter badge to helper if dragging more than one node
-                        if (sourceNodes.length > 1) {
-                            helper.append($("<span class='fancytree-childcounter'/>")
-                                .text("+" + (sourceNodes.length - 1)));
-                        }
-                        // Prepare an indicator for copy-mode
-                        helper.prepend($("<span class='fancytree-dnd-modifier'/>")
-                            .text("+").hide());
-                    },
-                    updateHelper: function (node, data) {
-                        var tree = node.tree,
-                            copyMode = false;
-
-                        // Show/hide the helper's copy indicator (+)
-                        data.ui.helper.find(".fancytree-dnd-modifier").toggle(copyMode);
-                        // Dim the source node(s) in move-mode
-                        $(".fancytree-drag-source", tree.$container)
-                            .toggleClass("fancytree-drag-remove", !copyMode);
-                    },
-                    dragDrop: function (node, data) {
-                        var sourceNodes = data.ui.helper.data("sourceNodes"),
-                            copyMode = false;
-
-                        if (copyMode) {
-                            $.each(sourceNodes, function (i, o) {
-                                o.copyTo(node, data.hitMode, function (n) {
-                                    delete n.key;
-                                    n.selected = false;
-                                    n.title = "Copy of " + n.title;
-                                });
-                            });
-                        } else {
-                            $.each(sourceNodes, function (i, o) {
-                                console.log(data.hitMode, node.title, o.title, node.key.replace("menu_", ""), o.key.replace("menu_", ""));
-                                $.post(
-                                    "{{ path('tree_admin_menu_move') }}",
-                                    {
-                                        moved_node: o.key.replace("menu_", ""),
-                                        destination_node: node.key.replace("menu_", ""),
-                                        mode: data.hitMode
-                                    },
-                                    function (data) {
-                                        if (data != true) {
-                                            alert('Le menu n\'a pas été mise à jour. Merci de recharger la page et de recommencer');
-                                        }
-                                    }
-                                ).fail(function () {
-                                    alert('Une erreur est survenue. Le menu n\'a pas été mise à jour.');
-                                });
-                                o.moveTo(node, data.hitMode);
-                            });
-                        }
-                    }
-                },
-                activate: function (event, data) {
-                    var node = data.node;
-                    $("[data-node='id']").each(function (index, input) {
-                        input.value = node.key.replace("menu_", "");
-                    });
-                    $("[data-node-action]").attr('disable', true);
-
+            glyph_opts = {
+                map: {
+                    doc: "glyphicon glyphicon-file",
+                    docOpen: "glyphicon glyphicon-file",
+                    checkbox: "glyphicon glyphicon-unchecked",
+                    checkboxSelected: "glyphicon glyphicon-check",
+                    checkboxUnknown: "glyphicon glyphicon-share",
+                    dragHelper: "glyphicon glyphicon-play",
+                    dropMarker: "glyphicon glyphicon-arrow-right",
+                    error: "glyphicon glyphicon-warning-sign",
+                    expanderClosed: "glyphicon glyphicon-menu-right",
+                    expanderLazy: "glyphicon glyphicon-menu-right",  // glyphicon-plus-sign
+                    expanderOpen: "glyphicon glyphicon-menu-down",  // glyphicon-collapse-down
+                    folder: "glyphicon glyphicon-folder-close",
+                    folderOpen: "glyphicon glyphicon-folder-open",
+                    loading: "glyphicon glyphicon-refresh glyphicon-spin"
                 }
+            };
+            $(function () {
+                // Initialize Fancytree
+                $("#tree").fancytree({
+                    extensions: ["glyph", 'dnd'],
+                    selectMode: 1,
+                    minExpandLevel: 2,
+                    source: {url: "{{ path("tree_admin_menu_json") }}", debugDelay: 1000},
+                    glyph: glyph_opts,
+                    dnd: {
+                        preventVoidMoves: true, // Prevent dropping nodes 'before self', etc.
+                        preventRecursiveMoves: true, // Prevent dropping nodes on own descendants
+                        autoExpandMS: 400,
+                        refreshPositions: true,
+                        draggable: {
+                            appendTo: "body",  // We don't want to clip the helper inside container
+                            // scroll: false,
+                            // containment: "parent",  // $("ul.fancytree-container"),
+                            // cursorAt: { left: 5 },
+                            revert: "invalid"
+                            // revert: function(dropped) {
+                            //   return
+                            // }
+                        },
+                        dragStart: function (node, data) {
+                            // allow dragging `node`:
+                            return true;
+                        },
+                        dragEnter: function (node, data) {
+                            return true;
+                        },
+                        initHelper: function (node, data) {
+                            // Helper was just created: modify markup
+                            var helper = data.ui.helper,
+                                sourceNodes = data.tree.getSelectedNodes();
+
+                            // Store a list of active + all selected nodes
+                            if (!node.isSelected()) {
+                                sourceNodes.unshift(node);
+                            }
+                            helper.data("sourceNodes", sourceNodes);
+                            // Mark selected nodes also as drag source (active node is already)
+                            $(".fancytree-active,.fancytree-selected", tree.$container)
+                                .addClass("fancytree-drag-source");
+                            // Add a counter badge to helper if dragging more than one node
+                            if (sourceNodes.length > 1) {
+                                helper.append($("<span class='fancytree-childcounter'/>")
+                                    .text("+" + (sourceNodes.length - 1)));
+                            }
+                            // Prepare an indicator for copy-mode
+                            helper.prepend($("<span class='fancytree-dnd-modifier'/>")
+                                .text("+").hide());
+                        },
+                        updateHelper: function (node, data) {
+                            var tree = node.tree,
+                                copyMode = false;
+
+                            // Show/hide the helper's copy indicator (+)
+                            data.ui.helper.find(".fancytree-dnd-modifier").toggle(copyMode);
+                            // Dim the source node(s) in move-mode
+                            $(".fancytree-drag-source", tree.$container)
+                                .toggleClass("fancytree-drag-remove", !copyMode);
+                        },
+                        dragDrop: function (node, data) {
+                            var sourceNodes = data.ui.helper.data("sourceNodes"),
+                                copyMode = false;
+
+                            if (copyMode) {
+                                $.each(sourceNodes, function (i, o) {
+                                    o.copyTo(node, data.hitMode, function (n) {
+                                        delete n.key;
+                                        n.selected = false;
+                                        n.title = "Copy of " + n.title;
+                                    });
+                                });
+                            } else {
+                                $.each(sourceNodes, function (i, o) {
+                                    console.log(data.hitMode, node.title, o.title, node.key.replace("menu_", ""), o.key.replace("menu_", ""));
+                                    $.post(
+                                        "{{ path('tree_admin_menu_move') }}",
+                                        {
+                                            moved_node: o.key.replace("menu_", ""),
+                                            destination_node: node.key.replace("menu_", ""),
+                                            mode: data.hitMode
+                                        },
+                                        function (data) {
+                                            if (data != true) {
+                                                alert('Le menu n\'a pas été mise à jour. Merci de recharger la page et de recommencer');
+                                            }
+                                        }
+                                    ).fail(function () {
+                                        alert('Une erreur est survenue. Le menu n\'a pas été mise à jour.');
+                                    });
+                                    o.moveTo(node, data.hitMode);
+                                });
+                            }
+                        }
+                    },
+                    activate: function (event, data) {
+                        var node = data.node;
+                        $("[data-node='id']").each(function (index, input) {
+                            input.value = node.key.replace("menu_", "");
+                        });
+                        $("[data-node-action]").enable();
+
+                    }
+                });
             });
         });
-    });
     </script>
 {%  endblock %}

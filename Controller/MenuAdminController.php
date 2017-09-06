@@ -223,7 +223,7 @@ class MenuAdminController extends Controller
     public function editAction(Request $request)
     {
         $id = $request->query->get("id", null);
-        $menu = $this->getDoctrine()->getRepository("Umanit\Bundle\TreeBundle:Menu")->find($id);
+        $menu = $this->getDoctrine()->getRepository(Menu::class)->find($id);
         if ($menu == null) {
             throw $this->createNotFoundException();
         }
@@ -245,7 +245,7 @@ class MenuAdminController extends Controller
         }
 
         return $this->render(
-            'admin/menu/edit.html.twig',
+            '@UmanitTree/admin/menu/edit.html.twig',
             [
                 "form" => $form->createView()
             ]
@@ -263,9 +263,9 @@ class MenuAdminController extends Controller
     public function deleteAction(Request $request)
     {
         $id = $request->query->get("id", null);
-        $menu = $this->getDoctrine()->getRepository("Umanit\Bundle\TreeBundle:Menu")->find($id);
+        $menu = $this->getDoctrine()->getRepository(Menu::class)->find($id);
 
-        if ($menu != null) {
+        if ($menu !== null) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($menu);
             $em->flush();
