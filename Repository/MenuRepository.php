@@ -16,7 +16,6 @@ use Umanit\Bundle\TreeBundle\Entity\Link;
  */
 class MenuRepository extends \Doctrine\ORM\EntityRepository
 {
-
     /**
      * Récupération du menu à plat
      *
@@ -24,15 +23,23 @@ class MenuRepository extends \Doctrine\ORM\EntityRepository
      */
     public function getMenu()
     {
+        // Build select part
+        $menuSelect       = $this->buildSelectPart('menu');
+        $secondMenuSelect = $this->buildSelectPart('c');
+
         $sql = <<<SQL
 with recursive menu_tree as (
-    select id, link_id, title, image, alt_image, parent_id, "locale", 1 as level, "position", priority, oid, updated_at
+    select $menuSelect
+    , link_id
+    , 1 as level
     , array[priority]::integer[] as path_priority
    from menu
    where parent_id is null
    union all
-   select c.id, c.link_id, c.title, c.image, c.alt_image, c.parent_id, c."locale", p.level + 1, c."position", c.priority, c.oid, c.updated_at
-    ,  p.path_priority||c.priority
+   select $secondMenuSelect
+    , c.link_id
+    , p.level + 1
+    , p.path_priority||c.priority
    from menu c
      join menu_tree p on c.parent_id = p.id
 )
@@ -43,9 +50,9 @@ order by path_priority
 SQL;
 
         $rsm = new ResultSetMappingBuilder($this->_em);
-        // @todo AGU : set Menu::class configurable
-        $rsm->addRootEntityFromClassMetadata(Menu::class, 'mt');
+        $rsm->addRootEntityFromClassMetadata($this->getClassMetadata()->name, 'mt');
         $rsm->addJoinedEntityFromClassMetadata(Link::class, 'l', 'mt', 'link', array('id' => 'address_id'));
+
 
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
 
@@ -61,16 +68,27 @@ SQL;
      */
     public function getIndentMenu()
     {
+        $cols = $this->getClassMetadata()->columnNames;
+        unset($cols['title']);
+        // Build select part
+        $menuSelect       = $this->buildSelectPart('menu', $cols);
+        $secondMenuSelect = $this->buildSelectPart('c', $cols);
+
         $sql = <<<SQL
 with recursive menu_tree as (
-    select id, link_id, title::text, image, alt_image, parent_id, "locale", 1 as level, "position", priority, oid, updated_at
+    select $menuSelect
+    , link_id
+    , menu.title::text
+    , 1 as level
     , array[priority]::integer[] as path_priority
    from menu
    where parent_id is null
    union all
-   select c.id, c.link_id, rpad('', p.level * 4, '\xC2\xA0')::text||c.title::text, c.image, c.alt_image, c.parent_id, c."locale", p.level + 1, c."position",
-    c.priority, c.oid, c.updated_at
-    ,  p.path_priority||c.priority
+   select $secondMenuSelect
+    , c.link_id
+    , rpad('', p.level * 4, '\xC2\xA0')::text||c.title::text
+    , p.level + 1
+    , p.path_priority||c.priority
    from menu c
      join menu_tree p on c.parent_id = p.id
 )
@@ -81,8 +99,7 @@ order by path_priority
 SQL;
 
         $rsm = new ResultSetMappingBuilder($this->_em);
-        // @todo AGU : set Menu::class configurable
-        $rsm->addRootEntityFromClassMetadata(Menu::class, 'mt');
+        $rsm->addRootEntityFromClassMetadata($this->getClassMetadata()->name, 'mt');
         $rsm->addJoinedEntityFromClassMetadata(Link::class, 'l', 'mt', 'link', array('id' => 'address_id'));
 
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
@@ -193,15 +210,23 @@ SQL;
      */
     public function getFrontMenu($locale)
     {
+        // Build select part
+        $menuSelect       = $this->buildSelectPart('menu');
+        $secondMenuSelect = $this->buildSelectPart('c');
+
         $sql = <<<SQL
 with recursive menu_tree as (
-    select id, link_id, title, image, alt_image, parent_id, "locale", 1 as level, "position", priority, oid, updated_at
+    select $menuSelect
+    , link_id
+    , 1 as level
     , array[priority]::integer[] as path_priority
    from menu
    where parent_id is null and "locale" = :locale
    union all
-   select c.id, c.link_id, c.title, c.image, c.alt_image, c.parent_id, c."locale", p.level + 1, c."position", c.priority, c.oid, c.updated_at
-    ,  p.path_priority||c.priority
+   select $secondMenuSelect
+    , c.link_id
+    , p.level + 1
+    , p.path_priority||c.priority
    from menu c
      join menu_tree p on c.parent_id = p.id
    where c."locale" = :locale
@@ -213,14 +238,12 @@ order by path_priority
 SQL;
 
         $rsm = new ResultSetMappingBuilder($this->_em);
-        // @todo AGU : set Menu::class configurable and use doctrine annotation reader to dynamically build rsm
-        $rsm->addEntityResult(Menu::class, 'mt');
-        $rsm->addFieldResult('mt', 'id', 'id');
-        $rsm->addFieldResult('mt', 'title', 'title');
-        $rsm->addFieldResult('mt', 'parent_id', 'parentId');
-        $rsm->addFieldResult('mt', 'position', 'position');
-        $rsm->addFieldResult('mt', 'image', 'image');
-        $rsm->addFieldResult('mt', 'alt_image', 'altImage');
+        $rsm->addEntityResult($this->getClassMetadata()->name, 'mt');
+
+        foreach ($this->getClassMetadata()->fieldNames as $col => $field) {
+            $rsm->addFieldResult('mt', $col, $field);
+        }
+
         $rsm->addJoinedEntityFromClassMetadata(Link::class, 'l', 'mt', 'link', array('id' => 'address_id'));
 
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
@@ -230,5 +253,25 @@ SQL;
         $query->setParameter('locale', $locale);
 
         return $query->getResult();
+    }
+
+    /**
+     * Builds select part from class metadata
+     *
+     * @param null  $alias
+     * @param array $columnNames
+     *
+     * @return string
+     */
+    protected function buildSelectPart($alias = null, array $columnNames = [])
+    {
+        if (empty($columnNames)) {
+            $columnNames = $this->getClassMetadata()->columnNames;
+        }
+        return implode(', ', array_map(function ($colname) use ($alias) {
+            if ($alias) {
+                return sprintf('%s.%s', $alias, $colname);
+            }
+        }, $columnNames));
     }
 }
