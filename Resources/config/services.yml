@@ -118,6 +118,8 @@ services:
     # Menu builder for sonata
     umanit.tree.event_subscriber.sonata_menu_builder_subscriber:
         class: Umanit\Bundle\TreeBundle\EventSubscriber\SonataMenuBuilderSubscriber
+        arguments:
+            - '%umanit_tree.menu_entity_class%'
         tags: ['kernel.event_subscriber']
 
     # Twig configuration extension

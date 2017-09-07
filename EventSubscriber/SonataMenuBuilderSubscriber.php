@@ -10,6 +10,21 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SonataMenuBuilderSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var
+     */
+    private $menuEntityClass;
+
+    /**
+     * SonataMenuBuilderSubscriber constructor.
+     *
+     * @param string $menuEntityClass
+     */
+    public function __construct($menuEntityClass)
+    {
+        $this->menuEntityClass = $menuEntityClass;
+    }
+
     public static function getSubscribedEvents()
     {
         return ['sonata.admin.event.configure.menu.sidebar' => 'addMenuItems'];
@@ -17,7 +32,10 @@ class SonataMenuBuilderSubscriber implements EventSubscriberInterface
 
     public function addMenuItems(Event $event)
     {
-        if (method_exists($event, 'getMenu') && get_class($event->getMenu()) === 'Knp\Menu\MenuItem') {
+        if (!empty($this->menuEntityClass) &&
+            method_exists($event, 'getMenu') &&
+            get_class($event->getMenu()) === 'Knp\Menu\MenuItem'
+        ) {
 
             /** @var \Knp\Menu\ItemInterface $menu */
             $menu = $event->getMenu();
