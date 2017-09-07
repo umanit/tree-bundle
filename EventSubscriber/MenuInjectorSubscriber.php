@@ -2,7 +2,6 @@
 
 namespace Umanit\Bundle\TreeBundle\EventSubscriber;
 
-use AppBundle\Entity\Page;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -98,36 +97,5 @@ class MenuInjectorSubscriber implements EventSubscriberInterface
         } while (end($parentId) !== false);
 
         $this->twig->addGlobal('menus', $menu);
-
-        $this->injectSiteMap($event);
-
-        $this->injectSearchAssistante($event);
     }
-
-    protected function injectSiteMap(GetResponseEvent $event)
-    {
-        $this->twig->addGlobal(
-            'sitemap',
-            $this->em->getRepository(Page::class)->getSiteMap($event->getRequest()->getLocale())
-        );
-    }
-
-    protected function injectSearchAssistante(GetResponseEvent $event)
-    {
-        // Récuparation du bouton assitant de recherche
-        $searchAssistancePage = null;
-
-        $configuration = $this->em->getRepository('Umanit\Bundle\TreeBundle:Configuration')->getConfiguration($event->getRequest()->getLocale());
-        if (!empty($configuration) && !empty($configuration->getAssistanceLink())) {
-            $link = $configuration->getAssistanceLink();
-
-            if (!empty($link->getInternalLink())) {
-                $internalLink = explode(';', $link->getInternalLink());
-                $searchAssistancePage = $this->em->getRepository($internalLink[1])->find($internalLink[0]);
-            }
-        }
-        $this->twig->addGlobal('search_assistante_page', $searchAssistancePage);
-    }
-
-
 }

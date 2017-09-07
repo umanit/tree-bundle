@@ -2,6 +2,8 @@
 
 namespace Umanit\Bundle\TreeBundle\Controller;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,7 +45,10 @@ class MenuAdminController extends Controller
      */
     public function dashboardAction()
     {
-        return $this->render('@UmanitTree/admin/menu/list.html.twig');
+            if (empty($this->getParameter('umanit_tree.menu_entity_class'))) {
+                throw new InvalidConfigurationException("You have to configure 'umanit_tree.menu_entity_class' in order to use the menu admin. Read the chapter 'Using the menu admin' of the README.");
+            }
+            return $this->render('@UmanitTree/admin/menu/list.html.twig');
     }
 
     /**
