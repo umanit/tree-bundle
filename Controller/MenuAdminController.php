@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -210,7 +211,10 @@ class MenuAdminController extends Controller
     {
         $menu = new $this->menuEntityClass();
 
-        $form = $this->createForm($this->menuFormClass, $menu);
+        $form = $this
+            ->createForm($this->menuFormClass, $menu)
+            ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
+        ;
 
         $form->handleRequest($request);
 
@@ -249,8 +253,10 @@ class MenuAdminController extends Controller
             throw $this->createNotFoundException();
         }
 
-        $form = $this->createForm($this->menuFormClass, $menu);
-
+        $form = $this
+            ->createForm($this->menuFormClass, $menu)
+            ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
+        ;
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

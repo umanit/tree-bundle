@@ -288,7 +288,7 @@ A CRUD is provided in order to administrate your menus. It's available on the ro
 
 Start by running `php bin/console assets:install` to get the assets in your web directory.
 
-##### Customize the admin layout
+##### Customizing the admin layout
 
 The layout can be customized to your needs by setting the `admin_layout` configuration value. 
 
@@ -365,6 +365,46 @@ sonata_admin:
             - bundles/umanittree/js/vendor/jquery.fancytree-all-deps.min.js
             - bundles/umanittree/js/vendor/jquery.fancytree.dnd.js
 
+```
+##### Customizing the admin form
+
+Let's assume you added an image attribute on your Menu entity and want to use VichUploader to administrate it.
+
+First, Create a form type:
+```php
+namespace AppBundle\Form;
+
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Vich\UploaderBundle\Form\Type\VichImageType;
+use Umanit\Bundle\TreeBundle\Form\Type\MenuType as BaseMenuType;
+
+class MenuType extends BaseMenuType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        parent::buildForm($builder, $options);
+        $builder
+            ->add('imageFile', VichImageType::class, [
+                'label'        => 'Image',
+                'required'     => false,
+                'allow_delete' => true,
+                'attr'         => [
+                    'imagine_pattern' => 'admin',
+                ],
+            ])
+            ->add('altImage')
+        ;
+    }
+}
+
+```
+
+Then add you form type to TreeBundle's configuration:
+```yaml
+umanit_tree:
+    # ...
+    menu_form_class:      AppBundle\Form\MenuType
 ```
 
 ## Configuration reference

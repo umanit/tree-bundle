@@ -75,7 +75,6 @@ class MenuType extends AbstractType
                 'choice_label' => 'title',
                 'required'     => false,
             ])
-            ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
             ->add('updatedAt', null, [
                 'data'  => new \DateTimeImmutable(),
                 'label' => false,
