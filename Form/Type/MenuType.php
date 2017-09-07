@@ -28,17 +28,24 @@ class MenuType extends AbstractType
     private $menuEntityClass;
 
     /**
+     * @var array
+     */
+    private $menus;
+
+    /**
      * MenuType constructor.
      *
      * @param EntityManagerInterface $em
      * @param array                  $nodeTypes
      * @param string                 $menuEntityClass
+     * @param array                  $menus
      */
-    public function __construct(EntityManagerInterface $em, array $nodeTypes, $menuEntityClass)
+    public function __construct(EntityManagerInterface $em, array $nodeTypes, $menuEntityClass, array $menus)
     {
         $this->em              = $em;
         $this->nodeTypes       = $nodeTypes;
         $this->menuEntityClass = $menuEntityClass;
+        $this->menus           = $menus;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -55,11 +62,7 @@ class MenuType extends AbstractType
         $builder
             ->add('title')
             ->add('position', Choicetype::class, [
-                'choices' => [
-                    // @todo AGU : set configurable
-                    "Principal"    => 'primary',
-                    "Pied de page" => 'footer',
-                ],
+                'choices' => array_combine($this->menus, $this->menus),
             ])
             ->add('link', LinkType::class, [
                 'models'         => $models,
