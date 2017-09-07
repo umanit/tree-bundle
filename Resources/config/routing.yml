@@ -1,3 +1,7 @@
+umanit.tree.menu:
+    resource: '@UmanitTreeBundle/Controller/'
+    type: annotation
+
 umanit.tree.default:
     path: /{path}
     defaults: { _controller: UmanitTreeBundle:Default:notFound }

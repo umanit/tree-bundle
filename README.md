@@ -207,23 +207,229 @@ Returns the path for the given link instance (instance of `Umanit\Bundle\TreeBun
 
 Returns true if the given link targets an external URL (instance of `Umanit\Bundle\TreeBundle\Entity\Link`).
 
+## Using the menu admin
+
+> **/!\ For performance concerns, we chose to support PostgreSQL only.**
+
+Follow those two steps to get started:
+
+### 1. Create your Menu entity
+
+```php
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Umanit\Bundle\TreeBundle\Entity\AbstractMenu as BaseMenu;
+
+/**
+ * Menu
+ *
+ * @ORM\Table(name="menu")
+ * @ORM\Entity(repositoryClass="Umanit\Bundle\TreeBundle\Repository\MenuRepository") // Using TreeBundle's repository is mandatory
+ */
+class Menu extends BaseMenu
+{
+}
+```
+
+### 2. Configure TreeBundle to use your Menu entity
+
+```yaml
+# app/config/config.yml
+umanit_tree:
+    # ...
+    menu_entity_class:    AppBundle\Entity\Menu
+
+```
+
+### Usage
+
+#### Front
+
+TreeBundle doesn't come with a template for the menu. A global twig variable is injected to your site, use it to build your menu template(s).
+
+**Example:**
+
+```twig
+<nav class="nav-primary">
+    <ul class="nav-primary__list nav-primary__lvl-1">
+        {% for menu in menus %}
+            {% if menu.position == 'primary' %}
+                <li class="nav-primary__item">
+                    <a href="{{ menu.link is empty ? '#' : get_path_from_link(menu.link) }}" class="nav-primary__link">
+                        {{- menu.title|raw -}}
+                        {#- <br class="hidden-xs hidden-sm"> -#}
+                    </a>
+                    {% if menu.children is not empty %}
+                        <ul class="nav-primary__list nav-primary__lvl-2">
+                            {% for subMenu in menu.children %}
+                                {%  if subMenu.link is empty %}
+                                    <li class="nav-primary__label">{{ subMenu.title|raw }}</li>
+                                    {% else %}
+                                    <li class="nav-primary__item">
+                                        <a href="{{ get_path_from_link(subMenu.link) }}" class="nav-primary__link"
+                                            <span class="nav-primary__text">{{ subMenu.title|raw }}</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {%  endif %}
+        {% endfor %}
+    </ul>
+</nav>
+```
+
+#### Menu admin
+
+A CRUD is provided in order to administrate your menus. It's available on the route `tree_admin_menu_dashboard`, /admin/menu.
+
+Start by running `php bin/console assets:install` to get the assets in your web directory.
+
+##### Customizing the admin layout
+
+The layout can be customized to your needs by setting the `admin_layout` configuration value. 
+
+Example if you want to use Sonata Admin's layout:
+```yaml
+# config.yml
+umanit_tree:
+    ...
+    admin_layout: '@SonataAdmin/standard_layout.html.twig' # Default is '@UmanitTree/admin/default_layout.html.twig'
+```
+
+The menu admin has 4 javascript dependencies, you're ought to include them as well. Have a look in the default_layout.html.twig. 
+
+```HTML
+    <!-- @UmanitTree/admin/default_layout.html.twig -->
+    <script src="{{ asset('bundles/umanittree/vendor/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('bundles/umanittree/vendor/js/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('bundles/umanittree/vendor/js/jquery.fancytree-all-deps.min.js') }}"></script>
+    <script src="{{ asset('bundles/umanittree/vendor/js/jquery.fancytree.dnd.js') }}"></script>
+```
+
+TreeBundle ships with those assets, you may use them or your own.
+
+Again, if you want to use it with SonataAdmin, configure it as following:
+
+```yaml
+
+sonata_admin:
+    # ...
+    assets:
+        stylesheets:
+            # Defaults:
+            - bundles/sonatacore/vendor/bootstrap/dist/css/bootstrap.min.css
+            - bundles/sonatacore/vendor/components-font-awesome/css/font-awesome.min.css
+            - bundles/sonatacore/vendor/ionicons/css/ionicons.min.css
+            - bundles/sonataadmin/vendor/admin-lte/dist/css/AdminLTE.min.css
+            - bundles/sonataadmin/vendor/admin-lte/dist/css/skins/skin-black.min.css
+            - bundles/sonataadmin/vendor/iCheck/skins/square/blue.css
+            - bundles/sonatacore/vendor/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css
+            - bundles/sonataadmin/vendor/jqueryui/themes/base/jquery-ui.css
+            - bundles/sonatacore/vendor/select2/select2.css
+            - bundles/sonatacore/vendor/select2-bootstrap-css/select2-bootstrap.min.css
+            - bundles/sonataadmin/vendor/x-editable/dist/bootstrap3-editable/css/bootstrap-editable.css
+            - bundles/sonataadmin/css/styles.css
+            - bundles/sonataadmin/css/layout.css
+            - bundles/sonataadmin/css/tree.css
+            - bundles/sonataadmin/css/colors.css
+            # TreeBundle's assets
+            - bundles/umanittree/css/admin.css
+            - bundles/umanittree/css/vendor/ui.fancytree.min.css
+        javascripts:
+            # Defaults:
+            - bundles/sonatacore/vendor/jquery/dist/jquery.min.js
+            - bundles/sonataadmin/vendor/jquery.scrollTo/jquery.scrollTo.min.js
+            - bundles/sonatacore/vendor/moment/min/moment.min.js
+            - bundles/sonataadmin/vendor/jqueryui/ui/minified/jquery-ui.min.js
+            - bundles/sonataadmin/vendor/jqueryui/ui/minified/i18n/jquery-ui-i18n.min.js
+            - bundles/sonatacore/vendor/bootstrap/dist/js/bootstrap.min.js
+            - bundles/sonatacore/vendor/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js
+            - bundles/sonataadmin/vendor/jquery-form/jquery.form.js
+            - bundles/sonataadmin/jquery/jquery.confirmExit.js
+            - bundles/sonataadmin/vendor/x-editable/dist/bootstrap3-editable/js/bootstrap-editable.min.js
+            - bundles/sonatacore/vendor/select2/select2.min.js
+            - bundles/sonataadmin/vendor/admin-lte/dist/js/app.min.js
+            - bundles/sonataadmin/vendor/iCheck/icheck.min.js
+            - bundles/sonataadmin/vendor/slimScroll/jquery.slimscroll.min.js
+            - bundles/sonataadmin/vendor/waypoints/lib/jquery.waypoints.min.js
+            - bundles/sonataadmin/vendor/waypoints/lib/shortcuts/sticky.min.js
+            - bundles/sonataadmin/Admin.js
+            - bundles/sonataadmin/treeview.js
+            # TreeBundle's assets
+            - bundles/umanittree/js/admin.js
+            - bundles/umanittree/js/admin.multi-media.js
+            - bundles/umanittree/js/vendor/jquery.fancytree-all-deps.min.js
+            - bundles/umanittree/js/vendor/jquery.fancytree.dnd.js
+
+```
+##### Customizing the admin form
+
+Let's assume you added an image attribute on your Menu entity and want to use VichUploader to administrate it.
+
+First, Create a form type:
+```php
+namespace AppBundle\Form;
+
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Vich\UploaderBundle\Form\Type\VichImageType;
+use Umanit\Bundle\TreeBundle\Form\Type\MenuType as BaseMenuType;
+
+class MenuType extends BaseMenuType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        parent::buildForm($builder, $options);
+        $builder
+            ->add('imageFile', VichImageType::class, [
+                'label'        => 'Image',
+                'required'     => false,
+                'allow_delete' => true,
+                'attr'         => [
+                    'imagine_pattern' => 'admin',
+                ],
+            ])
+            ->add('altImage')
+        ;
+    }
+}
+
+```
+
+Then add you form type to TreeBundle's configuration:
+```yaml
+umanit_tree:
+    # ...
+    menu_form_class:      AppBundle\Form\MenuType
+```
+
 ## Configuration reference
 
 ```yaml
 umanit_tree:
-    locale:               '%locale%'                                    # Default locale to use
-    root_class:           \Umanit\Bundle\TreeBundle\Entity\RootEntity   # Class for the root node. If you have a homepage object, put it there
-
-    # Defines a controller to call by class. Foreach entity ("class"), set a controller and method to call
-    controllers_by_class:
+    locale:               '%locale%'                                    # Optional. Default locale to use
+    root_class:           '\Umanit\Bundle\TreeBundle\Entity\RootEntity' # Optional. Class for the root node. If you have a homepage object, put it there
+    admin_layout:         '@UmanitTree/admin/default_layout.html.twig'  # Optional. Default layout for the menu admin section
+    menu_form_class:      'Umanit\Bundle\TreeBundle\Form\Type\MenuType' # Optional. Default form for Menu
+    menu_entity_class:    'AppBundle\Entity\Menu'                       # Optional. Your menu entity. Required if you want to use the menu admin
+    menus:                ['primary']                                   # Optional. Configure you menus.
+    
+    # Defines configuration per node types. You can set a specific controller per class and set if the node type must appear in the menu admin.
+    node_types:
+        # Prototype
         -
             class:                ~ # Required. Ex. : AppBundle\Entity\Page
             controller:           ~ # Required. Ex. : AppBundle:Page:show
+            menu:                 ~ # Optionnal. Default is false
 
 
     # Seo default values and translation domain
     seo:
-        redirect_301:         true   # Redirect old URLs to new one
+        redirect_301:         true   # Redirect old URLs to new ones
         default_title:        'Umanit Tree'
         default_description:  'Umanit tree bundle'
         default_keywords:     'umanit, web, bundle, symfony2'
@@ -233,4 +439,5 @@ umanit_tree:
     breadcrumb:
         root_name:            'Home'
         translation_domain:   'messages'
+
 ```

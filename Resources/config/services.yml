@@ -25,7 +25,7 @@ services:
         class: Umanit\Bundle\TreeBundle\Listener\RouteListener
         arguments:
             - '@doctrine'
-            - '%umanit_tree.controllers_by_class%'
+            - '%umanit_tree.node_types%'
             - '%umanit_tree.locale%'
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.request', priority: -10 }
@@ -95,8 +95,34 @@ services:
         tags:
             - { name: 'form.type', alias: umanit_node_type }
 
-    # Link form type
-    umanit.tree.form.type.link:
-        class: Umanit\Bundle\TreeBundle\Form\Type\SeoMetadataType
+    # Menu form type
+    umanit.tree.form.menu_type:
+        class: '%umanit_tree.menu_form_class%'
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '%umanit_tree.node_types%'
+            - '%umanit_tree.menu_entity_class%'
+            - '%umanit_tree.menus%'
         tags:
-            - { name: 'form.type', alias: umanit_seo_metadata_type }
+            - { name: form.type, alias: umanit_tree_menu_type }
+
+    # Menu injector
+    umanit.tree.event_subscriber.menu_injector_subscriber:
+        class: Umanit\Bundle\TreeBundle\EventSubscriber\MenuInjectorSubscriber
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@twig'
+            - '%umanit_tree.menu_entity_class%'
+        tags: ['kernel.event_subscriber']
+
+    # Menu builder for sonata
+    umanit.tree.event_subscriber.sonata_menu_builder_subscriber:
+        class: Umanit\Bundle\TreeBundle\EventSubscriber\SonataMenuBuilderSubscriber
+        tags: ['kernel.event_subscriber']
+
+    # Twig configuration extension
+    umanit.tree.twig.extension.configuration_extension:
+        class: Umanit\Bundle\TreeBundle\Twig\Extension\ConfigurationExtension
+        arguments: ['%umanit_tree.admin_layout%']
+        tags:
+            - { name: 'twig.extension' }
