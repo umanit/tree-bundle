@@ -56,11 +56,11 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('breadcrumb')
                     ->addDefaultsIfNotSet()
                     ->children()
-                    ->scalarNode('root_name')->defaultValue('Home')->end()
-                    ->scalarNode('translation_domain')->defaultValue('messages')->end()
+                        ->scalarNode('root_name')->defaultValue('Home')->end()
+                        ->scalarNode('translation_domain')->defaultValue('messages')->end()
+                    ->end()
                 ->end()
             ->end()
-        ->end()
         ;
 
         return $treeBuilder;
