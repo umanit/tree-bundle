@@ -27,7 +27,7 @@ services:
     gedmo.listener.tree:
         class: Gedmo\Tree\TreeListener
         tags:
-            - { name: doctrine.event_subscriber, connection: default }
+            - { name: doctrine.event_subscriber, connection: default, priority: 10 }
         calls:
             - [ setAnnotationReader, [ "@annotation_reader" ] ]
 
@@ -50,7 +50,7 @@ services:
     gedmo.listener.sluggable:
         class: Gedmo\Sluggable\SluggableListener
         tags:
-            - { name: doctrine.event_subscriber, connection: default }
+            - { name: doctrine.event_subscriber, connection: default, priority: 100 }
         calls:
             - [ setAnnotationReader, [ "@annotation_reader" ] ]
 
@@ -67,6 +67,7 @@ services:
             - { name: doctrine.event_subscriber, connection: default }
         calls:
             - [ setAnnotationReader, [ "@annotation_reader" ] ]
+
 ```
 
 Update your database schema to add our model

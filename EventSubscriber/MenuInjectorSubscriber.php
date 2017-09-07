@@ -40,7 +40,7 @@ class MenuInjectorSubscriber implements EventSubscriberInterface
 
     public function onKernelRequest(GetResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMasterRequest() || empty($this->menuEntityClass)) {
             return;
         }
 
