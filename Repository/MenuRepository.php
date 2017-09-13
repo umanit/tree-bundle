@@ -224,7 +224,7 @@ with recursive menu_tree as (
     , 1 as level
     , array[priority]::integer[] as path_priority
    from $table
-   where parent_id is null and "locale" = :locale
+   where parent_id is null and ("locale" = :locale or "locale" = 'unknown')
    union all
    select $secondMenuSelect
     , c.link_id
@@ -232,7 +232,7 @@ with recursive menu_tree as (
     , p.path_priority||c.priority
    from $table c
      join menu_tree p on c.parent_id = p.id
-   where c."locale" = :locale
+   where c."locale" = :locale or c."locale" = 'unknown'
 )
 SELECT %SELECT%, mt.level
 FROM menu_tree mt
