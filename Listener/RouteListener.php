@@ -12,7 +12,7 @@ class RouteListener
     /**
      * @var array Configuration, which controller to call by class
      */
-    protected $controllersByClass;
+    protected $nodeTypes;
 
     /**
      * @var string Default locale
@@ -27,18 +27,18 @@ class RouteListener
     /**
      * Constructor.
      *
-     * @param Registry $doctrine           Doctrine service
-     * @param array    $controllersByClass Configuration, which controller to call by class
-     * @param string   $defaultLocale      Default locale
+     * @param Registry $doctrine      Doctrine service
+     * @param array    $nodeTypes     Configuration, which controller to call by class
+     * @param string   $defaultLocale Default locale
      */
     public function __construct(
         Registry $doctrine,
-        array $controllersByClass,
+        array $nodeTypes,
         $defaultLocale
     ) {
-        $this->doctrine           = $doctrine;
-        $this->controllersByClass = $controllersByClass;
-        $this->defaultLocale      = $defaultLocale;
+        $this->doctrine      = $doctrine;
+        $this->nodeTypes     = $nodeTypes;
+        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -69,12 +69,13 @@ class RouteListener
             $entity = $repo->findOneById($node->getClassId());
 
             if ($entity) {
-                foreach ($this->controllersByClass as $controller) {
-                    if ($entity instanceof $controller['class']) {
+                foreach ($this->nodeTypes as $nodeType) {
+                    if ($entity instanceof $nodeType['class']) {
                         // Set a new controller and the object in 'contentObject'
                         $event->getRequest()->attributes->set('contentObject', $entity);
                         $event->getRequest()->attributes->set('contentNode', $node);
-                        $event->getRequest()->attributes->set('_controller', $controller['controller']);
+                        $event->getRequest()->attributes->set('_controller', $nodeType['controller']);
+                        $event->getRequest()->attributes->set('template', $nodeType['template']);
 
                         return;
                     }

@@ -424,8 +424,9 @@ umanit_tree:
         # Prototype
         -
             class:                ~ # Required. Ex. : AppBundle\Entity\Page
-            controller:           ~ # Required. Ex. : AppBundle:Page:show
-            menu:                 ~ # Optionnal. Default is false
+            controller:           ~ # Optional. Default FrameworkBundle:Template:template. Ex. : AppBundle:Page:show
+            template:             ~ # Required if controller is not set.
+            menu:                 ~ # Optional. Default is false
 
 
     # Seo default values and translation domain

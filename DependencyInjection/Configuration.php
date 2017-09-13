@@ -33,9 +33,23 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('node_types')->info('Configure each node type')
                     ->prototype('array')
+                        ->validate()
+                            ->ifTrue(function ($v) {
+                                if (!is_array($v)) {
+                                    return true;
+                                }
+                                if (is_null($v['template']) && $v['controller'] === 'FrameworkBundle:Template:template') {
+                                    return true;
+                                }
+
+                                return false;
+                            })
+                            ->thenInvalid('You must define either a controller or a template for your node_type"')
+                            ->end()
                         ->children()
                             ->scalarNode('class')->isRequired()->end()
-                            ->scalarNode('controller')->isRequired()->end()
+                            ->scalarNode('controller')->defaultValue('FrameworkBundle:Template:template')->end()
+                            ->scalarNode('template')->defaultNull()->end()
                             ->booleanNode('menu')
                                 ->info('Defines if the node should appear in the menu admin. Default is false.')
                                 ->defaultFalse()
