@@ -19,7 +19,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="btn-group pull-right">
-                            <a role="menuitem" class="btn btn-primary" tabindex="-1" href="{{ path('tree_admin_menu_add') }}">
+                            <a id="add-menu-item" role="menuitem" class="btn btn-primary" tabindex="-1" href="#">
                                 <i class="fa fa-plus-circle" aria-hidden="true"></i> {{ 'Add' | trans }}
                             </a>
                             <form class="btn-group inline" action="{{ path("tree_admin_menu_edit") }}">
@@ -84,6 +84,7 @@
             function initFancyTree(menuIdentifier) {
                 $("#tree-container").empty();
                 $("#tree-container").append('<div id="tree" class="fancytree-colorize-hover fancytree-fade-expander umanit-fancytree"></div>');
+                $("a#add-menu-item").attr('href', '{{ path('tree_admin_menu_add') }}?identifier=' + menuIdentifier);
                 // Initialize Fancytree
                 $("#tree").fancytree({
                     extensions: ["glyph", 'dnd'],

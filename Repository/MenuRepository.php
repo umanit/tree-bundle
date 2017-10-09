@@ -68,9 +68,11 @@ SQL;
     /**
      * Récupération du menu à plat indenté (pour les Select en BO)
      *
+     * @param string $identifier
+     *
      * @return AbstractMenu[]
      */
-    public function getIndentMenu()
+    public function getIndentMenu($identifier = 'primary')
     {
         $cols = $this->getClassMetadata()->columnNames;
         unset($cols['title']);
@@ -88,6 +90,7 @@ with recursive menu_tree as (
     , array[priority]::integer[] as path_priority
    from $table
    where parent_id is null
+     and $table.position = :identifier
    union all
    select $secondMenuSelect
     , c.link_id
@@ -96,6 +99,7 @@ with recursive menu_tree as (
     , p.path_priority||c.priority
    from $table c
      join menu_tree p on c.parent_id = p.id
+   where c.position = :identifier
 )
 SELECT %SELECT%, mt.level
 FROM menu_tree mt
@@ -110,6 +114,7 @@ SQL;
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
 
         $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query->setParameter('identifier', $identifier);
 
         return $query->getResult();
     }

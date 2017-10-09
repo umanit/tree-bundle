@@ -207,9 +207,10 @@ class MenuAdminController extends Controller
     public function addAction(Request $request)
     {
         $menu = new $this->menuEntityClass();
-
+        $identifier = $request->get('identifier', 'primary');
+        $menu->setPosition($identifier);
         $form = $this
-            ->createForm($this->menuFormClass, $menu)
+            ->createForm($this->menuFormClass, $menu, ['menu_position' => $identifier])
             ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
         ;
 
