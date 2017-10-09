@@ -18,9 +18,11 @@ class MenuRepository extends \Doctrine\ORM\EntityRepository
     /**
      * Récupération du menu à plat
      *
+     * @param string $identifier
+     *
      * @return array
      */
-    public function getMenu()
+    public function getMenu($identifier = 'primary')
     {
         // Build select part
         $table            = $this->getClassMetadata()->table['name'];
@@ -35,6 +37,7 @@ with recursive menu_tree as (
     , array[priority]::integer[] as path_priority
    from $table
    where parent_id is null
+     and $table.position = :identifier
    union all
    select $secondMenuSelect
     , c.link_id
@@ -42,6 +45,7 @@ with recursive menu_tree as (
     , p.path_priority||c.priority
    from $table c
      join menu_tree p on c.parent_id = p.id
+   where c.position = :identifier
 )
 SELECT %SELECT%, mt.level
 FROM menu_tree mt
@@ -53,10 +57,10 @@ SQL;
         $rsm->addRootEntityFromClassMetadata($this->getClassMetadata()->name, 'mt');
         $rsm->addJoinedEntityFromClassMetadata(Link::class, 'l', 'mt', 'link', array('id' => 'address_id'));
 
-
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
 
         $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query->setParameter('identifier', $identifier);
 
         return $query->getResult(Query::HYDRATE_ARRAY);
     }
@@ -64,9 +68,11 @@ SQL;
     /**
      * Récupération du menu à plat indenté (pour les Select en BO)
      *
+     * @param string $identifier
+     *
      * @return AbstractMenu[]
      */
-    public function getIndentMenu()
+    public function getIndentMenu($identifier = 'primary')
     {
         $cols = $this->getClassMetadata()->columnNames;
         unset($cols['title']);
@@ -84,6 +90,7 @@ with recursive menu_tree as (
     , array[priority]::integer[] as path_priority
    from $table
    where parent_id is null
+     and $table.position = :identifier
    union all
    select $secondMenuSelect
     , c.link_id
@@ -92,6 +99,7 @@ with recursive menu_tree as (
     , p.path_priority||c.priority
    from $table c
      join menu_tree p on c.parent_id = p.id
+   where c.position = :identifier
 )
 SELECT %SELECT%, mt.level
 FROM menu_tree mt
@@ -106,6 +114,7 @@ SQL;
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
 
         $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query->setParameter('identifier', $identifier);
 
         return $query->getResult();
     }
@@ -123,9 +132,12 @@ SQL;
         if ($parentId == null) {
             $selectSQL = ' IS NULL';
         }
+
+        $table = $this->getClassMetadata()->table['name'];
+
         $sql = <<<SQL
 SELECT id 
-FROM menu
+FROM $table
 WHERE parent_id $selectSQL
 ORDER BY priority
 SQL;
@@ -193,7 +205,7 @@ as priority FROM source
 ORDER BY priority)
 update $table set parent_id=orderable.parent_id, priority=orderable.priority
 FROM orderable
-WHERE menu.id = orderable.id
+WHERE $table.id = orderable.id
 SQL;
 
         $sql = strtr($sql, ['%CASE%' => $case]);

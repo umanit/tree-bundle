@@ -49,23 +49,26 @@ class MenuAdminController extends Controller
         if (empty($this->getParameter('umanit_tree.menu_entity_class'))) {
             throw new InvalidConfigurationException("You have to configure 'umanit_tree.menu_entity_class' in order to use the menu admin. Read the chapter 'Using the menu admin' of the README.");
         }
-        return $this->render('@UmanitTree/admin/menu/list.html.twig');
+        return $this->render('@UmanitTree/admin/menu/list.html.twig', ['menus' => $this->getParameter('umanit_tree.menus')]);
     }
 
     /**
      * Récupération en json de la structure de menu pour fancytree
      *
-     * @return JsonResponse
+     * @param Request $request
      *
+     * @return JsonResponse
      * @Route("/menu.json", name="tree_admin_menu_json")
      */
-    public function getMenuAction()
+    public function getMenuAction(Request $request)
     {
-        $menuFlat = $this->getDoctrine()->getRepository($this->menuEntityClass)->getMenu();
+        $identifier = $request->get('identifier', 'primary');
+        $menuFlat = $this->getDoctrine()->getRepository($this->menuEntityClass)->getMenu($identifier);
 
         $menu = [];
         $parentId = [];
         $currentMenu = reset($menuFlat);
+
         if (!empty($currentMenu)) {
             do {
                 $menuItem =
@@ -132,13 +135,7 @@ class MenuAdminController extends Controller
      */
     private function getIcon($position)
     {
-        if ($position == 'primary') {
-            return 'glyphicon glyphicon-menu-hamburger';
-        } elseif ($position == 'header') {
-            return 'glyphicon glyphicon-arrow-up';
-        } elseif ($position == 'footer') {
-            return 'glyphicon glyphicon-arrow-down';
-        }
+        return 'glyphicon glyphicon-arrow-right';
     }
 
     /**
@@ -210,9 +207,10 @@ class MenuAdminController extends Controller
     public function addAction(Request $request)
     {
         $menu = new $this->menuEntityClass();
-
+        $identifier = $request->get('identifier', 'primary');
+        $menu->setPosition($identifier);
         $form = $this
-            ->createForm($this->menuFormClass, $menu)
+            ->createForm($this->menuFormClass, $menu, ['menu_position' => $identifier])
             ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
         ;
 

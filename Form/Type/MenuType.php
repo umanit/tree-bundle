@@ -71,7 +71,7 @@ class MenuType extends AbstractType
             ])
             ->add('parent', EntityType::class, [
                 'class'        => $this->menuEntityClass,
-                'choices'      => $this->em->getRepository($this->menuEntityClass)->getIndentMenu(),
+                'choices'      => $this->em->getRepository($this->menuEntityClass)->getIndentMenu($options['menu_position']),
                 'choice_label' => 'title',
                 'required'     => false,
             ])
@@ -89,6 +89,7 @@ class MenuType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => $this->menuEntityClass,
+            'menu_position' => 'primary',
         ]);
     }
 }
