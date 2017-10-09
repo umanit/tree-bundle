@@ -227,6 +227,7 @@ use Umanit\Bundle\TreeBundle\Entity\AbstractMenu as BaseMenu;
  *
  * @ORM\Table(name="menu")
  * @ORM\Entity(repositoryClass="Umanit\Bundle\TreeBundle\Repository\MenuRepository") // Using TreeBundle's repository is mandatory
+ * @ORM\HasLifecycleCallbacks() // This is mandatory too
  */
 class Menu extends BaseMenu
 {

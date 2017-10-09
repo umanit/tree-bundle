@@ -46,10 +46,10 @@ class MenuAdminController extends Controller
      */
     public function dashboardAction()
     {
-            if (empty($this->getParameter('umanit_tree.menu_entity_class'))) {
-                throw new InvalidConfigurationException("You have to configure 'umanit_tree.menu_entity_class' in order to use the menu admin. Read the chapter 'Using the menu admin' of the README.");
-            }
-            return $this->render('@UmanitTree/admin/menu/list.html.twig');
+        if (empty($this->getParameter('umanit_tree.menu_entity_class'))) {
+            throw new InvalidConfigurationException("You have to configure 'umanit_tree.menu_entity_class' in order to use the menu admin. Read the chapter 'Using the menu admin' of the README.");
+        }
+        return $this->render('@UmanitTree/admin/menu/list.html.twig');
     }
 
     /**
