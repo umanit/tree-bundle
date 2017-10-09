@@ -135,7 +135,7 @@ class MenuAdminController extends Controller
      */
     private function getIcon($position)
     {
-        return 'glyphicon glyphicon-menu-hamburger';
+        return 'glyphicon glyphicon-arrow-right';
     }
 
     /**
