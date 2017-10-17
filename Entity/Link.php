@@ -12,7 +12,6 @@ use Symfony\Component\Validator\Context\ExecutionContext;
  *
  * @ORM\Table(name="treebundle_link")
  * @ORM\Entity()
- * @Assert\Callback(methods={"validateNotBoth"})
  */
 class Link
 {
@@ -40,7 +39,9 @@ class Link
 
     /**
      * Assert that externalLink and internalLink are not filled
+     *
      * @param ExecutionContext $context
+     * @Assert\Callback()
      */
     public function validateNotBoth(ExecutionContext $context)
     {
