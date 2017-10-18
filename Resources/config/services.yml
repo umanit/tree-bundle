@@ -19,6 +19,7 @@ services:
             - { name: 'doctrine.event_listener', event: postUpdate, priority: -20 }
             - { name: 'doctrine.event_listener', event: postPersist, priority: -20 }
             - { name: 'doctrine.event_listener', event: postRemove, priority: -20 }
+            - { name: 'doctrine.event_listener', event: postFlush, priority: -20 }
 
     # Listener to redirect to the right controller
     umanit.tree.listener.route_listener:
