@@ -66,7 +66,7 @@ class RouteListener
         if ($node) {
             // Search for the entity related to the node
             $repo   = $this->doctrine->getRepository($node->getClassName());
-            $entity = $repo->findOneById($node->getClassId());
+            $entity = $repo->find($node->getClassId());
 
             if ($entity) {
                 foreach ($this->nodeTypes as $nodeType) {
