@@ -25,8 +25,6 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
             ->setParameter('slug', $slug)
         ;
 
-        $qbv = $this->getEntityManager()->createQueryBuilder();
-
         if ($locale !== TreeNodeInterface::UNKNOWN_LOCALE) {
             $qb->andWhere($qb->expr()->orX(
                 $qb->expr()->eq('n.locale', ':locale'),
@@ -42,6 +40,8 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
         if ($parent) {
             $qb->andWhere('n.parent = :parent');
             $qb->setParameter('parent', $parent);
+        } else {
+            $qb->andWhere('n.parent is null');
         }
 
         try {
