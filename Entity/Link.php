@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Node
@@ -40,10 +41,11 @@ class Link
     /**
      * Assert that externalLink and internalLink are not filled
      *
-     * @param ExecutionContext $context
      * @Assert\Callback()
+     * @param ExecutionContextInterface $context
+     * @param mixed                     $payload
      */
-    public function validateNotBoth(ExecutionContext $context)
+    public function validateNotBoth(ExecutionContextInterface $context, $payload)
     {
         if ($this->externalLink && $this->internalLink) {
             $context
