@@ -2,8 +2,8 @@
 
 namespace Umanit\Bundle\TreeBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class MenuAdminController
  *
  * @Route("/admin/menu")
+ * @Security("is_granted('ROLE_TREE_MENU_ADMIN')")
  *
  * @todo AGU : translate comments.
  */

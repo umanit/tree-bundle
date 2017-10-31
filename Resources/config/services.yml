@@ -121,6 +121,7 @@ services:
         class: Umanit\Bundle\TreeBundle\EventSubscriber\SonataMenuBuilderSubscriber
         arguments:
             - '%umanit_tree.menu_entity_class%'
+            - '@security.authorization_checker'
         tags: ['kernel.event_subscriber']
 
     # Twig configuration extension
@@ -129,3 +130,10 @@ services:
         arguments: ['%umanit_tree.admin_layout%']
         tags:
             - { name: 'twig.extension' }
+
+    umanit_bundle_tree.security.menu_voter:
+        class: Umanit\Bundle\TreeBundle\Security\MenuVoter
+        arguments:
+            - '%umanit_tree.menus_roles%'
+        tags:
+            - { name: security.voter }

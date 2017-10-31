@@ -276,7 +276,7 @@ class NodeHelper
      *
      * @param Node $node
      *
-     * @return mixed
+     * @return TreeNodeInterface|null
      */
     public function getAssociatedEntity($node)
     {

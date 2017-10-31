@@ -4,6 +4,8 @@ namespace Umanit\Bundle\TreeBundle\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @author Arthur Guigand <aguigand@umanit.fr>
@@ -14,15 +16,21 @@ class SonataMenuBuilderSubscriber implements EventSubscriberInterface
      * @var
      */
     private $menuEntityClass;
+    /**
+     * @var AuthorizationCheckerInterface
+     */
+    private $checker;
 
     /**
      * SonataMenuBuilderSubscriber constructor.
      *
-     * @param string $menuEntityClass
+     * @param string                        $menuEntityClass
+     * @param AuthorizationCheckerInterface $checker
      */
-    public function __construct($menuEntityClass)
+    public function __construct($menuEntityClass, AuthorizationCheckerInterface $checker)
     {
         $this->menuEntityClass = $menuEntityClass;
+        $this->checker         = $checker;
     }
 
     public static function getSubscribedEvents()
@@ -32,7 +40,8 @@ class SonataMenuBuilderSubscriber implements EventSubscriberInterface
 
     public function addMenuItems(Event $event)
     {
-        if (!empty($this->menuEntityClass) &&
+        if ($this->checker->isGranted('ROLE_TREE_MENU_ADMIN') &&
+            !empty($this->menuEntityClass) &&
             method_exists($event, 'getMenu') &&
             get_class($event->getMenu()) === 'Knp\Menu\MenuItem'
         ) {
