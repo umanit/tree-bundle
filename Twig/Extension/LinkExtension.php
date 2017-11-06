@@ -2,7 +2,8 @@
 
 namespace Umanit\Bundle\TreeBundle\Twig\Extension;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Umanit\Bundle\TreeBundle\Entity\Link;
 use Umanit\Bundle\TreeBundle\Entity\Node;
 use Umanit\Bundle\TreeBundle\Router\NodeRouter;
@@ -10,25 +11,24 @@ use Umanit\Bundle\TreeBundle\Router\NodeRouter;
 class LinkExtension extends \Twig_Extension
 {
     /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
      * @var RouterInterface
      */
     protected $router;
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
 
     /**
      * Constuctor.
      *
-     * @param Registry   $doctrine
-     * @param NodeRouter $router
+     * @param NodeRouter             $router
+     * @param EntityManagerInterface $em
      */
-    public function __construct(Registry $doctrine, NodeRouter $router)
+    public function __construct(NodeRouter $router, EntityManagerInterface $em)
     {
-        $this->doctrine = $doctrine;
-        $this->router   = $router;
+        $this->router = $router;
+        $this->em     = $em;
     }
 
     /**
@@ -42,6 +42,7 @@ class LinkExtension extends \Twig_Extension
             new \Twig_Function('get_path_from_node', [$this, 'getNodePath']),
             new \Twig_Function('get_path', [$this, 'getPath']),
             new \Twig_Function('clear_path_cache', [$this, 'clearCache']),
+            new \Twig_Function('get_object_from_link', [$this, 'getObjectFromLink']),
         );
     }
 
@@ -107,6 +108,24 @@ class LinkExtension extends \Twig_Extension
     public function getPath($object, $parentObject = null, $root = false, $absolute = false, $parameters = [])
     {
         return $this->router->getPath($object, $parentObject, $root, $absolute, null, $parameters);
+    }
+
+    /**
+     * Get the object associated to an internal Link.
+     *
+     * @param Link $link
+     *
+     * @return null|object
+     */
+    public function getObjectFromLink(Link $link)
+    {
+        if ($this->isExternalLink($link)) {
+            return null;
+        }
+
+        list($objectId, $class) = explode(';', $link->getInternalLink());
+
+        return $this->em->getRepository($class)->find($objectId);
     }
 
     /**

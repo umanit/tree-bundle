@@ -43,8 +43,8 @@ services:
     umanit.tree.twig.extension.link:
         class: Umanit\Bundle\TreeBundle\Twig\Extension\LinkExtension
         arguments:
-            - '@doctrine'
             - '@umanit.tree.router'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: 'twig.extension' }
 
