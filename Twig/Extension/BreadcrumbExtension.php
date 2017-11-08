@@ -133,7 +133,7 @@ class BreadcrumbExtension extends \Twig_Extension
                 array(),
                 $this->configuration['translation_domain']
             ),
-            'link' => $this->router->getPathByNode($defaultNode)
+            'link' => $defaultNode ? $this->router->getPathByNode($defaultNode) : '#'
         );
     }
 }
