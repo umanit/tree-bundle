@@ -288,6 +288,8 @@ TreeBundle doesn't come with a template for the menu. A global twig variable is 
 
 A CRUD is provided in order to administrate your menus. It's available on the route `tree_admin_menu_dashboard`, /admin/menu.
 
+/!\ You need to have the role `ROLE_TREE_MENU_ADMIN` in order to be able to access the route.
+
 Start by running `php bin/console assets:install` to get the assets in your web directory.
 
 ##### Customizing the admin layout
