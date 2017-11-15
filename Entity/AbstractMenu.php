@@ -5,6 +5,7 @@ namespace Umanit\Bundle\TreeBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Menu
@@ -68,6 +69,7 @@ abstract class AbstractMenu
      *
      * @ORM\ManyToOne(targetEntity="Umanit\Bundle\TreeBundle\Entity\Link", fetch="EAGER", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="link_id", referencedColumnName="id")
+     * @Assert\Valid()
      */
     protected $link;
 
