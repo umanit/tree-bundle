@@ -364,8 +364,6 @@ sonata_admin:
             - bundles/sonataadmin/Admin.js
             - bundles/sonataadmin/treeview.js
             # TreeBundle's assets
-            - bundles/umanittree/js/admin.js
-            - bundles/umanittree/js/admin.multi-media.js
             - bundles/umanittree/js/vendor/jquery.fancytree-all-deps.min.js
             - bundles/umanittree/js/vendor/jquery.fancytree.dnd.js
 
