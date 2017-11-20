@@ -95,7 +95,7 @@ class LinkType extends AbstractType
 
                 if (!$data->getInternalLink() && !$data->getExternalLink()) {
                     foreach ($form->all() as $element) {
-                        $element->addError(new FormError('Vous devez spécifier au moins un lien interne ou externe'));
+                        $element->addError(new FormError('You must specify at least one external or internal link.'));
                     }
                 }
             }
