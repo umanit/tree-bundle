@@ -62,7 +62,7 @@ class Node
     /**
      * @var Node[]
      *
-     * @ORM\OneToMany(targetEntity="Umanit\Bundle\TreeBundle\Entity\Node", mappedBy="parent", cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="Umanit\Bundle\TreeBundle\Entity\Node", mappedBy="parent", cascade={"persist"})
      */
     protected $children;
 
