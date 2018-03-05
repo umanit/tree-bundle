@@ -107,13 +107,19 @@ services:
         tags:
             - { name: form.type, alias: umanit_tree_menu_type }
 
+    # Menu builder
+    umanit.tree.meny.menu_menu_builder:
+        class: Umanit\Bundle\TreeBundle\Menu\MenuBuilder
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - '%umanit_tree.menu_entity_class%'
+
     # Menu injector
     umanit.tree.event_subscriber.menu_injector_subscriber:
         class: Umanit\Bundle\TreeBundle\EventSubscriber\MenuInjectorSubscriber
         arguments:
-            - '@doctrine.orm.entity_manager'
             - '@twig'
-            - '%umanit_tree.menu_entity_class%'
+            - '@umanit.tree.meny.menu_menu_builder'
         tags: ['kernel.event_subscriber']
 
     # Menu builder for sonata

@@ -104,6 +104,27 @@ The 4 methods of TreeNodeInterface are :
 You can manage some SEO options such as title, description and keywords with the `Umanit\Bundle\TreeBundle\Model\SeoInterface`
 and use the `Umanit\Bundle\TreeBundle\Model\SeoTrait` to automatically add an attribute "seoMetadata" to your entity
 
+## Bind a controller and get the entity
+
+In order to bind a controller (or a template) to an entity, you have to configure the key `node_types`
+
+```yaml
+    node_types:
+        -
+            class:               'AppBundle\Entity\Page' # your entity
+            controller:          'AppBundle:Page:get' # action to call
+```
+
+The entity (or node) will be available in the request attribute.
+
+```php
+    public function getAction(Request $request)
+    {
+        $entity = $request->attributes->get('contentObject'); // Your entity
+        $node = $request->attributes->get('contentNode'); // TreeBundle's node
+    }
+```
+
 ## Create a Parent Node selector
 
 ### Usage example :
