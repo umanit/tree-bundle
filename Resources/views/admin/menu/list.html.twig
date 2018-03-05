@@ -6,7 +6,7 @@
         <ul class="nav nav-tabs pull-right">
             {% for menu in menus|reverse %}
                 <li{% if loop.last %} class="active"{% endif %}>
-                    <a href="#{{ menu }}" data-toggle="tab" data-menu="{{ menu }}">{{ menu }}</a>
+                    <a href="#{{ menu }}" data-toggle="tab" data-menu="{{ menu }}">{{ ('umanit_tree_bundle.menu.' ~ menu)|trans }}</a>
                 </li>
             {% endfor %}
             <li class="pull-left header"><i class="glyphicon glyphicon-menu-hamburger"></i> {{ 'Menus' | trans }}</li>
