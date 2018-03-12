@@ -4,6 +4,7 @@ namespace Umanit\Bundle\TreeBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -12,7 +13,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class UmanitTreeExtension extends Extension
+class UmanitTreeExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -40,7 +41,7 @@ class UmanitTreeExtension extends Extension
     private function setConfigAsParameters(ContainerBuilder &$container, array $params, $parent)
     {
         foreach ($params as $key => $value) {
-            $name = $parent . '.' . $key;
+            $name = $parent.'.'.$key;
             $container->setParameter($name, $value);
 
             if (is_array($value)) {
@@ -48,4 +49,20 @@ class UmanitTreeExtension extends Extension
             }
         }
     }
+
+    /**
+     * {@inheritdoc}
+     * @param ContainerBuilder $container
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $bundles = $container->getParameter('kernel.bundles');
+        // Conditionnaly load sonata_admin.yml
+        if (isset($bundles['SonataAdminBundle'])) {
+            $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+            $loader->load('sonata_admin.yml');
+        }
+    }
+
+
 }

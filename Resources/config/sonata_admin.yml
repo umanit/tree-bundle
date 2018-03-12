@@ -1,0 +1,11 @@
+sonata_admin:
+    # Extension for adding "Show on site" to tree bundle admins
+    extensions:
+        umanit_translation.admin.extension.tree_node_admin_extension:
+            implements:
+                - Umanit\Bundle\TreeBundle\Model\TreeNodeInterface
+services:
+    umanit_translation.admin.extension.tree_node_admin_extension:
+        class: Umanit\Bundle\TreeBundle\Admin\Extension\TreeNodeAdminExtension
+        tags:
+            - { name: sonata.admin.extens ion }
