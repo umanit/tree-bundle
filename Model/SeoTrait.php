@@ -13,12 +13,7 @@ trait SeoTrait
     /**
      * @var SeoMetadata
      *
-     * @ORM\OneToOne(
-     *      targetEntity="Umanit\Bundle\TreeBundle\Entity\SeoMetadata",
-     *      cascade={"persist", "remove"},
-     *      fetch="EAGER"
-     * )
-     * @ORM\JoinColumn(name="seoMetadata", referencedColumnName="id")
+     * @ORM\Embedded(class="Umanit\Bundle\TreeBundle\Entity\SeoMetadata", columnPrefix=false)
      */
     protected $seoMetadata;
 

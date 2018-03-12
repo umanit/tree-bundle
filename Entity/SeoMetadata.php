@@ -9,42 +9,31 @@ use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * SeoMetadata
- * @ORM\Table(name="treebundle_seometadata")
- * @ORM\Entity()
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
+ * @ORM\Embeddable
  */
 class SeoMetadata
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
-
-    /**
      * @var string
-     * @ORM\Column(name="title", type="string", length=255, nullable=true)
+     * @ORM\Column(name="seo_title", type="string", length=255, nullable=true)
      */
     protected $title;
 
     /**
      * @var string
-     * @ORM\Column(name="description", type="text", nullable=true)
+     * @ORM\Column(name="seo_description", type="text", nullable=true)
      */
     protected $description;
 
     /**
      * @var string
-     * @ORM\Column(name="keywords", type="text",  nullable=true)
+     * @ORM\Column(name="seo_keywords", type="text",  nullable=true)
      */
     protected $keywords;
 
     /**
      * @var string
-     * @ORM\Column(name="url", type="string", length=511, nullable=true)
+     * @ORM\Column(name="seo_url", type="string", length=511, nullable=true)
      */
     protected $url;
 
@@ -119,31 +108,7 @@ class SeoMetadata
 
         return $this;
     }
-
-    /**
-     * Get the value of Id
-     *
-     * @return integer
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set the value of Id
-     *
-     * @param integer $id
-     *
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
+    
     /**
      * @return string
      */
