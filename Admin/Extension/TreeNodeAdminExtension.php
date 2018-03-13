@@ -27,7 +27,7 @@ class TreeNodeAdminExtension extends AbstractAdminExtension
             $actions = $listMapper->get('_action')->getOption('actions');
             if ($actions && isset($actions['show'])) {
                 // Overrides show action to use TreeBundle node system
-                $actions['show'] = ['template' => '@UmanitTree/Admin/CRUD/list__action_show.html.twig'];
+                $actions['show'] = ['template' => '@UmanitTree/admin/CRUD/list__action_show.html.twig'];
                 $listMapper->get('_action')->setOption('actions', $actions);
             }
         }
@@ -35,9 +35,7 @@ class TreeNodeAdminExtension extends AbstractAdminExtension
 
     public function getPersistentParameters(AdminInterface $admin)
     {
-        $admin->setTemplate('button_show', '@UmanitTree/Admin/Button/show_button.html.twig');
+        $admin->setTemplate('button_show', '@UmanitTree/admin/Button/show_button.html.twig');
         return parent::getPersistentParameters($admin);
     }
-
-
 }
