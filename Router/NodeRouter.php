@@ -100,7 +100,12 @@ class NodeRouter
         $locale = null,
         $parameters = []
     ) {
-        $referenceNode = $this->requestStack->getCurrentRequest()->attributes->get('contentNode', null);
+        $referenceNode = null;
+
+        // In the app/console context, the request is an empty object request
+        if ($this->requestStack->getCurrentRequest() !== null) {
+            $referenceNode = $this->requestStack->getCurrentRequest()->attributes->get('contentNode', null);
+        }
         if ($referenceNode === null || $referenceNode->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
             $referenceNode = null;
         }
@@ -151,7 +156,7 @@ class NodeRouter
             $className,
             $classId,
             $parents,
-            $locale ? $locale : $this->requestStack->getCurrentRequest()->getLocale()
+            $locale
         );
 
         return $node;
