@@ -3,6 +3,8 @@
 namespace Umanit\Bundle\TreeBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -11,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
+use Umanit\Bundle\TreeBundle\Entity\Link;
 
 class LinkType extends AbstractType
 {
@@ -46,7 +49,7 @@ class LinkType extends AbstractType
 
         if ($options['allow_external']) {
             $builder
-                ->add('externalLink', 'text', array(
+                ->add('externalLink', TextType::class, array(
                     'translation_domain' => $options['translation_domain'],
                     'label'              => $options['label_external'],
                     'required'           => false,
@@ -59,9 +62,7 @@ class LinkType extends AbstractType
 
             foreach ($options['models'] as $displayName => $classPath) {
                 $repo     = $this->doctrine->getRepository($classPath);
-                $filters  = isset($options['query_filters'][$classPath])
-                    ? $options['query_filters'][$classPath]
-                    : []
+                $filters  = $options['query_filters'][$classPath] ?? []
                 ;
                 $entities = $repo->findBy($filters);
 
@@ -74,7 +75,7 @@ class LinkType extends AbstractType
             }
 
             $builder
-                ->add('internalLink', 'choice', array(
+                ->add('internalLink', ChoiceType::class, array(
                     'label'              => $options['label_internal'],
                     'translation_domain' => $options['translation_domain'],
                     'choices'            => $data,
@@ -105,7 +106,7 @@ class LinkType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class'         => 'Umanit\Bundle\TreeBundle\Entity\Link',
+            'data_class'         => Link::class,
             'models'             => array(),
             'query_filters'      => array(),
             'allow_internal'     => true,
@@ -122,7 +123,7 @@ class LinkType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class'         => 'Umanit\Bundle\TreeBundle\Entity\Link',
+            'data_class'         => Link::class,
             'models'             => array(),
             'query_filters'      => array(),
             'allow_internal'     => true,
