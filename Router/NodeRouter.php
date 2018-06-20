@@ -105,6 +105,7 @@ class NodeRouter
         // In the app/console context, the request is an empty object request
         if ($this->requestStack->getCurrentRequest() !== null) {
             $referenceNode = $this->requestStack->getCurrentRequest()->attributes->get('contentNode', null);
+            $locale = $locale ?? $this->requestStack->getCurrentRequest()->getLocale();
         }
         if ($referenceNode === null || $referenceNode->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
             $referenceNode = null;
