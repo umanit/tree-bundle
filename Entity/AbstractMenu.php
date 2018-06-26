@@ -65,7 +65,7 @@ abstract class AbstractMenu
     protected $position;
 
     /**
-     * @var string
+     * @var Link|null
      *
      * @ORM\ManyToOne(targetEntity="Umanit\Bundle\TreeBundle\Entity\Link", fetch="EAGER", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="link_id", referencedColumnName="id")
@@ -204,7 +204,7 @@ abstract class AbstractMenu
     }
 
     /**
-     * @return string
+     * @return Link|null
      */
     public function getLink()
     {
@@ -212,9 +212,9 @@ abstract class AbstractMenu
     }
 
     /**
-     * @param string $link
+     * @param Link|null $link
      */
-    public function setLink($link)
+    public function setLink(Link $link = null)
     {
         $this->link = $link;
     }
