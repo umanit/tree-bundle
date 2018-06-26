@@ -2,6 +2,7 @@
 
 namespace Umanit\Bundle\TreeBundle\Router;
 
+use Umanit\Bundle\TreeBundle\Entity\Link;
 use Umanit\Bundle\TreeBundle\Entity\Node;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -192,5 +193,27 @@ class NodeRouter
         return $this->router->generate('umanit.tree.default', array_merge(array(
             'path' => substr($node->getPath(), 1),
         ), $parameters), $absolute);
+    }
+
+    /**
+     * Returns path for the given Link.
+     *
+     * @param Link $link
+     *
+     * @return string
+     */
+    public function getPathFromLink(Link $link)
+    {
+        if ($link->getExternalLink()) {
+            return $link->getExternalLink();
+        }
+
+        if ($link->getInternalLink()) {
+            list($classId, $className) = explode(';', $link->getInternalLink());
+
+            return $this->getPathClass($className, $classId);
+        }
+
+        return '#';
     }
 }

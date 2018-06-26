@@ -55,17 +55,7 @@ class LinkExtension extends \Twig_Extension
      */
     public function getPathLink(Link $link)
     {
-        if ($link->getExternalLink()) {
-            return $link->getExternalLink();
-        }
-
-        if ($link->getInternalLink()) {
-            list($classId, $className) = explode(';', $link->getInternalLink());
-
-            return $this->router->getPathClass($className, $classId);
-        }
-
-        return '#';
+        return $this->router->getPathFromLink($link);
     }
 
     /**
