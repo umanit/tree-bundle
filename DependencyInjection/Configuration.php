@@ -39,20 +39,21 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->validate()
                             ->ifTrue(function ($v) {
-                                if (!is_array($v)) {
+                                if (!\is_array($v)) {
                                     return true;
                                 }
-                                if (is_null($v['template']) && $v['controller'] === 'FrameworkBundle:Template:template') {
+                                if (null === $v['template'] && $v['controller'] === 'Symfony\Bundle\FrameworkBundle\Controller\TemplateController:templateAction' && null === $v['api_controller']) {
                                     return true;
                                 }
 
                                 return false;
                             })
-                            ->thenInvalid('You must define either a controller or a template for your node_type"')
+                            ->thenInvalid('You must define an api_controller, a controller or a template for your node_type"')
                             ->end()
                         ->children()
                             ->scalarNode('class')->isRequired()->end()
-                            ->scalarNode('controller')->defaultValue('FrameworkBundle:Template:template')->end()
+                            ->scalarNode('controller')->defaultValue('Symfony\Bundle\FrameworkBundle\Controller\TemplateController:templateAction')->end()
+                            ->scalarNode('api_controller')->defaultNull()->info('Defines the api controller. Requires UmanitApiTreeBundle.')->end()
                             ->scalarNode('template')->defaultNull()->end()
                             ->booleanNode('menu')
                                 ->info('Defines if the node should appear in the menu admin. Default is false.')
