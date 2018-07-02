@@ -132,6 +132,7 @@ services:
         arguments:
             - '@umanit.tree.router'
             - '@umanit.tree.excerpt'
+            - '@translator'
             - '%umanit_tree.seo%'
         tags:
             - { name: 'form.type', alias: umanit_node_type }

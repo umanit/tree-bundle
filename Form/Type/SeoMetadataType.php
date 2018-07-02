@@ -15,6 +15,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Umanit\Bundle\TreeBundle\Entity\SeoMetadata;
 use Umanit\Bundle\TreeBundle\Helper\Excerpt;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
@@ -31,18 +32,27 @@ class SeoMetadataType extends AbstractType
     /** @var array */
     private $seoConfig;
 
+    /**  @var TranslatorInterface */
+    private $translator;
+
     /**
      * SeoMetadataType constructor.
      *
-     * @param NodeRouter $nodeRouter
-     * @param Excerpt    $excerpt
-     * @param array      $seoConfig
+     * @param NodeRouter          $nodeRouter
+     * @param Excerpt             $excerpt
+     * @param TranslatorInterface $translator
+     * @param array               $seoConfig
      */
-    public function __construct(NodeRouter $nodeRouter, Excerpt $excerpt, array $seoConfig)
-    {
+    public function __construct(
+        NodeRouter $nodeRouter,
+        Excerpt $excerpt,
+        TranslatorInterface $translator,
+        array $seoConfig
+    ) {
         $this->nodeRouter = $nodeRouter;
         $this->excerpt    = $excerpt;
         $this->seoConfig  = $seoConfig;
+        $this->translator = $translator;
     }
 
     /**
@@ -73,6 +83,7 @@ class SeoMetadataType extends AbstractType
             ])
         ;
 
+        // Add placeholders to seo fields.
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             if (null === $event->getData() || null === $event->getForm()->getParent()) {
                 return;
@@ -83,12 +94,13 @@ class SeoMetadataType extends AbstractType
             /** @var TreeNodeInterface $parentModelData */
             $parentModelData = $event->getForm()->getParent()->getData();
 
+            // Title
             if (null === $seoMetadata->getTitle()) {
                 $this->setSubFormOption($seoForm, 'title', 'attr', [
                     'placeholder' => $parentModelData->getTreeNodeName(),
                 ]);
             }
-
+            // Url
             if (null === $seoMetadata->getUrl()) {
                 $this->setSubFormOption($seoForm, 'url', 'attr', [
                     'placeholder' => $this->nodeRouter->getPath(
@@ -100,9 +112,14 @@ class SeoMetadataType extends AbstractType
                     ),
                 ]);
             }
-
+            // Description
             if (null === $seoMetadata->getDescription()) {
-                $description = $this->excerpt->fromEntity($parentModelData) ?: $this->seoConfig['default_description'];
+                $description = $this->excerpt->fromEntity($parentModelData) ?: $this->translator->trans(
+                    $this->seoConfig['default_description'],
+                    [],
+                    $this->seoConfig['translation_domain'],
+                    $parentModelData->getLocale()
+                );
 
                 $this->setSubFormOption($seoForm, 'description', 'attr', [
                     'placeholder' => html_entity_decode($description),
