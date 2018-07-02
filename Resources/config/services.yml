@@ -114,6 +114,16 @@ services:
             - ['setDoctrine', ['@doctrine']]
             - ['setTranslator', ['@translator.default']]
         tags:
+            - { name: 'form.type', alias: umanit_seo_metadata_type }
+
+    # node form type
+    umanit.tree.form.type.seo_metadata:
+        alias: Umanit\Bundle\TreeBundle\Form\Type\SeoMetadataType
+        public: true
+    Umanit\Bundle\TreeBundle\Form\Type\SeoMetadataType:
+        arguments:
+            - '@umanit.tree.router'
+        tags:
             - { name: 'form.type', alias: umanit_node_type }
 
     # Menu form type

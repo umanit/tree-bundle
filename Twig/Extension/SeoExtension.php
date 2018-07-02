@@ -2,9 +2,9 @@
 
 namespace Umanit\Bundle\TreeBundle\Twig\Extension;
 
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Umanit\Bundle\TreeBundle\Model\SeoInterface;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
 class SeoExtension extends \Twig_Extension
 {
@@ -63,17 +63,19 @@ class SeoExtension extends \Twig_Extension
             return $default;
         }
 
+        $defaultTitle = $default ?: $this->translator->trans(
+            $this->configuration['default_title'],
+            [],
+            $this->configuration['translation_domain']
+        );
+
         if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
             if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoTitle())) {
-                return $contentObject->getSeoTitle();
+                return $contentObject->getSeoTitle().' - '.$defaultTitle;
             }
         }
 
-        return $default ?: $this->translator->trans(
-            $this->configuration['default_title'],
-            array(),
-            $this->configuration['translation_domain']
-        );
+        return $defaultTitle;
     }
 
     /**
