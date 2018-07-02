@@ -18,6 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Umanit\Bundle\TreeBundle\Entity\SeoMetadata;
 use Umanit\Bundle\TreeBundle\Helper\Excerpt;
+use Umanit\Bundle\TreeBundle\Helper\Title;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 use Umanit\Bundle\TreeBundle\Router\NodeRouter;
 
@@ -35,22 +36,28 @@ class SeoMetadataType extends AbstractType
     /**  @var TranslatorInterface */
     private $translator;
 
+    /** @var Title */
+    private $title;
+
     /**
      * SeoMetadataType constructor.
      *
      * @param NodeRouter          $nodeRouter
      * @param Excerpt             $excerpt
+     * @param Title               $title
      * @param TranslatorInterface $translator
      * @param array               $seoConfig
      */
     public function __construct(
         NodeRouter $nodeRouter,
         Excerpt $excerpt,
+        Title $title,
         TranslatorInterface $translator,
         array $seoConfig
     ) {
         $this->nodeRouter = $nodeRouter;
         $this->excerpt    = $excerpt;
+        $this->title      = $title;
         $this->seoConfig  = $seoConfig;
         $this->translator = $translator;
     }
@@ -96,8 +103,15 @@ class SeoMetadataType extends AbstractType
 
             // Title
             if (null === $seoMetadata->getTitle()) {
+                $title = $this->title->fromEntity($parentModelData) ?: $this->translator->trans(
+                    $this->seoConfig['default_description'],
+                    [],
+                    $this->seoConfig['translation_domain'],
+                    $parentModelData->getLocale()
+                );
+
                 $this->setSubFormOption($seoForm, 'title', 'attr', [
-                    'placeholder' => $parentModelData->getTreeNodeName(),
+                    'placeholder' => html_entity_decode($title),
                 ]);
             }
             // Url
@@ -128,7 +142,7 @@ class SeoMetadataType extends AbstractType
             // Keywords
             if (null === $seoMetadata->getKeywords()) {
                 $this->setSubFormOption($seoForm, 'keywords', 'attr', [
-                    'placeholder' => $this->seoConfig['default_keywords']
+                    'placeholder' => $this->seoConfig['default_keywords'],
                 ]);
             }
         });

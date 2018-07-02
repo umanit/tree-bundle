@@ -67,6 +67,7 @@ services:
             - '@request_stack'
             - '@translator.default'
             - '@umanit.tree.excerpt'
+            - '@umanit.tree.title'
             - '%umanit_tree.seo%'
         tags:
             - { name: 'twig.extension' }
@@ -103,6 +104,14 @@ services:
         arguments:
             - '@property_accessor'
 
+    # Title
+    umanit.tree.title:
+        alias: Umanit\Bundle\TreeBundle\Helper\Title
+        public: true
+    Umanit\Bundle\TreeBundle\Helper\Title:
+        arguments:
+            - '@property_accessor'
+
     # Link form type
     umanit.tree.form.type.link:
         alias: Umanit\Bundle\TreeBundle\Form\Type\LinkType
@@ -133,6 +142,7 @@ services:
         arguments:
             - '@umanit.tree.router'
             - '@umanit.tree.excerpt'
+            - '@umanit.tree.title'
             - '@translator'
             - '%umanit_tree.seo%'
         tags:

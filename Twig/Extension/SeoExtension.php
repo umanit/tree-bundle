@@ -5,27 +5,25 @@ namespace Umanit\Bundle\TreeBundle\Twig\Extension;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Umanit\Bundle\TreeBundle\Helper\Excerpt;
+use Umanit\Bundle\TreeBundle\Helper\Title;
 use Umanit\Bundle\TreeBundle\Model\SeoInterface;
 
 class SeoExtension extends \Twig_Extension
 {
-    /**
-     * @var RequestStack
-     */
+    /** @var RequestStack */
     protected $request;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $configuration;
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
     /** @var Excerpt */
     private $excerpt;
+
+    /** @var Title */
+    private $title;
 
     /**
      * Constuctor.
@@ -33,14 +31,21 @@ class SeoExtension extends \Twig_Extension
      * @param RequestStack $request       Current request
      * @param Translator   $translator    Translation service
      * @param Excerpt      $excerpt       Excerpt helper service
+     * @param Title        $title
      * @param array        $configuration SEO configuration from umanit_tree key
      */
-    public function __construct(RequestStack $request, Translator $translator, Excerpt $excerpt, array $configuration)
-    {
+    public function __construct(
+        RequestStack $request,
+        Translator $translator,
+        Excerpt $excerpt,
+        Title $title,
+        array $configuration
+    ) {
         $this->request       = $request->getCurrentRequest();
         $this->configuration = $configuration;
         $this->translator    = $translator;
         $this->excerpt       = $excerpt;
+        $this->title         = $title;
     }
 
     /**
@@ -76,8 +81,8 @@ class SeoExtension extends \Twig_Extension
         );
 
         if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
-            if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoTitle())) {
-                return $contentObject->getSeoTitle().' - '.$defaultTitle;
+            if ($contentObject instanceof SeoInterface) {
+                return ($contentObject->getSeoTitle() ?: $this->title->fromEntity($contentObject)).' - '.$defaultTitle;
             }
         }
 
@@ -99,7 +104,7 @@ class SeoExtension extends \Twig_Extension
         }
 
         if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
-            if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoDescription())) {
+            if ($contentObject instanceof SeoInterface) {
                 return $contentObject->getSeoDescription() ?: $this->excerpt->fromEntity($contentObject);
             }
         }
