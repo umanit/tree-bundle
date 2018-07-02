@@ -125,6 +125,12 @@ class SeoMetadataType extends AbstractType
                     'placeholder' => html_entity_decode($description),
                 ]);
             }
+            // Keywords
+            if (null === $seoMetadata->getKeywords()) {
+                $this->setSubFormOption($seoForm, 'keywords', 'attr', [
+                    'placeholder' => $this->seoConfig['default_keywords']
+                ]);
+            }
         });
     }
 
