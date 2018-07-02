@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Umanit\Bundle\TreeBundle\Entity\SeoMetadata;
+use Umanit\Bundle\TreeBundle\Helper\Excerpt;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 use Umanit\Bundle\TreeBundle\Router\NodeRouter;
 
@@ -24,14 +25,24 @@ class SeoMetadataType extends AbstractType
     /** @var NodeRouter */
     private $nodeRouter;
 
+    /** @var Excerpt */
+    private $excerpt;
+
+    /** @var array */
+    private $seoConfig;
+
     /**
      * SeoMetadataType constructor.
      *
      * @param NodeRouter $nodeRouter
+     * @param Excerpt    $excerpt
+     * @param array      $seoConfig
      */
-    public function __construct(NodeRouter $nodeRouter)
+    public function __construct(NodeRouter $nodeRouter, Excerpt $excerpt, array $seoConfig)
     {
         $this->nodeRouter = $nodeRouter;
+        $this->excerpt    = $excerpt;
+        $this->seoConfig  = $seoConfig;
     }
 
     /**
@@ -61,6 +72,7 @@ class SeoMetadataType extends AbstractType
                 'required'           => false,
             ])
         ;
+
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             if (null === $event->getData() || null === $event->getForm()->getParent()) {
                 return;
@@ -85,7 +97,16 @@ class SeoMetadataType extends AbstractType
                         false,
                         false,
                         $parentModelData->getLocale()
-                    )]);
+                    ),
+                ]);
+            }
+
+            if (null === $seoMetadata->getDescription()) {
+                $description = $this->excerpt->fromEntity($parentModelData) ?: $this->seoConfig['default_description'];
+
+                $this->setSubFormOption($seoForm, 'description', 'attr', [
+                    'placeholder' => html_entity_decode($description),
+                ]);
             }
         });
     }

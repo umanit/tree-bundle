@@ -53,7 +53,7 @@ class SeoExtension extends \Twig_Extension
      * Returns SEO title of the page. Puts the default value if not given.
      *
      * @param string $default  Default title for the page
-     * @param int    $override Set default value if override is set to true
+     * @param bool    $override Set default value if override is set to true
      *
      * @return string
      */

@@ -94,6 +94,14 @@ services:
             - '@doctrine'
             - '@event_dispatcher'
 
+    # Excerpt
+    umanit.tree.excerpt:
+        alias: Umanit\Bundle\TreeBundle\Helper\Excerpt
+        public: true
+    Umanit\Bundle\TreeBundle\Helper\Excerpt:
+        arguments:
+            - '@property_accessor'
+
     # Link form type
     umanit.tree.form.type.link:
         alias: Umanit\Bundle\TreeBundle\Form\Type\LinkType
@@ -123,6 +131,8 @@ services:
     Umanit\Bundle\TreeBundle\Form\Type\SeoMetadataType:
         arguments:
             - '@umanit.tree.router'
+            - '@umanit.tree.excerpt'
+            - '%umanit_tree.seo%'
         tags:
             - { name: 'form.type', alias: umanit_node_type }
 
