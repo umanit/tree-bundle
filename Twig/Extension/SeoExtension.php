@@ -4,6 +4,7 @@ namespace Umanit\Bundle\TreeBundle\Twig\Extension;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Umanit\Bundle\TreeBundle\Helper\Excerpt;
 use Umanit\Bundle\TreeBundle\Model\SeoInterface;
 
 class SeoExtension extends \Twig_Extension
@@ -23,18 +24,23 @@ class SeoExtension extends \Twig_Extension
      */
     protected $translator;
 
+    /** @var Excerpt */
+    private $excerpt;
+
     /**
      * Constuctor.
      *
      * @param RequestStack $request       Current request
      * @param Translator   $translator    Translation service
+     * @param Excerpt      $excerpt       Excerpt helper service
      * @param array        $configuration SEO configuration from umanit_tree key
      */
-    public function __construct(RequestStack $request, Translator $translator, array $configuration)
+    public function __construct(RequestStack $request, Translator $translator, Excerpt $excerpt, array $configuration)
     {
         $this->request       = $request->getCurrentRequest();
         $this->configuration = $configuration;
         $this->translator    = $translator;
+        $this->excerpt       = $excerpt;
     }
 
     /**
@@ -42,18 +48,18 @@ class SeoExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
+        return [
             new \Twig_Function('get_seo_title', [$this, 'getSeoTitle']),
             new \Twig_Function('get_seo_description', [$this, 'getSeoDescription']),
             new \Twig_Function('get_seo_keywords', [$this, 'getSeoKeywords']),
-        );
+        ];
     }
 
     /**
      * Returns SEO title of the page. Puts the default value if not given.
      *
      * @param string $default  Default title for the page
-     * @param bool    $override Set default value if override is set to true
+     * @param bool   $override Set default value if override is set to true
      *
      * @return string
      */
@@ -94,13 +100,13 @@ class SeoExtension extends \Twig_Extension
 
         if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
             if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoDescription())) {
-                return $contentObject->getSeoDescription();
+                return $contentObject->getSeoDescription() ?: $this->excerpt->fromEntity($contentObject);
             }
         }
 
         return $default ?: $this->translator->trans(
             $this->configuration['default_description'],
-            array(),
+            [],
             $this->configuration['translation_domain']
         );
     }
@@ -127,7 +133,7 @@ class SeoExtension extends \Twig_Extension
 
         return $default ?: $this->translator->trans(
             $this->configuration['default_keywords'],
-            array(),
+            [],
             $this->configuration['translation_domain']
         );
     }

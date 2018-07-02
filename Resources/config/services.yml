@@ -66,6 +66,7 @@ services:
         arguments:
             - '@request_stack'
             - '@translator.default'
+            - '@umanit.tree.excerpt'
             - '%umanit_tree.seo%'
         tags:
             - { name: 'twig.extension' }
