@@ -25,10 +25,13 @@ class Excerpt
         'locale',
         'siteaccess',
         'translation',
-        'tuuid',
+        'uuid',
+        'image',
+        'media',
+        'video',
     ];
 
-    // Friendly field names of an excert.
+    // Friendly field names found in an excert.
     const FAV_KEYS = [
         'excerpt',
         'description',
@@ -67,25 +70,30 @@ class Excerpt
         // Parse every string attributes
         foreach ($refl->getProperties() as $property) {
             // Strip out unwanted values
-            if (in_array(mb_strtolower($property->getName()), self::STRIP_KEYS, true)) {
+            if (Str::striposInArray($property->getName(), self::STRIP_KEYS)) {
                 continue;
             }
+
             // Get the value
             try {
                 $value = $this->accessor->getValue($entity, $property->getName());
             } catch (AccessException $e) {
                 continue;
             }
-            // We only need a string
+
+            // Try to convert the value in a string
+            if (is_object($value) && method_exists($value, '__toString')) {
+                $value = (string) $value;
+            }
+
             if (false === is_string($value)) {
                 continue;
             }
+
             // If the field is one of the favourite
             // keys, directly return its value.
-            foreach (self::FAV_KEYS as $favKey) {
-                if (stripos($property->getName(), $favKey) || $favKey === mb_strtolower($property->getName())) {
-                    return Html::trimText($value, $length);
-                }
+            if (Str::striposInArray($property->getName(), self::FAV_KEYS)) {
+                return Html::trimText($value, $length);
             }
 
             // If no field matches the favKeys, build-up an
