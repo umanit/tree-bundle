@@ -1,7 +1,9 @@
 services:
     # Listener doctrine for node modifications
     umanit.tree.doctrine.node_listener:
-        class: Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineTreeNodeListener
+        alias: Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineTreeNodeListener
+        public: true
+    Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineTreeNodeListener:
         arguments:
             - '@umanit.tree.node_helper'
         tags:
@@ -12,7 +14,9 @@ services:
 
     # Listener doctrine for node modifications
     umanit.tree.doctrine.node_history_listener:
-        class: Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineNodeHistoryListener
+        alias: Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineNodeHistoryListener
+        public: true
+    Umanit\Bundle\TreeBundle\Doctrine\Listener\DoctrineNodeHistoryListener:
         arguments:
             - '%umanit_tree.locale%'
         tags:
@@ -23,7 +27,9 @@ services:
 
     # Listener to redirect to the right controller
     umanit.tree.listener.route_listener:
-        class: Umanit\Bundle\TreeBundle\Listener\RouteListener
+        alias: Umanit\Bundle\TreeBundle\Listener\RouteListener
+        public: true
+    Umanit\Bundle\TreeBundle\Listener\RouteListener:
         arguments:
             - '@doctrine'
             - '%umanit_tree.node_types%'
@@ -33,7 +39,9 @@ services:
 
     # Router for nodes
     umanit.tree.router:
-        class: Umanit\Bundle\TreeBundle\Router\NodeRouter
+        alias: Umanit\Bundle\TreeBundle\Router\NodeRouter
+        public: true
+    Umanit\Bundle\TreeBundle\Router\NodeRouter:
         arguments:
             - '@doctrine'
             - '@router'
@@ -41,7 +49,9 @@ services:
 
     # Helpers twig for links
     umanit.tree.twig.extension.link:
-        class: Umanit\Bundle\TreeBundle\Twig\Extension\LinkExtension
+        alias: Umanit\Bundle\TreeBundle\Twig\Extension\LinkExtension
+        public: true
+    Umanit\Bundle\TreeBundle\Twig\Extension\LinkExtension:
         arguments:
             - '@umanit.tree.router'
             - '@doctrine.orm.entity_manager'
@@ -50,7 +60,9 @@ services:
 
     # Helpers twig for SEO
     umanit.tree.twig.extension.seo:
-        class: Umanit\Bundle\TreeBundle\Twig\Extension\SeoExtension
+        alias: Umanit\Bundle\TreeBundle\Twig\Extension\SeoExtension
+        public: true
+    Umanit\Bundle\TreeBundle\Twig\Extension\SeoExtension:
         arguments:
             - '@request_stack'
             - '@translator.default'
@@ -60,7 +72,9 @@ services:
 
     # Helpers twig for SEO
     umanit.tree.twig.extension.breadcrumb:
-        class: Umanit\Bundle\TreeBundle\Twig\Extension\BreadcrumbExtension
+        alias: Umanit\Bundle\TreeBundle\Twig\Extension\BreadcrumbExtension
+        public: true
+    Umanit\Bundle\TreeBundle\Twig\Extension\BreadcrumbExtension:
         arguments:
             - '@request_stack'
             - '@translator.default'
@@ -72,7 +86,9 @@ services:
 
     # Helper for nodes
     umanit.tree.node_helper:
-        class: Umanit\Bundle\TreeBundle\Helper\NodeHelper
+        alias: Umanit\Bundle\TreeBundle\Helper\NodeHelper
+        public: true
+    Umanit\Bundle\TreeBundle\Helper\NodeHelper:
         arguments:
             - '%umanit_tree.locale%'
             - '@doctrine'
@@ -80,7 +96,9 @@ services:
 
     # Link form type
     umanit.tree.form.type.link:
-        class: Umanit\Bundle\TreeBundle\Form\Type\LinkType
+        alias: Umanit\Bundle\TreeBundle\Form\Type\LinkType
+        public: true
+    Umanit\Bundle\TreeBundle\Form\Type\LinkType:
         arguments:
             - '@doctrine'
             - '@translator.default'
@@ -89,7 +107,9 @@ services:
 
     # node form type
     umanit.tree.form.type.node:
-        class: Umanit\Bundle\TreeBundle\Form\Type\TreeNodeType
+        alias: Umanit\Bundle\TreeBundle\Form\Type\TreeNodeType
+        public: true
+    Umanit\Bundle\TreeBundle\Form\Type\TreeNodeType:
         calls:
             - ['setDoctrine', ['@doctrine']]
             - ['setTranslator', ['@translator.default']]
@@ -109,14 +129,18 @@ services:
 
     # Menu builder
     umanit.tree.meny.menu_menu_builder:
-        class: Umanit\Bundle\TreeBundle\Menu\MenuBuilder
+        alias: Umanit\Bundle\TreeBundle\Menu\MenuBuilder
+        public: true
+    Umanit\Bundle\TreeBundle\Menu\MenuBuilder:
         arguments:
             - '@doctrine.orm.entity_manager'
             - '%umanit_tree.menu_entity_class%'
 
     # Menu injector
     umanit.tree.event_subscriber.menu_injector_subscriber:
-        class: Umanit\Bundle\TreeBundle\EventSubscriber\MenuInjectorSubscriber
+        alias: Umanit\Bundle\TreeBundle\EventSubscriber\MenuInjectorSubscriber
+        public: true
+    Umanit\Bundle\TreeBundle\EventSubscriber\MenuInjectorSubscriber:
         arguments:
             - '@twig'
             - '@umanit.tree.meny.menu_menu_builder'
@@ -124,7 +148,9 @@ services:
 
     # Menu builder for sonata
     umanit.tree.event_subscriber.sonata_menu_builder_subscriber:
-        class: Umanit\Bundle\TreeBundle\EventSubscriber\SonataMenuBuilderSubscriber
+        alias: Umanit\Bundle\TreeBundle\EventSubscriber\SonataMenuBuilderSubscriber
+        public: true
+    Umanit\Bundle\TreeBundle\EventSubscriber\SonataMenuBuilderSubscriber:
         arguments:
             - '%umanit_tree.menu_entity_class%'
             - '@security.authorization_checker'
@@ -132,13 +158,17 @@ services:
 
     # Twig configuration extension
     umanit.tree.twig.extension.configuration_extension:
-        class: Umanit\Bundle\TreeBundle\Twig\Extension\ConfigurationExtension
+        alias: Umanit\Bundle\TreeBundle\Twig\Extension\ConfigurationExtension
+        public: true
+    Umanit\Bundle\TreeBundle\Twig\Extension\ConfigurationExtension:
         arguments: ['%umanit_tree.admin_layout%']
         tags:
             - { name: 'twig.extension' }
 
     umanit_bundle_tree.security.menu_voter:
-        class: Umanit\Bundle\TreeBundle\Security\MenuVoter
+        alias: Umanit\Bundle\TreeBundle\Security\MenuVoter
+        public: true
+    Umanit\Bundle\TreeBundle\Security\MenuVoter:
         arguments:
             - '%umanit_tree.menus_roles%'
         tags:
