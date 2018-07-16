@@ -2,11 +2,12 @@
 
 namespace Umanit\Bundle\TreeBundle\Router;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 use Umanit\Bundle\TreeBundle\Entity\Link;
 use Umanit\Bundle\TreeBundle\Entity\Node;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 
 /**
@@ -187,12 +188,12 @@ class NodeRouter
         if ($node->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
             return $this->router->generate('umanit.tree.default', array_merge(array(
                 'path' => '',
-            ), $parameters));
+            ), $parameters), $absolute ? UrlGeneratorInterface::ABSOLUTE_URL: UrlGeneratorInterface::ABSOLUTE_PATH);
         }
 
         return $this->router->generate('umanit.tree.default', array_merge(array(
             'path' => substr($node->getPath(), 1),
-        ), $parameters), $absolute);
+        ), $parameters), $absolute ? UrlGeneratorInterface::ABSOLUTE_URL: UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
