@@ -184,6 +184,8 @@ class NodeRouter
      */
     public function getPathByNode(Node $node, $absolute = false, $parameters = [])
     {
+        $parameters['_locale'] = $node->getLocale();
+
         // Root page
         if ($node->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
             return $this->router->generate('umanit.tree.default', array_merge(array(

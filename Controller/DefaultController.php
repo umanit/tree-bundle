@@ -3,8 +3,8 @@
 namespace Umanit\Bundle\TreeBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
 {
@@ -12,7 +12,7 @@ class DefaultController extends Controller
     {
         // Redirect 301 ?
         if ($this->getParameter('umanit_tree.seo.redirect_301')) {
-            $path       = $request->getPathInfo();
+            $path       = $request->get('path');
             $locale     = $request->getLocale();
             $repository = $this->get('doctrine')->getRepository('UmanitTreeBundle:NodeHistory');
 

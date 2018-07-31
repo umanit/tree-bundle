@@ -2,8 +2,8 @@
 
 namespace Umanit\Bundle\TreeBundle\Repository;
 
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 use Umanit\Bundle\TreeBundle\Entity\Node;
+use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 
 class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepository
 {
@@ -62,6 +62,10 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
      */
     public function getByPath($path, $locale = TreeNodeInterface::UNKNOWN_LOCALE)
     {
+        if ($path[0] !== '/') {
+            $path = '/'.$path;
+        }
+
         $qb = $this
             ->createQueryBuilder('n')
             ->where('n.path = :path')

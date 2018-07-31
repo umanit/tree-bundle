@@ -18,6 +18,10 @@ class NodeHistoryRepository extends \Doctrine\ORM\EntityRepository
      */
     public function getByPath($path, $locale = TreeNodeInterface::UNKNOWN_LOCALE)
     {
+        if ($path[0] !== '/') {
+            $path = '/'.$path;
+        }
+
         $qb = $this
             ->createQueryBuilder('n')
             ->where('n.path = :path')

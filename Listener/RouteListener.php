@@ -4,7 +4,6 @@ namespace Umanit\Bundle\TreeBundle\Listener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Umanit\Bundle\TreeBundle\Entity\Node;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 
 class RouteListener
@@ -51,12 +50,12 @@ class RouteListener
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
-        $path       = $event->getRequest()->getPathInfo();
+        $path       = $event->getRequest()->get('path');
         $locale     = $event->getRequest()->getLocale();
         $repository = $this->doctrine->getRepository('UmanitTreeBundle:Node');
 
         // Root node
-        if ($path === '/') {
+        if ($path === '/' || $path === '') {
             $node = $repository->getByPath(TreeNodeInterface::ROOT_NODE_PATH, $locale);
         } else {
             // Search for an other node
