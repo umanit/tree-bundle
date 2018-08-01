@@ -74,6 +74,10 @@ Update your database schema to add our model
 ```
 bin/console doctrine:schema:update --force
 ```
+or if you use [DoctrineMigrationsBundle](https://github.com/doctrine/DoctrineMigrationsBundle) : 
+```
+bin/console doctrine:migrations:migrate
+```
 
 Now, you have to create the root node. The default object is RootEntity, but you can override it in configuration (param
 `umanit_tree.root_class`).
@@ -161,9 +165,9 @@ $builder
 
 ## Create a link selector
 
-In order to create links to one or more nodes (or external links), it's possible !
+It's possible to create links to one or more nodes (or external links).
 
-In your entity that will have the link, adds a relation with the entity `Umanit\Bundle\TreeBundle\Entity\Link`.
+In your entity that will have the link, add a relation with the entity `Umanit\Bundle\TreeBundle\Entity\Link`.
 
 In your forms, you can materialize the relation with the `Umanit\Bundle\TreeBundle\Form\Type\LinkType`. By default, you'll have 2 fields, "internal link" (a textfield) and "external link" (a select). By default, the select will be empty. You have to populate it by giving the models allowed. You can keep only one field with the options : `allow_internal: false` or `allow_external: false`. Note : only one field can be filled at the same time.
 
@@ -311,7 +315,7 @@ A CRUD is provided in order to administrate your menus. It's available on the ro
 
 /!\ You need to have the role `ROLE_TREE_MENU_ADMIN` in order to be able to access the route.
 
-Start by running `php bin/console assets:install` to get the assets in your web directory.
+Start by running `php bin/console assets:install` to get the assets in your web/public directory.
 
 ##### Customizing the admin layout
 
@@ -423,7 +427,7 @@ class MenuType extends BaseMenuType
 
 ```
 
-Then add you form type to TreeBundle's configuration:
+Then add your form type to TreeBundle's configuration:
 ```yaml
 umanit_tree:
     # ...
