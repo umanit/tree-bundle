@@ -315,7 +315,7 @@ A CRUD is provided in order to administrate your menus. It's available on the ro
 
 /!\ You need to have the role `ROLE_TREE_MENU_ADMIN` in order to be able to access the route.
 
-Start by running `php bin/console assets:install` to get the assets in your web/public directory.
+Start by running `php bin/console assets:install` to get the assets in your web or public directory.
 
 ##### Customizing the admin layout
 
