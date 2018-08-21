@@ -67,8 +67,23 @@ class Excerpt
     {
         $values = '';
         $refl   = new \ReflectionClass($entity);
+
+        /** @var \ReflectionProperty[] $properties */
+        $properties = $refl->getProperties();
+
+        // Consider favourite keys first
+        uasort($properties, function(\ReflectionProperty $a, \ReflectionProperty $b) {
+            if (\in_array($a->getName(), $this::FAV_KEYS, true)) {
+                return -1;
+            }
+            if (\in_array($b->getName(), $this::FAV_KEYS, true)) {
+                return 1;
+            }
+            return 0;
+        });
+
         // Parse every string attributes
-        foreach ($refl->getProperties() as $property) {
+        foreach ($properties as $property) {
             // Strip out unwanted values
             if (Str::striposInArray($property->getName(), self::STRIP_KEYS)) {
                 continue;
