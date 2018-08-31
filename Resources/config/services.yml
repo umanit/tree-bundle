@@ -46,6 +46,7 @@ services:
             - '@doctrine'
             - '@router'
             - '@request_stack'
+            - '@umanit.tree.node_helper'
 
     # Helpers twig for links
     umanit.tree.twig.extension.link:
