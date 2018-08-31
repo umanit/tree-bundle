@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Umanit\Bundle\TreeBundle\Entity\Link;
 use Umanit\Bundle\TreeBundle\Entity\Node;
+use Umanit\Bundle\TreeBundle\Helper\NodeHelper;
 use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 
 /**
@@ -41,12 +42,14 @@ class NodeRouter
      * @param Registry        $doctrine     Doctrine ORM
      * @param RouterInterface $router       Symfony2 router
      * @param RequestStack    $requestStack Current request
+     * @param NodeHelper      $nodeHelper
      */
-    public function __construct(Registry $doctrine, RouterInterface $router, RequestStack $requestStack)
+    public function __construct(Registry $doctrine, RouterInterface $router, RequestStack $requestStack, NodeHelper $nodeHelper)
     {
         $this->doctrine     = $doctrine;
         $this->router       = $router;
         $this->requestStack = $requestStack;
+        $this->nodeHelper   = $nodeHelper;
     }
 
     /**
@@ -184,18 +187,24 @@ class NodeRouter
      */
     public function getPathByNode(Node $node, $absolute = false, $parameters = [])
     {
+        $entity = $this->nodeHelper->getAssociatedEntity($node);
+
+        if ($entity instanceof PathByNodeInterface) {
+            return $entity->getPathByNode($absolute, $parameters);
+        }
+
         $parameters['_locale'] = $node->getLocale();
 
         // Root page
         if ($node->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
-            return $this->router->generate('umanit.tree.default', array_merge(array(
+            return $this->router->generate('umanit.tree.default', array_merge([
                 'path' => '',
-            ), $parameters), $absolute ? UrlGeneratorInterface::ABSOLUTE_URL: UrlGeneratorInterface::ABSOLUTE_PATH);
+            ], $parameters), $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH);
         }
 
-        return $this->router->generate('umanit.tree.default', array_merge(array(
+        return $this->router->generate('umanit.tree.default', array_merge([
             'path' => substr($node->getPath(), 1),
-        ), $parameters), $absolute ? UrlGeneratorInterface::ABSOLUTE_URL: UrlGeneratorInterface::ABSOLUTE_PATH);
+        ], $parameters), $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
     /**
