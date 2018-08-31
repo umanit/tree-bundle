@@ -34,7 +34,6 @@ class Title
     // Friendly field names found in a title.
     const FAV_KEYS = [
         'name',
-        'name',
         'title',
         'label',
         'appellation',
@@ -76,8 +75,23 @@ class Title
     public function fromEntity($entity, $length = 100)
     {
         $refl = new \ReflectionClass($entity);
+
+        /** @var \ReflectionProperty[] $properties */
+        $properties = $refl->getProperties();
+
+        // Consider favourite keys first
+        uasort($properties, function(\ReflectionProperty $a, \ReflectionProperty $b) {
+            if (\in_array($a->getName(), $this::FAV_KEYS, true)) {
+                return -1;
+            }
+            if (\in_array($b->getName(), $this::FAV_KEYS, true)) {
+                return 1;
+            }
+            return 0;
+        });
+
         // Parse every string attributes
-        foreach ($refl->getProperties() as $property) {
+        foreach ($properties as $property) {
             // Strip out unwanted values
             if (Str::striposInArray($property->getName(), self::STRIP_KEYS)) {
                 continue;

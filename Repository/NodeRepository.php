@@ -135,7 +135,7 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
                 $select = $select.'WHEN n.parent = '.$parentId.' THEN '.(count($parents) - $idx).' ';
             }
 
-            $select .= 'ELSE 0 AS HIDDEN parentSort';
+            $select .= 'ELSE 0 END AS HIDDEN parentSort';
 
             $qb->addSelect($select);
             $qb->addOrderBy('parentSort', 'desc');
