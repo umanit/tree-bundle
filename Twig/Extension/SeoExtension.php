@@ -82,7 +82,7 @@ class SeoExtension extends \Twig_Extension
 
         if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
             if ($contentObject instanceof SeoInterface) {
-                return ($contentObject->getSeoTitle() ?: $this->title->fromEntity($contentObject)).' - '.$defaultTitle;
+                return ($contentObject->getSeoTitle() ?: $this->title->fromEntity($contentObject)).' | '.$defaultTitle;
             }
         }
 
