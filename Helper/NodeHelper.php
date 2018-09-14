@@ -267,7 +267,7 @@ class NodeHelper
             }
 
             $manager->remove($treeNode);
-            $manager->flush($treeNode);
+            $manager->flush();
         }
     }
 
