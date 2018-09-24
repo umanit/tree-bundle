@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormError;
 use Umanit\Bundle\TreeBundle\Entity\Link;
+use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 
 class LinkType extends AbstractType
 {
