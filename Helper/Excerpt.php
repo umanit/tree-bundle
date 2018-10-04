@@ -63,7 +63,7 @@ class Excerpt
      * @return string
      * @throws \ReflectionException
      */
-    public function fromEntity($entity, $length = 300)
+    public function fromEntity($entity, $length = 150)
     {
         $values = '';
         $refl   = new \ReflectionClass($entity);
