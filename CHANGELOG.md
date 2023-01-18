@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2023-01-18
+
 ### Added
 
 - Adds initial CHANGELOG
 - Adds support for PHP >= 8.0
-- Adds support for Symfony >= 5.4 
+- Adds support for Symfony >= 5.4
 - Adds typing
 - Adds attributes (both annotations and attributes are available for Doctrine ORM mapping configuration)
 
@@ -30,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Last release of v0.
 
-[Unreleased]: https://github.com/umanit/tree-bundle/compare/0.3.2...HEAD
+[Unreleased]: https://github.com/umanit/tree-bundle/compare/1.0.0...HEAD
+
+[1.0.0]: https://github.com/umanit/tree-bundle/compare/0.3.2...1.0.0
 
 [0.3.2]: https://github.com/umanit/tree-bundle/releases/tag/0.3.2
