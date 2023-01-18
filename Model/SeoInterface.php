@@ -1,6 +1,6 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Model;
+namespace Umanit\TreeBundle\Model;
 
 /**
  * Methods to implement to have SEO working
@@ -9,25 +9,29 @@ interface SeoInterface
 {
     /**
      * Returns page Url
-     * @return string
+     *
+     * @return string|null
      */
-    public function getSeoUrl();
+    public function getSeoUrl(): ?string;
 
     /**
      * Returns page title
-     * @return string
+     *
+     * @return string|null
      */
-    public function getSeoTitle();
+    public function getSeoTitle(): ?string;
 
     /**
      * Returns page description
-     * @return string
+     *
+     * @return string|null
      */
-    public function getSeoDescription();
+    public function getSeoDescription(): ?string;
 
     /**
      * Returns page keywords
-     * @return array
+     *
+     * @return string|null
      */
-    public function getSeoKeywords();
+    public function getSeoKeywords(): ?string;
 }

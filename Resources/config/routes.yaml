@@ -1,0 +1,29 @@
+tree_admin_menu_json:
+    path: /admin/menu/menu.json
+    controller: 'Umanit\TreeBundle\Controller\MenuAdminController::getMenu'
+
+tree_admin_menu_dashboard:
+    path: /admin/menu/
+    controller: 'Umanit\TreeBundle\Controller\MenuAdminController::dashboard'
+
+tree_admin_menu_move:
+    path: /admin/menu/move
+    controller: 'Umanit\TreeBundle\Controller\MenuAdminController::moveMenu'
+
+tree_admin_menu_add:
+    path: /admin/menu/add
+    controller: 'Umanit\TreeBundle\Controller\MenuAdminController::add'
+
+tree_admin_menu_edit:
+    path: /admin/menu/edit
+    controller: 'Umanit\TreeBundle\Controller\MenuAdminController::edit'
+
+tree_admin_menu_delete:
+    path: /admin/menu/delete
+    controller: 'Umanit\TreeBundle\Controller\MenuAdminController::delete'
+
+umanit.tree.default:
+    path: /{path}
+    controller: 'Umanit\TreeBundle\Controller\DefaultController::notFound'
+    requirements:
+        path: .*

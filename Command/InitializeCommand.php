@@ -1,45 +1,54 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Command;
+namespace Umanit\TreeBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Umanit\Bundle\TreeBundle\Entity\Node;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Umanit\TreeBundle\Entity\Node;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
-class InitializeCommand extends ContainerAwareCommand
+class InitializeCommand extends Command
 {
-    /**
-     * @{inheritDoc}
-     */
+    protected static $defaultName = 'umanit:tree:initialize';
+
+    private ?string $rootClass;
+    private EntityManagerInterface $em;
+
+    public function __construct(?string $rootClass, EntityManagerInterface $em)
+    {
+        $this->rootClass = $rootClass;
+        $this->em = $em;
+
+        parent::__construct();
+    }
+
     protected function configure()
     {
-        $this->setName('umanit:tree:initialize');
         $this->setDescription('Initialize the root node');
     }
 
-    /**
-     * @{inheritDoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $class = $this->getContainer()->getParameter('umanit_tree.root_class');
+        $class = $this->rootClass;
         $root = new $class();
 
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        $em->persist($root);
-        $em->flush($root);
+        $this->em->persist($root);
+        $this->em->flush($root);
 
         $node = new Node();
+
         $node->setNodeName(TreeNodeInterface::ROOT_NODE_PATH);
         $node->setClassName(get_class($root));
         $node->setClassId($root->getId());
         $node->setLocale('unknown');
 
-        $em->persist($node);
-        $em->flush($node);
+        $this->em->persist($node);
+        $this->em->flush($node);
 
         $output->writeln('Initialization finished');
+
+        return Command::SUCCESS;
     }
 }

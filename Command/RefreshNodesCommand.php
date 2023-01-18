@@ -1,37 +1,42 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Command;
+namespace Umanit\TreeBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Umanit\TreeBundle\Helper\NodeHelper;
 
-class RefreshNodesCommand extends ContainerAwareCommand
+class RefreshNodesCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    protected static $defaultName = 'umanit:tree:refresh';
+
+    private NodeHelper $nodeHelper;
+    private array $nodeTypes;
+    private EntityManagerInterface $em;
+
+    public function __construct(NodeHelper $nodeHelper, array $nodeTypes, EntityManagerInterface $em)
+    {
+        $this->nodeHelper = $nodeHelper;
+        $this->nodeTypes = $nodeTypes;
+        $this->em = $em;
+
+        parent::__construct();
+    }
+
     protected function configure()
     {
-        $this->setName('umanit:tree:refresh');
         $this->setDescription('Refresh all tree nodes');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $nodeHelper = $this->getContainer()->get('umanit.tree.node_helper');
-
-        foreach ($this->getContainer()->getParameter('umanit_tree.node_types') as $controllers) {
+        foreach ($this->nodeTypes as $controllers) {
             $output->writeln(sprintf('<info>Refresh %s</info>', $controllers['class']));
-            $repository = $this->getContainer()->get('doctrine')->getRepository($controllers['class']);
+            $repository = $this->em->getRepository($controllers['class']);
 
-            $total = $this
-                ->getContainer()
-                ->get('doctrine')
-                ->getManager()
+            $total = $this->em
                 ->createQueryBuilder()
                 ->select('COUNT(t)')
                 ->from($controllers['class'], 't')
@@ -39,14 +44,15 @@ class RefreshNodesCommand extends ContainerAwareCommand
                 ->getSingleScalarResult()
             ;
 
-            $fetchTotal = 0;
             for ($fetchTotal = 0; $fetchTotal < $total; $fetchTotal += 100) {
                 $objects = $repository->findBy([], [], 100, $fetchTotal);
 
                 foreach ($objects as $object) {
-                    $nodeHelper->updateNodes($object);
+                    $this->nodeHelper->updateNodes($object);
                 }
             }
         }
+
+        return Command::SUCCESS;
     }
 }

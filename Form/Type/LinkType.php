@@ -1,89 +1,69 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Form\Type;
+namespace Umanit\TreeBundle\Form\Type;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormError;
-use Umanit\Bundle\TreeBundle\Entity\Link;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Umanit\TreeBundle\Entity\Link;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
 class LinkType extends AbstractType
 {
-    /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @param Registry   $doctrine
-     * @param Translator $translator
-     */
-    public function __construct(Registry $doctrine, Translator $translator)
+    public function __construct(protected Registry $doctrine, protected Translator $translator)
     {
-        $this->doctrine   = $doctrine;
-        $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // Form builder
         if (!$options['allow_internal'] && !$options['allow_external']) {
-            throw new \InvalidArgumentException('You must allow at least internal or external link on umanit_link_type');
+            throw new \InvalidArgumentException(
+                'You must allow at least internal or external link on umanit_link_type'
+            );
         }
 
         if ($options['allow_external']) {
-            $builder
-                ->add('externalLink', TextType::class, array(
-                    'translation_domain' => $options['translation_domain'],
-                    'label'              => $options['label_external'],
-                    'required'           => false,
-                ))
-            ;
+            $builder->add('externalLink', TextType::class, [
+                'translation_domain' => $options['translation_domain'],
+                'label'              => $options['label_external'],
+                'required'           => false,
+            ]);
         }
 
         if ($options['allow_internal']) {
-            $data = array();
+            $data = [];
 
             foreach ($options['models'] as $displayName => $classPath) {
-                $repo     = $this->doctrine->getRepository($classPath);
-                $filters  = $options['query_filters'][$classPath] ?? []
-                ;
+                $repo = $this->doctrine->getRepository($classPath);
+                $filters = $options['query_filters'][$classPath] ?? [];
                 $entities = $repo->findBy($filters);
 
-                $data[$displayName] = array();
+                $data[$displayName] = [];
 
                 foreach ($entities as $entity) {
-                    $clazz = $this->doctrine->getManager()->getClassMetadata(get_class($entity))->getName();
-                    $data[$displayName][$entity->__toString().($entity->getLocale() !== TreeNodeInterface::UNKNOWN_LOCALE
-                        ? ' ('.$entity->getLocale().')':'')] = $entity->getId().';'.$clazz;
+                    $clazz = $this->doctrine->getManager()->getClassMetadata($entity::class)->getName();
+                    $data[$displayName][$entity->__toString().($entity->getLocale() !== TreeNodeInterface::UNKNOWN_LOCALE ?
+                        ' ('.$entity->getLocale().')' :
+                        '')] = $entity->getId().';'.$clazz;
                 }
             }
 
             $builder
-                ->add('internalLink', ChoiceType::class, array(
+                ->add('internalLink', ChoiceType::class, [
                     'label'              => $options['label_internal'],
                     'translation_domain' => $options['translation_domain'],
                     'choices'            => $data,
-                    'attr'               => array('class' => 'umanit-form-select2'),
+                    'attr'               => ['class' => 'umanit-form-select2'],
                     'required'           => false,
-                ))
+                ])
             ;
         }
 
@@ -107,39 +87,19 @@ class LinkType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array(
+        $resolver->setDefaults([
             'data_class'         => Link::class,
-            'models'             => array(),
-            'query_filters'      => array(),
+            'models'             => [],
+            'query_filters'      => [],
             'allow_internal'     => true,
             'allow_external'     => true,
             'translation_domain' => 'UmanitTreeBundle',
             'label_internal'     => 'link.internal',
             'label_external'     => 'link.external',
-        ));
+        ]);
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(array(
-            'data_class'         => Link::class,
-            'models'             => array(),
-            'query_filters'      => array(),
-            'allow_internal'     => true,
-            'allow_external'     => true,
-            'translation_domain' => 'UmanitTreeBundle',
-            'label_internal'     => 'link.internal',
-            'label_external'     => 'link.external',
-        ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getBlockPrefix(): string
     {
         return 'umanit_link_type';
     }

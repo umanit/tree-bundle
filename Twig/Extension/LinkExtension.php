@@ -1,49 +1,34 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Twig\Extension;
+namespace Umanit\TreeBundle\Twig\Extension;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Umanit\Bundle\TreeBundle\Entity\Link;
-use Umanit\Bundle\TreeBundle\Entity\Node;
-use Umanit\Bundle\TreeBundle\Router\NodeRouter;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
+use Umanit\TreeBundle\Entity\Link;
+use Umanit\TreeBundle\Entity\Node;
+use Umanit\TreeBundle\Router\NodeRouter;
 
-class LinkExtension extends \Twig_Extension
+class LinkExtension extends AbstractExtension
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * Constuctor.
-     *
-     * @param NodeRouter             $router
-     * @param EntityManagerInterface $em
-     */
-    public function __construct(NodeRouter $router, EntityManagerInterface $em)
+    public function __construct(protected NodeRouter $router, private EntityManagerInterface $em)
     {
-        $this->router = $router;
-        $this->em     = $em;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
-        return array(
-            new \Twig_Function('get_path_from_link', [$this, 'getPathLink']),
-            new \Twig_Function('is_external_link', [$this, 'isExternalLink']),
-            new \Twig_Function('get_path_from_node', [$this, 'getNodePath']),
-            new \Twig_Function('get_path', [$this, 'getPath']),
-            new \Twig_Function('clear_path_cache', [$this, 'clearCache']),
-            new \Twig_Function('get_object_from_link', [$this, 'getObjectFromLink']),
-        );
+        return [
+            new TwigFunction('get_path_from_link', [$this, 'getPathLink']),
+            new TwigFunction('is_external_link', [$this, 'isExternalLink']),
+            new TwigFunction('get_path_from_node', [$this, 'getNodePath']),
+            new TwigFunction('get_path', [$this, 'getPath']),
+            new TwigFunction('clear_path_cache', [$this, 'clearCache']),
+            new TwigFunction('get_object_from_link', [$this, 'getObjectFromLink']),
+        ];
     }
 
     /**
@@ -53,7 +38,7 @@ class LinkExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function getPathLink(Link $link)
+    public function getPathLink(Link $link): string
     {
         return $this->router->getPathFromLink($link);
     }
@@ -65,9 +50,9 @@ class LinkExtension extends \Twig_Extension
      *
      * @return bool
      */
-    public function isExternalLink($link)
+    public function isExternalLink($link): bool
     {
-        return !empty($link) && $link->getExternalLink() ? true : false;
+        return !empty($link) && $link->getExternalLink();
     }
 
     /**
@@ -79,7 +64,7 @@ class LinkExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function getNodePath(Node $node, $absolute = false, $parameters = [])
+    public function getNodePath(Node $node, $absolute = false, $parameters = []): string
     {
         return $this->router->getPathByNode($node, $absolute, $parameters);
     }
@@ -92,11 +77,14 @@ class LinkExtension extends \Twig_Extension
      * @param bool  $root         Use root node as reference
      * @param bool  $absolute     Absolute URL
      * @param array $parameters   URL parameters
-     *
-     * @return string
      */
-    public function getPath($object, $parentObject = null, $root = false, $absolute = false, $parameters = [])
-    {
+    public function getPath(
+        mixed $object,
+        mixed $parentObject = null,
+        $root = false,
+        $absolute = false,
+        $parameters = []
+    ): string {
         $locale = null;
         if (method_exists($object, 'getLocale')) {
             $locale = $object->getLocale();
@@ -112,13 +100,13 @@ class LinkExtension extends \Twig_Extension
      *
      * @return null|object
      */
-    public function getObjectFromLink(Link $link)
+    public function getObjectFromLink(Link $link): ?object
     {
         if ($this->isExternalLink($link)) {
             return null;
         }
 
-        list($objectId, $class) = explode(';', $link->getInternalLink());
+        [$objectId, $class] = explode(';', $link->getInternalLink());
 
         return $this->em->getRepository($class)->find($objectId);
     }
@@ -129,13 +117,5 @@ class LinkExtension extends \Twig_Extension
     public function clearCache()
     {
         $this->router->clearCache();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'umanit_tree_link';
     }
 }

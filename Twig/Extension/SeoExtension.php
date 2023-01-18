@@ -1,33 +1,21 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Twig\Extension;
+namespace Umanit\TreeBundle\Twig\Extension;
 
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Umanit\Bundle\TreeBundle\Helper\Excerpt;
-use Umanit\Bundle\TreeBundle\Helper\Title;
-use Umanit\Bundle\TreeBundle\Model\SeoInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
+use Umanit\TreeBundle\Helper\Excerpt;
+use Umanit\TreeBundle\Helper\Title;
+use Umanit\TreeBundle\Model\SeoInterface;
 
-class SeoExtension extends \Twig_Extension
+class SeoExtension extends AbstractExtension
 {
-    /** @var RequestStack */
-    protected $request;
-
-    /** @var array */
-    protected $configuration;
-
-    /** @var Translator */
-    protected $translator;
-
-    /** @var Excerpt */
-    private $excerpt;
-
-    /** @var Title */
-    private $title;
+    protected ?Request $request;
 
     /**
-     * Constuctor.
-     *
      * @param RequestStack $request       Current request
      * @param Translator   $translator    Translation service
      * @param Excerpt      $excerpt       Excerpt helper service
@@ -36,27 +24,23 @@ class SeoExtension extends \Twig_Extension
      */
     public function __construct(
         RequestStack $request,
-        Translator $translator,
-        Excerpt $excerpt,
-        Title $title,
-        array $configuration
+        protected Translator $translator,
+        private Excerpt $excerpt,
+        private Title $title,
+        protected array $configuration
     ) {
-        $this->request       = $request->getCurrentRequest();
-        $this->configuration = $configuration;
-        $this->translator    = $translator;
-        $this->excerpt       = $excerpt;
-        $this->title         = $title;
+        $this->request = $request->getCurrentRequest();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new \Twig_Function('get_seo_title', [$this, 'getSeoTitle']),
-            new \Twig_Function('get_seo_description', [$this, 'getSeoDescription']),
-            new \Twig_Function('get_seo_keywords', [$this, 'getSeoKeywords']),
+            new TwigFunction('get_seo_title', [$this, 'getSeoTitle']),
+            new TwigFunction('get_seo_description', [$this, 'getSeoDescription']),
+            new TwigFunction('get_seo_keywords', [$this, 'getSeoKeywords']),
         ];
     }
 
@@ -65,10 +49,8 @@ class SeoExtension extends \Twig_Extension
      *
      * @param string $default  Default title for the page
      * @param bool   $override Set default value if override is set to true
-     *
-     * @return string
      */
-    public function getSeoTitle($default = '', $override = false)
+    public function getSeoTitle($default = '', $override = false): string
     {
         if ($default && $override) {
             return $default;
@@ -80,7 +62,10 @@ class SeoExtension extends \Twig_Extension
             $this->configuration['translation_domain']
         );
 
-        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
+        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get(
+                'contentObject',
+                null
+            )) {
             if ($contentObject instanceof SeoInterface) {
                 return ($contentObject->getSeoTitle() ?: $this->title->fromEntity($contentObject)).' | '.$defaultTitle;
             }
@@ -95,15 +80,18 @@ class SeoExtension extends \Twig_Extension
      * @param string $default  Default title for the page
      * @param int    $override Set default value if override is set to true
      *
-     * @return string
+     * @throws \ReflectionException
      */
-    public function getSeoDescription($default = '', $override = false)
+    public function getSeoDescription($default = '', $override = false): string
     {
         if ($default && $override) {
             return $default;
         }
 
-        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
+        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get(
+                'contentObject',
+                null
+            )) {
             if ($contentObject instanceof SeoInterface) {
                 return $contentObject->getSeoDescription() ?: $this->excerpt->fromEntity($contentObject);
             }
@@ -121,16 +109,17 @@ class SeoExtension extends \Twig_Extension
      *
      * @param string $default  Default title for the page
      * @param int    $override Set default value if override is set to true
-     *
-     * @return string
      */
-    public function getSeoKeywords($default = '', $override = false)
+    public function getSeoKeywords($default = '', $override = false): string
     {
         if ($default && $override) {
             return $default;
         }
 
-        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get('contentObject', null)) {
+        if (!empty($this->request->attributes) && $contentObject = $this->request->attributes->get(
+                'contentObject',
+                null
+            )) {
             if ($contentObject instanceof SeoInterface && !empty($contentObject->getSeoKeywords())) {
                 return $contentObject->getSeoKeywords();
             }
@@ -141,13 +130,5 @@ class SeoExtension extends \Twig_Extension
             [],
             $this->configuration['translation_domain']
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'umanit_tree_seo';
     }
 }

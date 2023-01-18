@@ -1,12 +1,10 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Helper;
+namespace Umanit\TreeBundle\Helper;
 
 /**
  * Html helper.
  * Inspired by Bolt CMS.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class Html
 {
@@ -20,21 +18,22 @@ class Html
      *
      * @return string Trimmed string
      */
-    public static function trimText($str, $desiredLength, $hellip = true, $cutOffCap = 10)
+    public static function trimText(string $str, int $desiredLength, bool $hellip = true, int $cutOffCap = 10): string
     {
         if ($hellip) {
             $ellipseStr = ' …';
-            $newLength  = $desiredLength - 1;
+            $newLength = $desiredLength - 1;
         } else {
             $ellipseStr = '';
-            $newLength  = $desiredLength;
+            $newLength = $desiredLength;
         }
 
         $str = trim(strip_tags($str));
 
         if (mb_strlen($str) > $desiredLength) {
             $nextChar = mb_substr($str, $newLength, 1);
-            $str      = mb_substr($str, 0, $newLength);
+            $str = mb_substr($str, 0, $newLength);
+
             if (' ' !== $nextChar && ($lastSpace = mb_strrpos($str, ' ')) !== false) {
                 // Check for to long cutoff
                 if (mb_strlen($str) - $lastSpace >= $cutOffCap) {

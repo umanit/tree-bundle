@@ -1,40 +1,22 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Event;
+namespace Umanit\TreeBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
 /**
- * Event trigger when the bundle register the parents of a node.
+ * Event triggered when the bundle registers the parents of a node
  */
 class NodeParentRegisterEvent extends Event
 {
-    const NAME = 'umanit.node.parent_register';
+    public const NAME = 'umanit.node.parent_register';
 
-    /**
-     * @var TreeNodeInterface
-     */
-    private $entity;
-
-    /**
-     * @var array
-     */
-    private $parents;
-
-    /**
-     * @param TreeNodeInterface $entity
-     */
-    public function __construct(TreeNodeInterface $entity, array $parents)
+    public function __construct(private TreeNodeInterface $entity, private array $parents)
     {
-        $this->entity  = $entity;
-        $this->parents = $parents;
     }
 
-    /**
-     * @return TreeNodeInterface
-     */
-    public function getEntity()
+    public function getEntity(): TreeNodeInterface
     {
         return $this->entity;
     }
@@ -44,7 +26,7 @@ class NodeParentRegisterEvent extends Event
      *
      * @return TreeNodeInterface[]
      */
-    public function getParents()
+    public function getParents(): array
     {
         return $this->parents;
     }

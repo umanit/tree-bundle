@@ -1,9 +1,9 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Model;
+namespace Umanit\TreeBundle\Model;
 
-use Umanit\Bundle\TreeBundle\Entity\SeoMetadata;
 use Doctrine\ORM\Mapping as ORM;
+use Umanit\TreeBundle\Entity\SeoMetadata;
 
 /**
  * Contains data usable for SEO.
@@ -11,30 +11,17 @@ use Doctrine\ORM\Mapping as ORM;
 trait SeoTrait
 {
     /**
-     * @var SeoMetadata
-     *
-     * @ORM\Embedded(class="Umanit\Bundle\TreeBundle\Entity\SeoMetadata", columnPrefix=false)
+     * @ORM\Embedded(class="Umanit\TreeBundle\Entity\SeoMetadata", columnPrefix=false)
      */
-    protected $seoMetadata;
+    #[ORM\Embedded(class: SeoMetadata::class, columnPrefix: false)]
+    protected ?SeoMetadata $seoMetadata = null;
 
-    /**
-     * Get the value of Seo Metadata.
-     *
-     * @return SeoMetadata
-     */
-    public function getSeoMetadata()
+    public function getSeoMetadata(): SeoMetadata
     {
         return $this->seoMetadata;
     }
 
-    /**
-     * Set the value of Seo Metadata.
-     *
-     * @param SeoMetadata $seoMetadata
-     *
-     * @return self
-     */
-    public function setSeoMetadata(SeoMetadata $seoMetadata)
+    public function setSeoMetadata(SeoMetadata $seoMetadata): self
     {
         $this->seoMetadata = $seoMetadata;
 
@@ -44,7 +31,7 @@ trait SeoTrait
     /**
      * {@inheritdoc}
      */
-    public function getSeoUrl()
+    public function getSeoUrl(): ?string
     {
         return $this->seoMetadata == null ? '' : $this->seoMetadata->getUrl();
     }
@@ -52,7 +39,7 @@ trait SeoTrait
     /**
      * {@inheritdoc}
      */
-    public function getSeoTitle()
+    public function getSeoTitle(): ?string
     {
         return $this->seoMetadata == null ? '' : $this->seoMetadata->getTitle();
     }
@@ -60,7 +47,7 @@ trait SeoTrait
     /**
      * {@inheritdoc}
      */
-    public function getSeoDescription()
+    public function getSeoDescription(): ?string
     {
         return $this->seoMetadata == null ? '' : $this->seoMetadata->getDescription();
     }
@@ -68,7 +55,7 @@ trait SeoTrait
     /**
      * {@inheritdoc}
      */
-    public function getSeoKeywords()
+    public function getSeoKeywords(): ?string
     {
         return $this->seoMetadata == null ? '' : $this->seoMetadata->getKeywords();
     }

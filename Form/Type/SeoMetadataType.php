@@ -1,65 +1,31 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Form\Type;
+namespace Umanit\TreeBundle\Form\Type;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\CallbackValidator;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use Umanit\Bundle\TreeBundle\Entity\SeoMetadata;
-use Umanit\Bundle\TreeBundle\Helper\Excerpt;
-use Umanit\Bundle\TreeBundle\Helper\Title;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
-use Umanit\Bundle\TreeBundle\Router\NodeRouter;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Umanit\TreeBundle\Entity\SeoMetadata;
+use Umanit\TreeBundle\Helper\Excerpt;
+use Umanit\TreeBundle\Helper\Title;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
+use Umanit\TreeBundle\Router\NodeRouter;
 
 class SeoMetadataType extends AbstractType
 {
-    /** @var NodeRouter */
-    private $nodeRouter;
-
-    /** @var Excerpt */
-    private $excerpt;
-
-    /** @var array */
-    private $seoConfig;
-
-    /**  @var TranslatorInterface */
-    private $translator;
-
-    /** @var Title */
-    private $title;
-
-    /**
-     * SeoMetadataType constructor.
-     *
-     * @param NodeRouter          $nodeRouter
-     * @param Excerpt             $excerpt
-     * @param Title               $title
-     * @param TranslatorInterface $translator
-     * @param array               $seoConfig
-     */
     public function __construct(
-        NodeRouter $nodeRouter,
-        Excerpt $excerpt,
-        Title $title,
-        TranslatorInterface $translator,
-        array $seoConfig
+        private NodeRouter $nodeRouter,
+        private Excerpt $excerpt,
+        private Title $title,
+        private TranslatorInterface $translator,
+        private array $seoConfig
     ) {
-        $this->nodeRouter = $nodeRouter;
-        $this->excerpt    = $excerpt;
-        $this->title      = $title;
-        $this->seoConfig  = $seoConfig;
-        $this->translator = $translator;
     }
 
     /**
@@ -95,9 +61,10 @@ class SeoMetadataType extends AbstractType
             if (null === $event->getData() || null === $event->getForm()->getParent()) {
                 return;
             }
+
             /** @var SeoMetadata $seoMetadata */
             $seoMetadata = $event->getData();
-            $seoForm     = $event->getForm();
+            $seoForm = $event->getForm();
             /** @var TreeNodeInterface $parentModelData */
             $parentModelData = $event->getForm()->getParent()->getData();
 
@@ -114,6 +81,7 @@ class SeoMetadataType extends AbstractType
                     'placeholder' => html_entity_decode($title),
                 ]);
             }
+
             // Url
             if (null === $seoMetadata->getUrl()) {
                 $this->setSubFormOption($seoForm, 'url', 'attr', [
@@ -126,6 +94,7 @@ class SeoMetadataType extends AbstractType
                     ),
                 ]);
             }
+
             // Description
             if (null === $seoMetadata->getDescription()) {
                 $description = $this->excerpt->fromEntity($parentModelData) ?: $this->translator->trans(
@@ -139,6 +108,7 @@ class SeoMetadataType extends AbstractType
                     'placeholder' => html_entity_decode($description),
                 ]);
             }
+
             // Keywords
             if (null === $seoMetadata->getKeywords()) {
                 $this->setSubFormOption($seoForm, 'keywords', 'attr', [
@@ -150,21 +120,19 @@ class SeoMetadataType extends AbstractType
 
     /**
      * Set a form options.
-     *
-     * @param FormInterface $parentForm
-     * @param  string       $childName
-     * @param  string       $optionName
-     * @param  mixed        $optionValue
      */
-    protected function setSubFormOption(FormInterface $parentForm, $childName, $optionName, $optionValue)
-    {
+    protected function setSubFormOption(
+        FormInterface $parentForm,
+        string $childName,
+        string $optionName,
+        mixed $optionValue
+    ) {
         $options = $parentForm->get($childName)->getConfig()->getOptions();
-
         $options[$optionName] = $optionValue;
 
         $parentForm->add(
             $childName,
-            get_class($parentForm->get($childName)->getConfig()->getType()->getInnerType()),
+            $parentForm->get($childName)->getConfig()->getType()->getInnerType()::class,
             $options
         );
     }
@@ -172,27 +140,12 @@ class SeoMetadataType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'         => SeoMetadata::class,
+            'data_class' => SeoMetadata::class,
             'translation_domain' => 'UmanitTreeBundle',
         ]);
     }
 
-
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults([
-            'data_class'         => SeoMetadata::class,
-            'translation_domain' => 'UmanitTreeBundle',
-        ]);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'umanit_seo_metadata_type';
     }

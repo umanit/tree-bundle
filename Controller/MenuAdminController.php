@@ -1,70 +1,52 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Controller;
+namespace Umanit\TreeBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Doctrine\Persistence\ManagerRegistry;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * Class MenuAdminController
- *
- * @Route("/admin/menu")
- * @Security("is_granted('ROLE_TREE_MENU_ADMIN')")
- *
- * @todo AGU : translate comments.
- */
-class MenuAdminController extends Controller
+#[IsGranted('ROLE_TREE_MENU_ADMIN')]
+class MenuAdminController extends AbstractController
 {
-    /** @var string */
-    protected $menuFormClass;
+    private ManagerRegistry $doctrine;
 
-    /** @var string */
-    protected $menuEntityClass;
-
-    /**
-     * @inheritdoc
-     *
-     * @param ContainerInterface|null $container
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        parent::setContainer($container);
-        $this->menuFormClass = $this->getParameter('umanit_tree.menu_form_class');
-        $this->menuEntityClass = $this->getParameter('umanit_tree.menu_entity_class');
+        $this->doctrine = $doctrine;
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * @Route("/", name="tree_admin_menu_dashboard")
-     */
-    public function dashboardAction()
+    public function dashboard(): Response
     {
         if (empty($this->getParameter('umanit_tree.menu_entity_class'))) {
-            throw new InvalidConfigurationException("You have to configure 'umanit_tree.menu_entity_class' in order to use the menu admin. Read the chapter 'Using the menu admin' of the README.");
+            throw new InvalidConfigurationException(
+                'You have to configure "umanit_tree.menu_entity_class" in order to use the menu admin. Read the chapter "Using the menu admin" of the README.'
+            );
         }
-        return $this->render('@UmanitTree/admin/menu/list.html.twig', ['menus' => $this->getParameter('umanit_tree.menus')]);
+
+        return $this->render('@UmanitTree/admin/menu/list.html.twig', [
+            'menus' => $this->getParameter('umanit_tree.menus'),
+        ]);
     }
 
     /**
-     * Récupération en json de la structure de menu pour fancytree
+     * Returns menu structure as JsonResponse for Fancy Tree
      *
      * @param Request $request
      *
      * @return JsonResponse
-     * @Route("/menu.json", name="tree_admin_menu_json")
      */
-    public function getMenuAction(Request $request)
+    public function getMenu(Request $request): JsonResponse
     {
         $identifier = $request->get('identifier', 'primary');
-        $menuFlat = $this->getDoctrine()->getRepository($this->menuEntityClass)->getMenu($identifier);
+        $menuEntityClass = $this->getParameter('umanit_tree.menu_entity_class');
+        $menuFlat = $this->doctrine->getRepository($menuEntityClass)->getMenu($identifier);
 
         $menu = [];
         $parentId = [];
@@ -74,83 +56,73 @@ class MenuAdminController extends Controller
             do {
                 $menuItem =
                     [
-                        'title' => $currentMenu['title'],
-                        'key' => 'menu_'.$currentMenu['id'],
-                        'children' => [],
+                        'title'        => $currentMenu['title'],
+                        'key'          => 'menu_'.$currentMenu['id'],
+                        'children'     => [],
                         'has_children' => false,
-                        'parent_id' => $currentMenu['parentId'],
-                        'icon' => $this->getIcon($currentMenu['position'])
+                        'parent_id'    => $currentMenu['parentId'],
+                        'icon'         => $this->getIcon($currentMenu['position']),
                     ];
 
                 if (!empty($parentId) && $menuItem['parent_id'] != end($parentId)) {
                     do {
                         $parent = array_pop($menu);
 
-                        if ($parent['parent_id'] == null) {
-                            array_push($menu, $parent);
+                        if (empty($parent) || $parent['parent_id'] == null) {
+                            $menu[] = $parent;
                             break;
                         }
+
                         $grandParent = array_pop($menu);
                         $parent['icon'] = $grandParent['icon'];
                         $grandParent['children'][] = $parent;
                         $grandParent['has_children'] = true;
-                        array_push($menu, $grandParent);
+                        $menu[] = $grandParent;
                         array_pop($parentId);
-
                     } while ($menuItem['parent_id'] != end($parentId) && end($parentId) !== false);
-
-                    array_push($parentId, $currentMenu['id']);
-
-                } else {
-                    array_push($parentId, $currentMenu['id']);
                 }
 
-                array_push($menu, $menuItem);
-
+                $parentId[] = $currentMenu['id'];
+                $menu[] = $menuItem;
                 $currentMenu = next($menuFlat);
             } while (!empty($currentMenu));
         }
+
         do {
             $parent = array_pop($menu);
 
-            if ($parent['parent_id'] == null) {
-                array_push($menu, $parent);
+            if (empty($parent) || $parent['parent_id'] == null) {
+                $menu[] = $parent;
                 break;
             }
+
             $grandParent = array_pop($menu);
             $parent['icon'] = $grandParent['icon'];
             $grandParent['children'][] = $parent;
             $grandParent['has_children'] = true;
-            array_push($menu, $grandParent);
+            $menu[] = $grandParent;
             array_pop($parentId);
-
         } while (end($parentId) !== false);
 
         return new JsonResponse($menu);
     }
 
-    /**
-     * Retourne le style à utiliser pour un icone de menu
-     * @param string $position
-     * @return string
-     */
-    private function getIcon($position)
+    private function getIcon(string $position): string
     {
         return 'glyphicon glyphicon-arrow-right';
     }
 
     /**
-     * Déplacement d'un object
+     * Moves an object
      *
      * @param Request $request
      *
      * @return JsonResponse
-     *
-     * @Route("/move", name="tree_admin_menu_move")
      */
-    public function moveMenuAction(Request $request)
+    public function moveMenu(Request $request): JsonResponse
     {
-        $repository = $this->getDoctrine()->getRepository($this->menuEntityClass);
+        $menuEntityClass = $this->getParameter('umanit_tree.menu_entity_class');
+        $repository = $this->doctrine->getRepository($menuEntityClass);
         $movedNode = intval($request->request->get('moved_node'));
         $destinationNodeId = $request->request->get('destination_node');
         $mode = $request->request->get('mode'); // before, after, over
@@ -172,8 +144,8 @@ class MenuAdminController extends Controller
         }
 
         $actualMenu = $repository->subIdMenu($parentId);
-
         $newMenu = [];
+
         foreach ($actualMenu as $item) {
             if ($mode == 'before' && $item['id'] == $destinationNodeId) {
                 $newMenu[] = $movedNode;
@@ -195,24 +167,15 @@ class MenuAdminController extends Controller
         return new JsonResponse($count != 0);
     }
 
-
-    /**
-     * Ajout d'un élément
-     *
-     * @param Request $request
-     *
-     * @return Response
-     *
-     * @Route("/add", name="tree_admin_menu_add")
-     */
-    public function addAction(Request $request)
+    public function add(Request $request): Response
     {
-        $menu = new $this->menuEntityClass();
+        $menuEntityClass = $this->getParameter('umanit_tree.menu_entity_class');
+        $menu = new $menuEntityClass();
         $identifier = $request->get('identifier', 'primary');
         $menu->setPosition($identifier);
-        $form = $this
-            ->createForm($this->menuFormClass, $menu, ['menu_position' => $identifier])
-            ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
+        $menuFormClass = $this->getParameter('umanit_tree.menu_form_class');
+        $form = $this->createForm($menuFormClass, $menu, ['menu_position' => $identifier])
+                     ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
         ;
 
         $form->handleRequest($request);
@@ -222,47 +185,42 @@ class MenuAdminController extends Controller
             // but, the original `$task` variable has also been updated
             $menu = $form->getData();
             $menu->setPriority(999);
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->doctrine->getManager();
 
             $em->persist($menu);
             $em->flush();
 
             return $this->redirectToRoute('tree_admin_menu_dashboard');
-
         }
 
         return $this->render('@UmanitTree/admin/menu/add.html.twig', [
-            "form" => $form->createView(),
+            'form' => $form->createView(),
         ]);
     }
 
-    /**
-     * Edition d'un élément
-     *
-     * @param Request $request
-     *
-     * @return Response
-     * @Route("/edit", name="tree_admin_menu_edit")
-     */
-    public function editAction(Request $request)
+    public function edit(Request $request): Response
     {
-        $id = $request->query->get("id", null);
-        $menu = $this->getDoctrine()->getRepository($this->menuEntityClass)->find($id);
+        $id = $request->query->get('id', null);
+        $menuEntityClass = $this->getParameter('umanit_tree.menu_entity_class');
+        $menu = $this->doctrine->getRepository($menuEntityClass)->find($id);
+
         if ($menu == null) {
             throw $this->createNotFoundException();
         }
 
+        $menuFormClass = $this->getParameter('umanit_tree.menu_form_class');
         $form = $this
-            ->createForm($this->menuFormClass, $menu)
+            ->createForm($menuFormClass, $menu)
             ->add('save', SubmitType::class, ['attr' => ['class' => 'btn-success']])
         ;
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // $form->getData() holds the submitted values
             // but, the original `$task` variable has also been updated
             $menu = $form->getData();
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->doctrine->getManager();
 
             $em->persist($menu);
             $em->flush();
@@ -273,30 +231,23 @@ class MenuAdminController extends Controller
         return $this->render(
             '@UmanitTree/admin/menu/edit.html.twig',
             [
-                "form" => $form->createView()
+                'form' => $form->createView(),
             ]
         );
     }
 
-    /**
-     * Suppression d'un élément
-     *
-     * @param Request $request
-     *
-     * @return Response
-     * @Route("/delete", name="tree_admin_menu_delete")
-     */
-    public function deleteAction(Request $request)
+    public function delete(Request $request): RedirectResponse
     {
-        $id = $request->query->get("id", null);
-        $menu = $this->getDoctrine()->getRepository($this->menuEntityClass)->find($id);
+        $id = $request->query->get('id', null);
+        $menuEntityClass = $this->getParameter('umanit_tree.menu_entity_class');
+        $menu = $this->doctrine->getRepository($menuEntityClass)->find($id);
 
         if ($menu !== null) {
-            $em = $this->getDoctrine()->getManager();
+            $em = $this->doctrine->getManager();
             $em->remove($menu);
             $em->flush();
         }
 
-        return $this->redirectToRoute("tree_admin_menu_dashboard");
+        return $this->redirectToRoute('tree_admin_menu_dashboard');
     }
 }

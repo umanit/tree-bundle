@@ -1,6 +1,6 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Entity;
+namespace Umanit\TreeBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -11,45 +11,26 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="treebundle_root")
  * @ORM\Entity()
  */
-class RootEntity
+#[ORM\Table(name: 'treebundle_root')]
+#[ORM\Entity]
+class RootEntity implements \Stringable
 {
     /**
-     * @var int
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
-    /**
-     * Get the value of Id
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set the value of Id
-     *
-     * @param int $id
-     *
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return 'home';
     }

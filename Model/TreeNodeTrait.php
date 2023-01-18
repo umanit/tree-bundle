@@ -1,32 +1,28 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Model;
+namespace Umanit\TreeBundle\Model;
 
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 
-/**
- * Tree node trait
- */
 trait TreeNodeTrait
 {
     /**
      * @var mixed[]
      */
-    protected $parents;
+    protected array $parents;
 
     /**
-     * @var string
      * @ORM\Column(name="locale", type="string", length=7)
      */
-    protected $locale = TreeNodeInterface::UNKNOWN_LOCALE;
+    #[ORM\Column(name: 'locale', type: 'string', length: 7)]
+    protected string $locale = TreeNodeInterface::UNKNOWN_LOCALE;
 
     /**
      * Return the document locale
      *
      * @return string
      */
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return $this->locale;
     }
@@ -35,8 +31,10 @@ trait TreeNodeTrait
      * Set the locale of the document
      *
      * @param string $locale
+     *
+     * @return self
      */
-    public function setLocale($locale)
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
 
@@ -46,18 +44,16 @@ trait TreeNodeTrait
     /**
      * {@inheritDoc}
      */
-    public function getParents()
+    public function getParents(): array
     {
-        return empty($this->parents) ? array() : $this->parents;
+        return empty($this->parents) ? [] : $this->parents;
     }
 
-    /**
-     * Set parents node
-     * @param mixed[] $parents
-     */
-    public function setParents($parents)
+    public function setParents(array $parents): self
     {
         $this->parents = $parents;
+
+        return $this;
     }
 
     /**
@@ -66,7 +62,7 @@ trait TreeNodeTrait
      *
      * @return bool
      */
-    public function createRootNodeByDefault()
+    public function createRootNodeByDefault(): bool
     {
         return true;
     }

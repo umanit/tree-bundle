@@ -1,14 +1,14 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Router;
+namespace Umanit\TreeBundle\Router;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Umanit\Bundle\TreeBundle\Entity\Link;
-use Umanit\Bundle\TreeBundle\Entity\Node;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Umanit\TreeBundle\Entity\Link;
+use Umanit\TreeBundle\Entity\Node;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
 /**
  * Router that returns a path for the given node.
@@ -16,61 +16,37 @@ use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 class NodeRouter
 {
     /**
-     * @var Registry
+     * @var array Cache to avoid a huge amount of requests
      */
-    protected $doctrine;
+    protected array $cache;
 
-    /**
-     * @var Router Symfony2 router
-     */
-    protected $router;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var array Cache to avoid an huge amount of requests
-     */
-    protected $cache;
-
-    /**
-     * Constructor.
-     *
-     * @param Registry        $doctrine     Doctrine ORM
-     * @param RouterInterface $router       Symfony2 router
-     * @param RequestStack    $requestStack Current request
-     */
-    public function __construct(Registry $doctrine, RouterInterface $router, RequestStack $requestStack)
-    {
-        $this->doctrine     = $doctrine;
-        $this->router       = $router;
-        $this->requestStack = $requestStack;
+    public function __construct(
+        protected Registry $doctrine,
+        protected RouterInterface $router,
+        protected RequestStack $requestStack
+    ) {
     }
 
     /**
      * Get path for the given object.
      *
-     * @param mixed $object       Entity searched
-     * @param mixed $parentObject Object parent from which we want to get the nodes
-     * @param bool  $root         Use root node as reference
-     * @param bool  $absolute     Absolute URL or not
-     * @param bool  $locale       Locale to use
-     * @param array $parameters   URL parameters
-     *
-     * @return string
+     * @param mixed       $object       Entity searched
+     * @param mixed       $parentObject Object parent from which we want to get the nodes
+     * @param bool        $root         Use root node as reference
+     * @param bool        $absolute     Absolute URL or not
+     * @param string|null $locale       Locale to use
+     * @param array       $parameters   URL parameters
      */
     public function getPath(
-        $object,
-        $parentObject = null,
-        $root = false,
-        $absolute = false,
-        $locale = null,
-        $parameters = []
-    ) {
+        mixed $object,
+        mixed $parentObject = null,
+        bool $root = false,
+        bool $absolute = false,
+        ?string $locale = null,
+        array $parameters = []
+    ): string {
         return $object ? $this->getPathClass(
-            $this->doctrine->getManager()->getClassMetadata(get_class($object))->getName(),
+            $this->doctrine->getManager()->getClassMetadata($object::class)->getName(),
             $object->getId(),
             $parentObject,
             $root,
@@ -83,39 +59,39 @@ class NodeRouter
     /**
      * Returns a path for the given matching the given className and classId.
      *
-     * @param string $className    Class full name (with namespace)
-     * @param int    $classId      Instance ID
-     * @param mixed  $parentObject Object parent from which we want to get the nodes
-     * @param bool   $root         Use root node as reference
-     * @param bool   $absolute     Absolute URL or not
-     * @param bool   $locale       Locale to use
-     * @param array  $parameters   URL parameters
-     *
-     * @return string
+     * @param string      $className    Class full name (with namespace)
+     * @param int         $classId      Instance ID
+     * @param mixed       $parentObject Object parent from which we want to get the nodes
+     * @param bool        $root         Use root node as reference
+     * @param bool        $absolute     Absolute URL or not
+     * @param string|null $locale       Locale to use
+     * @param array       $parameters   URL parameters
      */
     public function getPathClass(
-        $className,
-        $classId,
-        $parentObject = null,
-        $root = false,
-        $absolute = false,
-        $locale = null,
-        $parameters = []
-    ) {
+        string $className,
+        int $classId,
+        mixed $parentObject = null,
+        bool $root = false,
+        bool $absolute = false,
+        ?string $locale = null,
+        array $parameters = []
+    ): string {
         $referenceNode = null;
 
         // In the app/console context, the request is an empty object request
         if ($this->requestStack->getCurrentRequest() !== null) {
             $referenceNode = $this->requestStack->getCurrentRequest()->attributes->get('contentNode', null);
-            $locale = $locale ?? $this->requestStack->getCurrentRequest()->getLocale();
+            $locale ??= $this->requestStack->getCurrentRequest()->getLocale();
         }
+
         if ($referenceNode === null || $referenceNode->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
             $referenceNode = null;
         }
 
         if (!is_null($parentObject) && $root === false) {
-            $classNameParent = $this->doctrine->getManager()->getClassMetadata(get_class($parentObject))->getName();
-            if ($classNameParent === "Umanit\Bundle\TreeBundle\Entity\Node") {
+            $classNameParent = $this->doctrine->getManager()->getClassMetadata($parentObject::class)->getName();
+
+            if ($classNameParent === Node::class) {
                 $referenceNode = $parentObject;
             } else {
                 $referenceNode = $this->buildNode(
@@ -140,13 +116,11 @@ class NodeRouter
      * @param int       $classId       Class identifier
      * @param Node|null $referenceNode Node reference
      * @param bool      $root          Use root node as reference
-     * @param bool      $locale        Locale to use
-     *
-     * @return string
+     * @param string    $locale        Locale to use
      */
-    public function buildNode($className, $classId, $referenceNode, $root, $locale)
+    public function buildNode(string $className, int $classId, ?Node $referenceNode, bool $root, string $locale): ?Node
     {
-        $manager = $this->doctrine->getRepository('Umanit\Bundle\TreeBundle\Entity\Node');
+        $manager = $this->doctrine->getRepository(Node::class);
 
         $parents = [];
         if ($referenceNode && !$root) {
@@ -155,47 +129,51 @@ class NodeRouter
             } while ($referenceNode = $referenceNode->getParent());
         }
 
-        $node = $manager->searchNode(
+        return $manager->searchNode(
             $className,
             $classId,
             $parents,
             $locale
         );
-
-        return $node;
     }
 
     /**
      * Clear node's cache.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
-        $this->cache = array();
+        $this->cache = [];
     }
 
     /**
      * Returns the relative path to access the given node.
      *
-     * @param Node  $node
      * @param bool  $absolute   Absolute URL or not
      * @param array $parameters URL parameters
      *
-     * @return string
      */
-    public function getPathByNode(Node $node, $absolute = false, $parameters = [])
+    public function getPathByNode(Node $node, bool $absolute = false, array $parameters = []): string
     {
         $parameters['_locale'] = $node->getLocale();
 
         // Root page
         if ($node->getPath() === TreeNodeInterface::ROOT_NODE_PATH) {
-            return $this->router->generate('umanit.tree.default', array_merge(array(
-                'path' => '',
-            ), $parameters), $absolute ? UrlGeneratorInterface::ABSOLUTE_URL: UrlGeneratorInterface::ABSOLUTE_PATH);
+            return $this->router->generate(
+                'umanit.tree.default',
+                array_merge([
+                    'path' => '',
+                ], $parameters),
+                $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH
+            );
         }
 
-        return $this->router->generate('umanit.tree.default', array_merge(array(
-            'path' => substr($node->getPath(), 1),
-        ), $parameters), $absolute ? UrlGeneratorInterface::ABSOLUTE_URL: UrlGeneratorInterface::ABSOLUTE_PATH);
+        return $this->router->generate(
+            'umanit.tree.default',
+            array_merge([
+                'path' => substr($node->getPath(), 1),
+            ], $parameters),
+            $absolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH
+        );
     }
 
     /**
@@ -205,14 +183,14 @@ class NodeRouter
      *
      * @return string
      */
-    public function getPathFromLink(Link $link)
+    public function getPathFromLink(Link $link): string
     {
         if ($link->getExternalLink()) {
             return $link->getExternalLink();
         }
 
         if ($link->getInternalLink()) {
-            list($classId, $className) = explode(';', $link->getInternalLink());
+            [$classId, $className] = explode(';', $link->getInternalLink());
 
             return $this->getPathClass($className, $classId);
         }

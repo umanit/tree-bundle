@@ -1,6 +1,6 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\DependencyInjection;
+namespace Umanit\TreeBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -17,15 +17,15 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('umanit_tree');
+        $treeBuilder = new TreeBuilder('umanit_tree');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
                 ->scalarNode('locale')->defaultValue('%locale%')->end()
-                ->scalarNode('root_class')->defaultValue('Umanit\Bundle\TreeBundle\Entity\RootEntity')->end()
+                ->scalarNode('root_class')->defaultValue('Umanit\TreeBundle\Entity\RootEntity')->end()
                 ->scalarNode('admin_layout')->defaultValue('@UmanitTree/admin/default_layout.html.twig')->end()
-                ->scalarNode('menu_form_class')->defaultValue('Umanit\Bundle\TreeBundle\Form\Type\MenuType')->end()
+                ->scalarNode('menu_form_class')->defaultValue('Umanit\TreeBundle\Form\Type\MenuType')->end()
                 ->scalarNode('menu_entity_class')->defaultNull()->end()
                 ->arrayNode('menus')->info('Defines the menus in your application.')
                     ->prototype('scalar')->end()

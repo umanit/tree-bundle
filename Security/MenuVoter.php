@@ -1,31 +1,17 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Security;
+namespace Umanit\TreeBundle\Security;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @author Arthur Guigand <aguigand@umanit.fr>
- */
 class MenuVoter implements VoterInterface
 {
-    const MENU_ADMIN = 'ROLE_TREE_MENU_ADMIN';
+    public const MENU_ADMIN = 'ROLE_TREE_MENU_ADMIN';
 
-    /**
-     * @var array
-     */
-    private $menuRoles;
-
-    /**
-     * MenuVoter constructor.
-     *
-     * @param array $menuRoles
-     */
-    public function __construct(array $menuRoles = [])
+    public function __construct(private array $menuRoles = [])
     {
-        $this->menuRoles = $menuRoles;
     }
 
     protected function supports($attribute, $subject)
@@ -43,5 +29,4 @@ class MenuVoter implements VoterInterface
 
         return count(array_intersect($this->menuRoles, $user->getRoles())) > 0;
     }
-
 }

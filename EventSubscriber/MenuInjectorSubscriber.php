@@ -1,47 +1,27 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\EventSubscriber;
+namespace Umanit\TreeBundle\EventSubscriber;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Twig_Environment;
-use Umanit\Bundle\TreeBundle\Menu\MenuBuilder;
+use Twig\Environment;
+use Umanit\TreeBundle\Menu\MenuBuilder;
 
 class MenuInjectorSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Twig_Environment $twig
-     */
-    protected $twig;
-
-    /**
-     * @var MenuBuilder
-     */
-    private $menuBuilder;
-
-    /**
-     * MenuInjectorSubscriber constructor.
-     *
-     * @param Twig_Environment $twig
-     * @param MenuBuilder      $menuBuilder
-     */
-    public function __construct(Twig_Environment $twig, MenuBuilder $menuBuilder)
+    public function __construct(protected Environment $twig, private MenuBuilder $menuBuilder)
     {
-        $this->twig        = $twig;
-        $this->menuBuilder = $menuBuilder;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [KernelEvents::REQUEST => 'onKernelRequest'];
     }
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
