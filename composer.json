@@ -14,7 +14,9 @@
     "require": {
         "php": "^8.0",
         "gedmo/doctrine-extensions": "~3.9",
-        "symfony/framework-bundle": "^5.4|^6.0"
+        "symfony/framework-bundle": "^5.4|^6.0",
+        "doctrine/doctrine-bundle": "^2.7",
+        "doctrine/orm": "^2.13"
     },
     "minimum-stability": "stable",
     "target-dir": "Umanit/TreeBundle",

@@ -129,6 +129,7 @@ services:
             - '%umanit_tree.locale%'
             - '@doctrine'
             - '@event_dispatcher'
+            - '@doctrine.orm.umanit_tree_entity_manager'
 
     # Excerpt
     umanit.tree.excerpt:

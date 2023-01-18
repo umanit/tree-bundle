@@ -3,6 +3,7 @@
 namespace Umanit\TreeBundle\Helper;
 
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Umanit\TreeBundle\Entity\Node;
@@ -24,11 +25,13 @@ class NodeHelper
      * @param string                   $locale Default locale
      * @param ManagerRegistry          $doctrine
      * @param EventDispatcherInterface $eventDispatcher
+     * @param EntityManagerInterface   $umanitTreeEntityManager
      */
     public function __construct(
         protected string $locale,
         protected ManagerRegistry $doctrine,
-        protected EventDispatcherInterface $eventDispatcher
+        protected EventDispatcherInterface $eventDispatcher,
+        protected EntityManagerInterface $umanitTreeEntityManager
     ) {
         $this->entitiesToRemove = [];
     }
@@ -38,21 +41,13 @@ class NodeHelper
      */
     public function updateNodes(TreeNodeInterface $entity): void
     {
-        /*
-         * J'utilise un entity manager dédié par endroits car sinon ça vide les blocs de la page edito...
-         * à cause du fait que l'UnitOfWork clear toutes les propriétés sauf la collectionDeletions
-         * entre deux transactions. BlockBundle faisant un DELETE puis un INSERT des nodes, j'ai un DELETE
-         * supplémentaire qui se jour dans le tour d'UnitOfWork impliqué dans ce listener qui vide donc les
-         * blocs définitivement.
-         */
-        $treeManager = $this->doctrine->getManager('umanit_tree');
         $manager = $this->doctrine->getManager();
 
         $event = new NodeBeforeUpdateEvent($entity);
         $this->eventDispatcher->dispatch($event, NodeBeforeUpdateEvent::NAME);
 
         // Get tree nodes
-        $treeNodes = $treeManager->getRepository(Node::class)->findBy([
+        $treeNodes = $this->umanitTreeEntityManager->getRepository(Node::class)->findBy([
             'className' => $manager->getClassMetadata($entity::class)->getName(),
             'classId'   => $entity->getId(),
             'locale'    => $entity->getLocale(),
@@ -85,8 +80,8 @@ class NodeHelper
             if ($nodeName !== $treeNode->getNodeName()) {
                 $treeNode->setNodeName($nodeName);
 
-                $treeManager->persist($treeNode);
-                $treeManager->flush($treeNode);
+                $this->umanitTreeEntityManager->persist($treeNode);
+                $this->umanitTreeEntityManager->flush($treeNode);
             }
         }
 
@@ -113,22 +108,20 @@ class NodeHelper
      */
     public function flush(): void
     {
-        $treeManager = $this->doctrine->getManager('umanit_tree');
-
         $entities = $this->entitiesToRemove;
         $this->entitiesToRemove = [];
 
         if (!empty($entities)) {
             foreach ($entities as $entity) {
-                $nodes = $treeManager->getRepository(Node::class)->findBy([
+                $nodes = $this->umanitTreeEntityManager->getRepository(Node::class)->findBy([
                     'className' => $entity['name'],
                     'classId'   => $entity['id'],
                     'locale'    => $entity['locale'],
                 ]);
 
                 foreach ($nodes as $node) {
-                    $treeManager->remove($node);
-                    $treeManager->flush($node);
+                    $this->umanitTreeEntityManager->remove($node);
+                    $this->umanitTreeEntityManager->flush($node);
                 }
             }
         }
@@ -139,7 +132,6 @@ class NodeHelper
      */
     private function createNodes(TreeNodeInterface $entity): void
     {
-        $treeManager = $this->doctrine->getManager('umanit_tree');
         $className = $this->doctrine->getManager()->getClassMetadata($entity::class)->getName();
 
         $event = new NodeBeforeUpdateEvent($entity);
@@ -166,8 +158,8 @@ class NodeHelper
                  ->setLocale($entity->getLocale())
             ;
 
-            $treeManager->persist($node);
-            $treeManager->flush($node);
+            $this->umanitTreeEntityManager->persist($node);
+            $this->umanitTreeEntityManager->flush($node);
             $nodes = [$node];
         } else {
             $nodes = [];
@@ -188,11 +180,10 @@ class NodeHelper
      */
     private function registerParents(TreeNodeInterface $entity, array $treeNodes, array $parents): void
     {
-        $treeManager = $this->doctrine->getManager('umanit_tree');
         $manager = $this->doctrine->getManager();
 
         $nodeKeep = [];
-        $nodeParents = $treeManager->getRepository(Node::class)->findParentsNodesAsArray($parents);
+        $nodeParents = $this->umanitTreeEntityManager->getRepository(Node::class)->findParentsNodesAsArray($parents);
 
         // Nodes from the parent
         if (!empty($nodeParents) && empty($treeNodes)) {
@@ -203,11 +194,11 @@ class NodeHelper
                         ->setClassName($manager->getClassMetadata($entity::class)->getName())
                         ->setClassId($entity->getId())
                         ->setLocale($node['locale'])
-                        ->setParent($treeManager->getReference(Node::class, $node['id']))
+                        ->setParent($this->umanitTreeEntityManager->getReference(Node::class, $node['id']))
                 ;
 
-                $treeManager->persist($newNode);
-                $treeManager->flush($newNode);
+                $this->umanitTreeEntityManager->persist($newNode);
+                $this->umanitTreeEntityManager->flush($newNode);
             }
         } elseif (!empty($nodeParents)) {
             // Checks if we already have this parent
@@ -230,11 +221,11 @@ class NodeHelper
                                 ->setClassName($manager->getClassMetadata($entity::class)->getName())
                                 ->setClassId($entity->getId())
                                 ->setLocale($node['locale'])
-                                ->setParent($treeManager->getReference(Node::class, $node['id']))
+                                ->setParent($this->umanitTreeEntityManager->getReference(Node::class, $node['id']))
                         ;
 
-                        $treeManager->persist($newNode);
-                        $treeManager->flush($newNode);
+                        $this->umanitTreeEntityManager->persist($newNode);
+                        $this->umanitTreeEntityManager->flush($newNode);
                     }
                 }
             }
@@ -250,8 +241,8 @@ class NodeHelper
                 continue;
             }
 
-            $treeManager->remove($treeNode);
-            $treeManager->flush();
+            $this->umanitTreeEntityManager->remove($treeNode);
+            $this->umanitTreeEntityManager->flush();
         }
     }
 
