@@ -1,126 +1,83 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Entity;
+namespace Umanit\TreeBundle\Entity;
 
-use Umanit\Bundle\TreeBundle\Model\SeoInterface;
-use Umanit\Bundle\TreeBundle\Entity\Translation\SeoMetadataTranslation;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * SeoMetadata
+ *
  * @ORM\Embeddable
  */
+#[ORM\Embeddable]
 class SeoMetadata
 {
     /**
-     * @var string
      * @ORM\Column(name="seo_title", type="string", length=255, nullable=true)
      */
-    protected $title;
+    #[ORM\Column(name: 'seo_title', type: 'string', length: 255, nullable: true)]
+    protected ?string $title = null;
 
     /**
-     * @var string
      * @ORM\Column(name="seo_description", type="text", nullable=true)
      */
-    protected $description;
+    #[ORM\Column(name: 'seo_description', type: 'text', nullable: true)]
+    protected ?string $description = null;
 
     /**
-     * @var string
      * @ORM\Column(name="seo_keywords", type="text",  nullable=true)
      */
-    protected $keywords;
+    #[ORM\Column(name: 'seo_keywords', type: 'text', nullable: true)]
+    protected ?string $keywords = null;
 
     /**
-     * @var string
      * @ORM\Column(name="seo_url", type="string", length=511, nullable=true)
      */
-    protected $url;
+    #[ORM\Column(name: 'seo_url', type: 'string', length: 511, nullable: true)]
+    protected ?string $url = null;
 
-    /**
-     * Get the value of Title
-     *
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * Set the value of Title
-     *
-     * @param string $title
-     *
-     * @return self
-     */
-    public function setTitle($title)
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * Get the value of Description
-     *
-     * @return string
-     */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * Set the value of Description
-     *
-     * @param string $description
-     *
-     * @return self
-     */
-    public function setDescription($description)
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
         return $this;
     }
 
-    /**
-     * Get the value of Keywords
-     *
-     * @return string
-     */
-    public function getKeywords()
+    public function getKeywords(): ?string
     {
         return $this->keywords;
     }
 
-    /**
-     * Set the value of Keywords
-     *
-     * @param string $keywords
-     *
-     * @return self
-     */
-    public function setKeywords($keywords)
+    public function setKeywords(?string $keywords): self
     {
         $this->keywords = $keywords;
 
         return $this;
     }
-    
-    /**
-     * @return string
-     */
+
     public function getUrl()
     {
         return $this->url;
     }
 
-    /**
-     * @param string $url
-     */
-    public function setUrl($url)
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
     }

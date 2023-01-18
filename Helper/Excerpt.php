@@ -1,6 +1,6 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Helper;
+namespace Umanit\TreeBundle\Helper;
 
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -8,13 +8,11 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 /**
  * Excerpt util class.
  * Inspired by Bolt CMS.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
  */
 class Excerpt
 {
     // The field names we do not want in an excerpt
-    const STRIP_KEYS = [
+    public const STRIP_KEYS = [
         'slug',
         'username',
         'owner',
@@ -31,27 +29,16 @@ class Excerpt
         'video',
     ];
 
-    // Friendly field names found in an excert.
-    const FAV_KEYS = [
+    // Friendly field names found in an excerpt.
+    public const FAV_KEYS = [
         'excerpt',
         'description',
         'intro',
         'introduction',
     ];
 
-    /**
-     * @var PropertyAccessor
-     */
-    private $accessor;
-
-    /**
-     * Excerpt constructor.
-     *
-     * @param PropertyAccessor $accessor
-     */
-    public function __construct(PropertyAccessor $accessor)
+    public function __construct(private PropertyAccessor $accessor)
     {
-        $this->accessor = $accessor;
     }
 
     /**
@@ -60,25 +47,23 @@ class Excerpt
      * @param object $entity The object from which the excerpt is generated.
      * @param int    $length The max length of the excerpt.
      *
-     * @return string
      * @throws \ReflectionException
      */
-    public function fromEntity($entity, $length = 150)
+    public function fromEntity(object $entity, int $length = 150): string
     {
         $values = '';
-        $refl   = new \ReflectionClass($entity);
-
-        /** @var \ReflectionProperty[] $properties */
+        $refl = new \ReflectionClass($entity);
         $properties = $refl->getProperties();
 
         // Consider favourite keys first
-        uasort($properties, function(\ReflectionProperty $a, \ReflectionProperty $b) {
+        uasort($properties, function (\ReflectionProperty $a, \ReflectionProperty $b) {
             if (\in_array($a->getName(), $this::FAV_KEYS, true)) {
                 return -1;
             }
             if (\in_array($b->getName(), $this::FAV_KEYS, true)) {
                 return 1;
             }
+
             return 0;
         });
 
@@ -92,7 +77,7 @@ class Excerpt
             // Get the value
             try {
                 $value = $this->accessor->getValue($entity, $property->getName());
-            } catch (AccessException $e) {
+            } catch (AccessException) {
                 continue;
             }
 
@@ -118,5 +103,4 @@ class Excerpt
 
         return Html::trimText($values, $length);
     }
-
 }

@@ -1,12 +1,13 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Repository;
+namespace Umanit\TreeBundle\Repository;
 
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Doctrine\ORM\EntityRepository;
+use Umanit\TreeBundle\Entity\Node;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
-class NodeHistoryRepository extends \Doctrine\ORM\EntityRepository
+class NodeHistoryRepository extends EntityRepository
 {
-
     /**
      * Returns a node that match the given path for the given locale (if a locale is set, the "UNKNOWN_LOCALE" will be
      * added to the query).
@@ -16,7 +17,7 @@ class NodeHistoryRepository extends \Doctrine\ORM\EntityRepository
      *
      * @return Node|null
      */
-    public function getByPath($path, $locale = TreeNodeInterface::UNKNOWN_LOCALE)
+    public function getByPath(string $path, string $locale = TreeNodeInterface::UNKNOWN_LOCALE): ?Node
     {
         if ($path[0] !== '/') {
             $path = '/'.$path;
@@ -29,22 +30,25 @@ class NodeHistoryRepository extends \Doctrine\ORM\EntityRepository
         ;
 
         if ($locale !== TreeNodeInterface::UNKNOWN_LOCALE) {
-            $qb->andWhere($qb->expr()->orX(
-                $qb->expr()->eq('n.locale', ':locale'),
-                $qb->expr()->eq('n.locale', ':unknow_locale')
-            ));
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('n.locale', ':locale'),
+                    $qb->expr()->eq('n.locale', ':unknown_locale')
+                )
+            );
             $qb->setParameter('locale', $locale);
-            $qb->setParameter('unknow_locale', TreeNodeInterface::UNKNOWN_LOCALE);
+            $qb->setParameter('unknown_locale', TreeNodeInterface::UNKNOWN_LOCALE);
         } else {
             $qb->andWhere('n.locale = :locale');
             $qb->setParameter('locale', TreeNodeInterface::UNKNOWN_LOCALE);
         }
+
         $qb->orderBy('n.id', 'DESC');
         $qb->setMaxResults(1);
 
         try {
             return $qb->getQuery()->getOneOrNullResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }

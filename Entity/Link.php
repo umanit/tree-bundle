@@ -1,11 +1,9 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Entity;
+namespace Umanit\TreeBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
@@ -14,114 +12,73 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  * @ORM\Table(name="treebundle_link")
  * @ORM\Entity()
  */
+#[ORM\Table(name: 'treebundle_link')]
+#[ORM\Entity]
 class Link
 {
     /**
-     * @var int
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
-     * @var string
      * @ORM\Column(name="uri", type="text", nullable=true)
-     * @Assert\Url()
      */
-    protected $externalLink;
+    #[ORM\Column(name: 'uri', type: 'text', nullable: true)]
+    #[Assert\Url]
+    protected ?string $externalLink = null;
 
     /**
-     * @var string
      * @ORM\Column(name="internalUri", type="text", nullable=true)
      */
-    protected $internalLink;
+    #[ORM\Column(name: 'internalUri', type: 'text', nullable: true)]
+    protected ?string $internalLink = null;
 
     /**
      * Assert that externalLink and internalLink are not filled
      *
-     * @Assert\Callback()
      * @param ExecutionContextInterface $context
      * @param mixed                     $payload
      */
-    public function validateNotBoth(ExecutionContextInterface $context, $payload)
+    #[Assert\Callback]
+    public function validateNotBoth(ExecutionContextInterface $context, mixed $payload)
     {
         if ($this->externalLink && $this->internalLink) {
-            $context
-                ->buildViolation('error.link.both_filled')
-                ->setTranslationDomain('UmanitTreeBundle')
-                ->addViolation()
+            $context->buildViolation('error.link.both_filled')
+                    ->setTranslationDomain('UmanitTreeBundle')
+                    ->addViolation()
             ;
         }
     }
 
-    /**
-     * Get the value of Id
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set the value of Id
-     *
-     * @param int $id
-     *
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of External Link
-     *
-     * @return string
-     */
-    public function getExternalLink()
+    public function getExternalLink(): ?string
     {
         return $this->externalLink;
     }
 
-    /**
-     * Set the value of External Link
-     *
-     * @param string $externalLink
-     *
-     * @return self
-     */
-    public function setExternalLink($externalLink)
+    public function setExternalLink(?string $externalLink): self
     {
         $this->externalLink = $externalLink;
 
         return $this;
     }
 
-    /**
-     * Get the value of Internal Link
-     *
-     * @return string
-     */
-    public function getInternalLink()
+    public function getInternalLink(): ?string
     {
         return $this->internalLink;
     }
 
-    /**
-     * Set the value of Internal Link
-     *
-     * @param string $internalLink
-     *
-     * @return self
-     */
-    public function setInternalLink($internalLink)
+    public function setInternalLink(?string $internalLink): self
     {
         $this->internalLink = $internalLink;
 

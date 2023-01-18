@@ -1,10 +1,11 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Entity;
+namespace Umanit\TreeBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Umanit\TreeBundle\Repository\NodeHistoryRepository;
 
 /**
  * Node
@@ -13,197 +14,118 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *     @ORM\Index(name="treebundle_node_history_search_idx", columns={"path", "locale"}),
  *     @ORM\Index(name="treebundle_node_history_search_idx_2", columns={"className", "classId", "locale"}),
  * })
- * @ORM\Entity(repositoryClass="Umanit\Bundle\TreeBundle\Repository\NodeHistoryRepository")
+ * @ORM\Entity(repositoryClass="Umanit\TreeBundle\Repository\NodeHistoryRepository")
  * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
  */
+#[ORM\Table(name: 'treebundle_node_history')]
+#[ORM\Index(name: 'treebundle_node_history_search_idx', columns: ['path', 'locale'])]
+#[ORM\Index(name: 'treebundle_node_history_search_idx_2', columns: ['className', 'classId', 'locale'])]
+#[ORM\Entity(repositoryClass: NodeHistoryRepository::class)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class NodeHistory
 {
     /**
-     * @var int
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="path", type="string", length=255, nullable=true)
      */
-    protected $path;
+    #[ORM\Column(name: 'path', type: 'string', length: 255, nullable: true)]
+    protected ?string $path = null;
 
     /**
-     * @var string Object class
-     *
      * @ORM\Column(name="className", type="string", length=255, nullable=true)
      */
-    protected $className;
+    #[ORM\Column(name: 'className', type: 'string', length: 255, nullable: true)]
+    protected ?string $className = null;
 
     /**
-     * @var int Object Id
-     *
      * @ORM\Column(name="classId", type="integer", nullable=true)
      */
-    protected $classId;
+    #[ORM\Column(name: 'classId', type: 'integer', nullable: true)]
+    protected ?int $classId = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="nodeName", type="string", length=255)
      */
-    protected $nodeName;
+    #[ORM\Column(name: 'nodeName', type: 'string', length: 255)]
+    protected string $nodeName;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="locale", type="string", length=10, nullable=true)
      */
-    protected $locale;
+    #[ORM\Column(name: 'locale', type: 'string', length: 10, nullable: true)]
+    protected ?string $locale;
 
-    /**
-     * Get the value of Id
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set the value of Id
-     *
-     * @param int $id
-     *
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of Class
-     *
-     * @return string Object class
-     */
-    public function getClassName()
+    public function getClassName(): ?string
     {
         return $this->className;
     }
 
-    /**
-     * Set the value of Class
-     *
-     * @param string $className
-     *
-     * @return self
-     */
-    public function setClassName($className)
+    public function setClassName(?string $className): self
     {
         $this->className = $className;
 
         return $this;
     }
 
-    /**
-     * Get the value of Path
-     *
-     * @return string
-     */
-    public function getPath()
+    public function getPath(): ?string
     {
         return $this->path;
     }
 
-    /**
-     * Set the value of Path
-     *
-     * @param string $path
-     *
-     * @return self
-     */
-    public function setPath($path)
+    public function setPath(?string $path): self
     {
         $this->path = $path;
 
         return $this;
     }
 
-    /**
-     * Get the value of Node Name
-     *
-     * @return string
-     */
-    public function getNodeName()
+    public function getNodeName(): string
     {
         return $this->nodeName;
     }
 
-    /**
-     * Set the value of Node Name
-     *
-     * @param string $nodeName
-     *
-     * @return self
-     */
-    public function setNodeName($nodeName)
+    public function setNodeName(string $nodeName): self
     {
         $this->nodeName = $nodeName;
 
         return $this;
     }
 
-    /**
-     * Get the value of Locale
-     *
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return $this->locale;
     }
 
-    /**
-     * Set the value of Locale
-     *
-     * @param string $locale
-     *
-     * @return self
-     */
-    public function setLocale($locale)
+    public function setLocale(?string $locale): self
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * Get the value of Class Id
-     *
-     * @return int Object Id
-     */
-    public function getClassId()
+    public function getClassId(): ?int
     {
         return $this->classId;
     }
 
-    /**
-     * Set the value of Class Id
-     *
-     * @param int $classId Object Id
-     *
-     * @return self
-     */
-    public function setClassId($classId)
+    public function setClassId(?int $classId): self
     {
         $this->classId = $classId;
 
         return $this;
     }
-
 }

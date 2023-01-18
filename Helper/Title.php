@@ -1,19 +1,14 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Helper;
+namespace Umanit\TreeBundle\Helper;
 
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-/**
- * Title util class.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
- */
 class Title
 {
     // The field names we do not want in a title.
-    const STRIP_KEYS = [
+    public const STRIP_KEYS = [
         'slug',
         'owner',
         'status',
@@ -32,7 +27,7 @@ class Title
     ];
 
     // Friendly field names found in a title.
-    const FAV_KEYS = [
+    public const FAV_KEYS = [
         'name',
         'title',
         'label',
@@ -48,19 +43,8 @@ class Title
         'identity',
     ];
 
-    /**
-     * @var PropertyAccessor
-     */
-    private $accessor;
-
-    /**
-     * Excerpt constructor.
-     *
-     * @param PropertyAccessor $accessor
-     */
-    public function __construct(PropertyAccessor $accessor)
+    public function __construct(private PropertyAccessor $accessor)
     {
-        $this->accessor = $accessor;
     }
 
     /**
@@ -70,24 +54,19 @@ class Title
      * @param int    $length The max length of the excerpt.
      *
      * @return string|null
-     * @throws \ReflectionException
      */
-    public function fromEntity($entity, $length = 100)
+    public function fromEntity(object $entity, int $length = 100): ?string
     {
         $refl = new \ReflectionClass($entity);
-
-        /** @var \ReflectionProperty[] $properties */
         $properties = $refl->getProperties();
 
         // Consider favourite keys first
-        uasort($properties, function(\ReflectionProperty $a, \ReflectionProperty $b) {
-            if (\in_array($a->getName(), $this::FAV_KEYS, true)) {
-                return -1;
-            }
-            if (\in_array($b->getName(), $this::FAV_KEYS, true)) {
-                return 1;
-            }
-            return 0;
+        uasort($properties, function (\ReflectionProperty $a, \ReflectionProperty $b) {
+            return match (true) {
+                \in_array($a->getName(), $this::FAV_KEYS, true) => -1,
+                \in_array($b->getName(), $this::FAV_KEYS, true) => 1,
+                default => 0,
+            };
         });
 
         // Parse every string attributes
@@ -100,7 +79,7 @@ class Title
             // Get the value
             try {
                 $value = $this->accessor->getValue($entity, $property->getName());
-            } catch (AccessException $e) {
+            } catch (AccessException) {
                 continue;
             }
 

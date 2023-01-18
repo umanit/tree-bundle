@@ -1,83 +1,81 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Entity;
+namespace Umanit\TreeBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
 /**
- * Menu
- *
  * @ORM\MappedSuperclass
  */
+#[ORM\MappedSuperclass]
 abstract class AbstractMenu
 {
     /**
-     * @var int
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
-     * @var int
-     *
      * @ORM\Column(name="oid", type="integer")
      */
-    protected $oid;
+    #[ORM\Column(name: 'oid', type: 'integer')]
+    protected ?int $oid = null;
 
     /**
-     * @var string
      * @ORM\Column(name="locale", type="string", length=7, nullable=false)
      */
-    protected $locale = TreeNodeInterface::UNKNOWN_LOCALE;
+    #[ORM\Column(name: 'locale', type: 'string', length: 7)]
+    protected string $locale = TreeNodeInterface::UNKNOWN_LOCALE;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="title", type="string", length=255)
      */
-    protected $title;
+    #[ORM\Column(name: 'title', type: 'string', length: 255)]
+    protected string $title;
 
     /**
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     *
-     * @var \DateTime
      */
-    protected $updatedAt;
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
+    protected ?\DateTimeInterface $updatedAt = null;
 
     /**
-     * @var int
-     *
      * @ORM\Column(name="priority", type="integer")
      */
-    protected $priority;
+    #[ORM\Column(name: 'priority', type: 'integer')]
+    protected int $priority;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="position", type="string", length=16)
      */
-    protected $position;
+    #[ORM\Column(name: 'position', type: 'string', length: 16)]
+    protected string $position;
 
     /**
-     * @var Link|null
-     *
-     * @ORM\ManyToOne(targetEntity="Umanit\Bundle\TreeBundle\Entity\Link", fetch="EAGER", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity="Umanit\TreeBundle\Entity\Link", fetch="EAGER", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="link_id", referencedColumnName="id")
-     * @Assert\Valid()
      */
-    protected $link;
+    #[ORM\ManyToOne(targetEntity: Link::class, fetch: 'EAGER', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'link_id', referencedColumnName: 'id')]
+    #[Assert\Valid]
+    protected ?Link $link = null;
 
     /**
      * Éléments enfants
+     *
      * @ORM\OneToMany(targetEntity="Menu", mappedBy="parent", cascade={"remove"})
      */
-    protected $children;
+    #[ORM\OneToMany(targetEntity: 'Menu', mappedBy: 'parent', cascade: ['remove'])]
+    protected Collection $children;
 
     /**
      * Le parent. Si null alors noeud racine
@@ -85,6 +83,8 @@ abstract class AbstractMenu
      * @ORM\ManyToOne(targetEntity="Menu", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
      */
+    #[ORM\ManyToOne(targetEntity: 'Menu', inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
     protected $parent;
 
     /**
@@ -92,46 +92,27 @@ abstract class AbstractMenu
      *
      * @ORM\Column(name="parent_id", type="integer", nullable=true)
      */
-    protected $parentId;
+    #[ORM\Column(name: 'parent_id', type: 'integer', nullable: true)]
+    protected ?int $parentId = null;
 
-    /**
-     * Menu constructor.
-     */
     public function __construct()
     {
         $this->children = new ArrayCollection();
     }
 
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set title
-     *
-     * @param string $title
-     *
-     * @return AbstractMenu
-     */
-    public function setTitle($title)
+    public function setTitle(string $title): self
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * Get title
-     *
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -142,110 +123,78 @@ abstract class AbstractMenu
      * @ORM\PrePersist()
      * @ORM\PreUpdate()
      */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function update()
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updatedAt;
     }
 
-    /**
-     * @param \DateTime $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 
-    /**
-     * Set position
-     *
-     * @param string $position
-     *
-     * @return AbstractMenu
-     */
-    public function setPosition($position)
+    public function setPosition(string $position): self
     {
         $this->position = $position;
 
         return $this;
     }
 
-    /**
-     * Get position
-     *
-     * @return string
-     */
-    public function getPosition()
+    public function getPosition(): string
     {
         return $this->position;
     }
 
-    /**
-     * @return int
-     */
-    public function getPriority()
+    public function getPriority(): int
     {
         return $this->priority;
     }
 
-    /**
-     * @param int $priority
-     */
-    public function setPriority($priority)
+    public function setPriority(int $priority): self
     {
         $this->priority = $priority;
+
+        return $this;
     }
 
-    /**
-     * @return Link|null
-     */
-    public function getLink()
+    public function getLink(): ?Link
     {
         return $this->link;
     }
 
-    /**
-     * @param Link|null $link
-     */
-    public function setLink(Link $link = null)
+    public function setLink(?Link $link = null): self
     {
         $this->link = $link;
+
+        return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getChildren()
+    public function getChildren(): Collection
     {
         return $this->children;
     }
 
-    /**
-     * @param mixed $children
-     */
-    public function setChildren($children)
+    public function setChildren(Collection $children): self
     {
         $this->children = $children;
+
+        return $this;
     }
 
-    /**
-     * @param AbstractMenu $child
-     */
-    public function addChildren($child)
+    public function addChildren(AbstractMenu $child)
     {
         $this->children->add($child);
     }
 
-    /**
-     * @return mixed
-     */
     public function getParent()
     {
         return $this->parent;
@@ -254,25 +203,23 @@ abstract class AbstractMenu
     /**
      * @param mixed $parent
      */
-    public function setParent($parent)
+    public function setParent($parent): self
     {
         $this->parent = $parent;
+
+        return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getParentId()
+    public function getParentId(): ?int
     {
         return $this->parentId;
     }
 
-    /**
-     * @param mixed $parentId
-     */
-    public function setParentId($parentId)
+    public function setParentId(?int $parentId): self
     {
         $this->parentId = $parentId;
+
+        return $this;
     }
 
     /**
@@ -280,6 +227,7 @@ abstract class AbstractMenu
      *
      * @ORM\PreFlush()
      */
+    #[ORM\PreFlush]
     public function setDefaultOid()
     {
         if ($this->oid === null) {
@@ -287,20 +235,16 @@ abstract class AbstractMenu
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getOid()
+    public function getOid(): int
     {
         return $this->oid;
     }
 
-    /**
-     * @param int $oid
-     */
-    public function setOid($oid)
+    public function setOid(int $oid): self
     {
         $this->oid = $oid;
+
+        return $this;
     }
 
     /**
@@ -308,7 +252,7 @@ abstract class AbstractMenu
      *
      * @return string
      */
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return $this->locale;
     }
@@ -320,7 +264,7 @@ abstract class AbstractMenu
      *
      * @return self
      */
-    public function setLocale($locale)
+    public function setLocale(string $locale): self
     {
         $this->locale = $locale;
 

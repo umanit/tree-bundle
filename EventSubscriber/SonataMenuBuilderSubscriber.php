@@ -1,39 +1,20 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\EventSubscriber;
+namespace Umanit\TreeBundle\EventSubscriber;
 
-use Symfony\Component\EventDispatcher\Event;
+use Knp\Menu\ItemInterface;
+use Knp\Menu\MenuItem;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * @author Arthur Guigand <aguigand@umanit.fr>
- */
 class SonataMenuBuilderSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var
-     */
-    private $menuEntityClass;
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $checker;
-
-    /**
-     * SonataMenuBuilderSubscriber constructor.
-     *
-     * @param string                        $menuEntityClass
-     * @param AuthorizationCheckerInterface $checker
-     */
-    public function __construct($menuEntityClass, AuthorizationCheckerInterface $checker)
+    public function __construct(private $menuEntityClass, private AuthorizationCheckerInterface $checker)
     {
-        $this->menuEntityClass = $menuEntityClass;
-        $this->checker         = $checker;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return ['sonata.admin.event.configure.menu.sidebar' => 'addMenuItems'];
     }
@@ -43,13 +24,14 @@ class SonataMenuBuilderSubscriber implements EventSubscriberInterface
         if ($this->checker->isGranted('ROLE_TREE_MENU_ADMIN') &&
             !empty($this->menuEntityClass) &&
             method_exists($event, 'getMenu') &&
-            get_class($event->getMenu()) === 'Knp\Menu\MenuItem'
-        ) {
-
-            /** @var \Knp\Menu\ItemInterface $menu */
+            $event->getMenu()::class === MenuItem::class) {
+            /** @var ItemInterface $menu */
             $menu = $event->getMenu();
 
-            $menu->addChild('Menu', ['route' => 'tree_admin_menu_dashboard', 'extras' => ['icon' => '<i class="fa fa-bars"></i>']]);
+            $menu->addChild('Menu', [
+                'route'  => 'tree_admin_menu_dashboard',
+                'extras' => ['icon' => '<i class="fas fa-bars"></i>'],
+            ]);
         }
     }
 }

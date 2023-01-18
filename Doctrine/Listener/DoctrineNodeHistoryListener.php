@@ -1,41 +1,24 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: vgraillot
- * Date: 03/07/2017
- * Time: 15:16.
- */
 
-namespace Umanit\Bundle\TreeBundle\Doctrine\Listener;
+namespace Umanit\TreeBundle\Doctrine\Listener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Umanit\Bundle\TreeBundle\Entity\Node;
-use Umanit\Bundle\TreeBundle\Entity\NodeHistory;
+use Umanit\TreeBundle\Entity\Node;
+use Umanit\TreeBundle\Entity\NodeHistory;
 
 class DoctrineNodeHistoryListener
 {
     /**
      * @var string Default locale
      */
-    protected $locale;
+    protected string $locale;
 
-    /**
-     * @var array
-     */
-    protected $nodesToUpdate = [];
+    protected array $nodesToUpdate = [];
 
-    /**
-     * @var array
-     */
-    protected $nodesToRemove = [];
+    protected array $nodesToRemove = [];
 
-    /**
-     * Constructor.
-     *
-     * @param string $locale Default locale
-     */
-    public function __construct($locale)
+    public function __construct(string $locale)
     {
         $this->locale = $locale;
     }
@@ -45,10 +28,9 @@ class DoctrineNodeHistoryListener
      *
      * @param LifecycleEventArgs $args
      */
-    public function postPersist(LifecycleEventArgs $args)
+    public function postPersist(LifecycleEventArgs $args): void
     {
-        $entity  = $args->getObject();
-        $manager = $args->getEntityManager();
+        $entity = $args->getObject();
 
         if ($entity instanceof Node) {
             $this->nodesToUpdate[] = $entity;
@@ -61,10 +43,9 @@ class DoctrineNodeHistoryListener
      *
      * @param LifecycleEventArgs $args
      */
-    public function postUpdate(LifecycleEventArgs $args)
+    public function postUpdate(LifecycleEventArgs $args): void
     {
-        $entity  = $args->getObject();
-        $manager = $args->getEntityManager();
+        $entity = $args->getObject();
 
         if ($entity instanceof Node) {
             $this->nodesToUpdate[] = $entity;
@@ -76,10 +57,9 @@ class DoctrineNodeHistoryListener
      *
      * @param LifecycleEventArgs $args
      */
-    public function postRemove(LifecycleEventArgs $args)
+    public function postRemove(LifecycleEventArgs $args): void
     {
-        $entity  = $args->getObject();
-        $manager = $args->getEntityManager();
+        $entity = $args->getObject();
 
         if ($entity instanceof Node) {
             $this->nodesToRemove[] = $entity;
@@ -89,22 +69,24 @@ class DoctrineNodeHistoryListener
     /**
      * Deletes all treenodes related to an entity.
      *
-     * @param LifecycleEventArgs $args
+     * @param PostFlushEventArgs $args
      */
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush(PostFlushEventArgs $args): void
     {
-        $manager = $args->getEntityManager();
+        $manager = $args->getObjectManager();
 
-        $nodesToUpdate       = $this->nodesToUpdate;
+        $nodesToUpdate = $this->nodesToUpdate;
         $this->nodesToUpdate = [];
+
         foreach ($nodesToUpdate as $entity) {
             // Get tree nodes
-            $treeNodes = $manager->getRepository('UmanitTreeBundle:NodeHistory')->findBy(array(
+            $treeNodes = $manager->getRepository(Node::class)->findBy([
                 'path'      => $entity->getPath(),
                 'className' => $entity->getClassName(),
                 'classId'   => $entity->getClassId(),
                 'locale'    => $entity->getLocale(),
-            ));
+            ]);
+
             if (empty($treeNodes)) {
                 $nodeHistory = new NodeHistory();
                 $nodeHistory
@@ -122,21 +104,23 @@ class DoctrineNodeHistoryListener
             }
         }
 
-        $nodesToRemove       = $this->nodesToRemove;
+        $nodesToRemove = $this->nodesToRemove;
         $this->nodesToRemove = [];
+
         foreach ($nodesToRemove as $entity) {
             // Get tree nodes
-            $treeNodes = $manager->getRepository('UmanitTreeBundle:Node')->findBy(array(
+            $treeNodes = $manager->getRepository(Node::class)->findBy([
                 'className' => $entity->getClassName(),
                 'classId'   => $entity->getClassId(),
                 'locale'    => $entity->getLocale(),
-            ));
+            ]);
             if (empty($treeNodes)) {
-                $nodes = $manager->getRepository('UmanitTreeBundle:NodeHistory')->findBy(array(
+                $nodes = $manager->getRepository(NodeHistory::class)->findBy([
                     'className' => $entity->getClassName(),
                     'classId'   => $entity->getClassId(),
                     'locale'    => $entity->getLocale(),
-                ));
+                ]);
+
                 foreach ($nodes as $node) {
                     $manager->remove($node);
                 }

@@ -1,34 +1,22 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Event;
+namespace Umanit\TreeBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
 /**
- * Event trigger when the bundle has updated an entity.
+ * Event triggered when the bundle has updated an entity
  */
 class NodeUpdatedEvent extends Event
 {
-    const NAME = 'umanit.node.updated';
+    public const NAME = 'umanit.node.updated';
 
-    /**
-     * @var TreeNodeInterface
-     */
-    private $entity;
-
-    /**
-     * @param TreeNodeInterface $entity
-     */
-    public function __construct(TreeNodeInterface $entity)
+    public function __construct(private TreeNodeInterface $entity, private array $parents)
     {
-        $this->entity  = $entity;
     }
 
-    /**
-     * @return TreeNodeInterface
-     */
-    public function getEntity()
+    public function getEntity(): TreeNodeInterface
     {
         return $this->entity;
     }
@@ -38,7 +26,7 @@ class NodeUpdatedEvent extends Event
      *
      * @return TreeNodeInterface[]
      */
-    public function getParents()
+    public function getParents(): array
     {
         return $this->parents;
     }

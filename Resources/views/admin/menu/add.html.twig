@@ -3,22 +3,22 @@
 {% form_theme form '@UmanitTree/admin/menu/menu_form_layout.html.twig' %}
 
 {% block content %}
-    <div class="row">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row">
         <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="box box-primary">
-                        <div class="box-header">
-                            <h4 class="box-title">
-                                Menu
-                            </h4>
-                        </div>
-                        <div class="box-body">
-                            {{ form(form) }}
-                        </div>
-                    </div>
-                </div>
+          <div class="box box-primary">
+            <div class="box-header">
+              <h4 class="box-title">
+                Menu
+              </h4>
             </div>
+            <div class="box-body">
+              {{ form(form) }}
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-{%  endblock %}
+  </div>
+{% endblock %}

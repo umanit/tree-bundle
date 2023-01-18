@@ -1,27 +1,23 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Helper;
+namespace Umanit\TreeBundle\Helper;
 
-/**
- * String Helper.
- *
- * @author Arthur Guigand <aguigand@umanit.fr>
- */
 class Str
 {
     /**
      * Insensitive fuzzy search of a string in an array.
      *
-     * @param  string $needle
-     * @param array   $haystack
+     * @param string $needle
+     * @param array  $haystack
      *
      * @return bool
      */
-    public static function striposInArray($needle, array $haystack)
+    public static function striposInArray(string $needle, array $haystack): bool
     {
         $needle = mb_strtolower($needle);
+
         foreach ($haystack as $hay) {
-            if ($hay === $needle || stripos($needle, $hay)) {
+            if ($hay === $needle || stripos($hay, $needle)) {
                 return true;
             }
         }

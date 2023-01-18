@@ -1,11 +1,12 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Repository;
+namespace Umanit\TreeBundle\Repository;
 
-use Umanit\Bundle\TreeBundle\Entity\Node;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Gedmo\Tree\Entity\Repository\MaterializedPathRepository;
+use Umanit\TreeBundle\Entity\Node;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
-class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepository
+class NodeRepository extends MaterializedPathRepository
 {
     /**
      * Returns a node that match the given slug for the given locale (if a locale is set, the "UNKNOWN_LOCALE" will be
@@ -14,11 +15,12 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
      * @param string $slug   Slug to search
      * @param string $locale Locale of the object searched
      * @param mixed  $parent Parent of the object
-     *
-     * @return Node|null
      */
-    public function getBySlug($slug, $locale = TreeNodeInterface::UNKNOWN_LOCALE, $parent = null)
-    {
+    public function getBySlug(
+        string $slug,
+        string $locale = TreeNodeInterface::UNKNOWN_LOCALE,
+        mixed $parent = null
+    ): ?Node {
         $qb = $this
             ->createQueryBuilder('n')
             ->where('n.slug = :slug')
@@ -26,10 +28,12 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
         ;
 
         if ($locale !== TreeNodeInterface::UNKNOWN_LOCALE) {
-            $qb->andWhere($qb->expr()->orX(
-                $qb->expr()->eq('n.locale', ':locale'),
-                $qb->expr()->eq('n.locale', ':unknow_locale')
-            ));
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('n.locale', ':locale'),
+                    $qb->expr()->eq('n.locale', ':unknow_locale')
+                )
+            );
             $qb->setParameter('locale', $locale);
             $qb->setParameter('unknow_locale', TreeNodeInterface::UNKNOWN_LOCALE);
         } else {
@@ -46,7 +50,7 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
 
         try {
             return $qb->getQuery()->getOneOrNullResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }
@@ -57,10 +61,8 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
      *
      * @param string $path   Slug to search
      * @param string $locale Locale of the object searched
-     *
-     * @return Node|null
      */
-    public function getByPath($path, $locale = TreeNodeInterface::UNKNOWN_LOCALE)
+    public function getByPath(string $path, string $locale = TreeNodeInterface::UNKNOWN_LOCALE): ?Node
     {
         if ($path[0] !== '/') {
             $path = '/'.$path;
@@ -73,10 +75,12 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
         ;
 
         if ($locale !== TreeNodeInterface::UNKNOWN_LOCALE) {
-            $qb->andWhere($qb->expr()->orX(
-                $qb->expr()->eq('n.locale', ':locale'),
-                $qb->expr()->eq('n.locale', ':unknow_locale')
-            ));
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('n.locale', ':locale'),
+                    $qb->expr()->eq('n.locale', ':unknow_locale')
+                )
+            );
             $qb->setParameter('locale', $locale);
             $qb->setParameter('unknow_locale', TreeNodeInterface::UNKNOWN_LOCALE);
         } else {
@@ -86,7 +90,7 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
 
         try {
             return $qb->getQuery()->getOneOrNullResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }
@@ -99,11 +103,13 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
      * @param int    $classId   Class identifier
      * @param Node[] $parents   Node parents allowed for the current node
      * @param string $locale    Locale of the content
-     *
-     * @return Node|null
      */
-    public function searchNode($className, $classId, $parents, $locale = TreeNodeInterface::UNKNOWN_LOCALE)
-    {
+    public function searchNode(
+        string $className,
+        int $classId,
+        array $parents,
+        string $locale = TreeNodeInterface::UNKNOWN_LOCALE
+    ): ?Node {
         $qb = $this
             ->createQueryBuilder('n')
             ->where('n.className = :className')
@@ -113,13 +119,13 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
             ->setMaxResults(1)
         ;
 
-        $qbv = $this->getEntityManager()->createQueryBuilder();
-
         if ($locale !== TreeNodeInterface::UNKNOWN_LOCALE) {
-            $qb->andWhere($qb->expr()->orX(
-                $qb->expr()->eq('n.locale', ':locale'),
-                $qb->expr()->eq('n.locale', ':unknow_locale')
-            ));
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->eq('n.locale', ':locale'),
+                    $qb->expr()->eq('n.locale', ':unknow_locale')
+                )
+            );
 
             $qb->setParameter('locale', $locale);
             $qb->setParameter('unknow_locale', TreeNodeInterface::UNKNOWN_LOCALE);
@@ -145,7 +151,7 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
 
         try {
             return $qb->getQuery()->getOneOrNullResult();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }
@@ -157,14 +163,14 @@ class NodeRepository extends \Gedmo\Tree\Entity\Repository\MaterializedPathRepos
      *
      * @return array
      */
-    public function findParentsNodesAsArray($parents)
+    public function findParentsNodesAsArray(array $parents): array
     {
         $parentConditions = [];
-        $nodeConditions   = [];
+        $nodeConditions = [];
         foreach ($parents as $parent) {
             if ($parent instanceof TreeNodeInterface) {
-                $className = $this->_em->getClassMetadata(get_class($parent))->getName();
-                $locale    = $parent->getLocale();
+                $className = $this->_em->getClassMetadata($parent::class)->getName();
+                $locale = $parent->getLocale();
 
                 if (!isset($parentConditions[$className])) {
                     $parentConditions[$className] = [];

@@ -1,32 +1,21 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Doctrine\Listener;
+namespace Umanit\TreeBundle\Doctrine\Listener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Umanit\Bundle\TreeBundle\Entity\Node;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
-use Umanit\Bundle\TreeBundle\Helper\NodeHelper;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Umanit\TreeBundle\Helper\NodeHelper;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
 class DoctrineTreeNodeListener
 {
-    /**
-     * @var NodeHelper
-     */
-    protected $nodeHelper;
+    protected NodeHelper $nodeHelper;
 
     /**
-     * Nodes to update on flush.
-     *
-     * @var array
+     * @var array Nodes to update on flush.
      */
-    protected $nodesToUpdate = [];
+    protected array $nodesToUpdate = [];
 
-    /**
-     * Constructor.
-     *
-     * @param string $locale Default locale
-     */
     public function __construct(NodeHelper $nodeHelper)
     {
         $this->nodeHelper = $nodeHelper;
@@ -37,10 +26,9 @@ class DoctrineTreeNodeListener
      *
      * @param LifecycleEventArgs $args
      */
-    public function postPersist(LifecycleEventArgs $args)
+    public function postPersist(LifecycleEventArgs $args): void
     {
-        $entity  = $args->getObject();
-        $manager = $args->getEntityManager();
+        $entity = $args->getObject();
 
         if ($entity instanceof TreeNodeInterface) {
             $this->nodesToUpdate[] = $entity;
@@ -53,10 +41,9 @@ class DoctrineTreeNodeListener
      *
      * @param LifecycleEventArgs $args
      */
-    public function postUpdate(LifecycleEventArgs $args)
+    public function postUpdate(LifecycleEventArgs $args): void
     {
-        $entity  = $args->getObject();
-        $manager = $args->getEntityManager();
+        $entity = $args->getObject();
 
         if ($entity instanceof TreeNodeInterface) {
             $this->nodesToUpdate[] = $entity;
@@ -68,10 +55,9 @@ class DoctrineTreeNodeListener
      *
      * @param LifecycleEventArgs $args
      */
-    public function preRemove(LifecycleEventArgs $args)
+    public function preRemove(LifecycleEventArgs $args): void
     {
-        $entity  = $args->getObject();
-        $manager = $args->getEntityManager();
+        $entity = $args->getObject();
 
         if ($entity instanceof TreeNodeInterface) {
             $this->nodeHelper->prepareRemove($entity);
@@ -81,12 +67,13 @@ class DoctrineTreeNodeListener
     /**
      * Deletes all treenodes related to an entity.
      *
-     * @param LifecycleEventArgs $args
+     * @param PostFlushEventArgs $args
      */
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush(PostFlushEventArgs $args): void
     {
-        $nodesToUpdate       = $this->nodesToUpdate;
+        $nodesToUpdate = $this->nodesToUpdate;
         $this->nodesToUpdate = [];
+
         foreach ($nodesToUpdate as $nodeToUpdate) {
             $this->nodeHelper->updateNodes($nodeToUpdate);
         }

@@ -1,10 +1,13 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Entity;
+namespace Umanit\TreeBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Umanit\TreeBundle\Handler\UniqueSlugHandler;
+use Umanit\TreeBundle\Repository\NodeRepository;
 
 /**
  * Node.
@@ -16,401 +19,244 @@ use Gedmo\Mapping\Annotation as Gedmo;
  *     @ORM\Index(name="search_idx_2", columns={"className", "classId", "locale"}),
  *     @ORM\Index(name="search_idx_3", columns={"className", "classId"})
  * })
- * @ORM\Entity(repositoryClass="Umanit\Bundle\TreeBundle\Repository\NodeRepository")
+ * @ORM\Entity(repositoryClass="Umanit\TreeBundle\Repository\NodeRepository")
  * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
- * @Gedmo\Tree(type="materializedPath")
  */
+
+#[ORM\Table(name: 'treebundle_node')]
+#[ORM\Index(name: 'search_idx_slug', columns: ['slug'])]
+#[ORM\Index(name: 'search_idx_2', columns: ['className', 'classId', 'locale'])]
+#[ORM\Index(name: 'search_idx_3', columns: ['className', 'classId'])]
+#[ORM\UniqueConstraint(name: 'search_idx', columns: ['path', 'locale'])]
+#[ORM\Entity(repositoryClass: NodeRepository::class)]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
+#[Gedmo\Tree(type: 'materializedPath')]
 class Node
 {
     /**
-     * @var int
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    protected ?int $id = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="path", type="string", length=255, nullable=true)
-     * @Gedmo\TreePath(separator="/", appendId=false, startsWithSeparator=true, endsWithSeparator=false)
      */
-    protected $path;
+    #[ORM\Column(name: 'path', type: 'string', length: 255, nullable: true)]
+    #[Gedmo\TreePath(separator: '/', appendId: false, startsWithSeparator: true, endsWithSeparator: false)]
+    protected ?string $path = null;
 
     /**
-     * @var int
-     *
-     * @Gedmo\TreePathSource()
-     * @Gedmo\Slug(handlers={
-     *     @Gedmo\SlugHandler(class="Umanit\Bundle\TreeBundle\Handler\UniqueSlugHandler")
-     * }, fields={"nodeName"}, unique=false)
      * @ORM\Column(name="slug", type="string")
      */
-    protected $slug;
+    #[ORM\Column(name: 'slug', type: 'string')]
+    #[Gedmo\TreePathSource()]
+    #[Gedmo\Slug(fields: ['nodeName'], unique: false)]
+    #[Gedmo\SlugHandler(class: UniqueSlugHandler::class)]
+    protected string $slug;
 
     /**
-     * @var Node
-     *
-     * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="Umanit\Bundle\TreeBundle\Entity\Node", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="Umanit\TreeBundle\Entity\Node", inversedBy="children")
      * @ORM\JoinColumn(name="parentId", referencedColumnName="id", onDelete="CASCADE")
      */
-    protected $parent;
+    #[ORM\ManyToOne(targetEntity: Node::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parentId', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Gedmo\TreeParent]
+    protected ?Node $parent = null;
 
     /**
-     * @var Node[]
-     *
-     * @ORM\OneToMany(targetEntity="Umanit\Bundle\TreeBundle\Entity\Node", mappedBy="parent", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Umanit\TreeBundle\Entity\Node", mappedBy="parent", cascade={"persist"})
      */
-    protected $children;
+    #[ORM\OneToMany(mappedBy: 'parent', targetEntity: Node::class, cascade: ['persist'])]
+    protected Collection $children;
 
     /**
-     * @var string Object class
-     *
      * @ORM\Column(name="className", type="string", length=255, nullable=true)
      */
-    protected $className;
+    #[ORM\Column(name: 'className', type: 'string', length: 255, nullable: true)]
+    protected ?string $className = null;
 
     /**
-     * @var int Object Id
-     *
      * @ORM\Column(name="classId", type="integer", nullable=true)
      */
-    protected $classId;
+    #[ORM\Column(name: 'classId', type: 'integer', nullable: true)]
+    protected ?int $classId = null;
 
     /**
-     * @var int
-     *
-     * @Gedmo\TreeLevel
      * @ORM\Column(name="level", type="integer", nullable=true)
      */
-    protected $level;
+    #[ORM\Column(name: 'level', type: 'integer', nullable: true)]
+    #[Gedmo\TreeLevel]
+    protected ?int $level = null;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="nodeName", type="string", length=255)
      */
-    protected $nodeName;
+    #[ORM\Column(name: 'nodeName', type: 'string', length: 255)]
+    protected string $nodeName;
 
     /**
-     * @var string
-     *
      * @ORM\Column(name="locale", type="string", length=10, nullable=true)
      */
-    protected $locale;
+    #[ORM\Column(name: 'locale', type: 'string', length: 10, nullable: true)]
+    protected ?string $locale = null;
 
     /**
-     * @var bool
-     *
      * @ORM\Column(name="managed", type="boolean", nullable=true)
      */
-    protected $managed;
+    #[ORM\Column(name: 'managed', type: 'boolean', nullable: true)]
+    protected bool $managed;
 
     public function __construct()
     {
-        $this->managed  = true;
+        $this->managed = true;
         $this->children = new ArrayCollection();
     }
 
-    /**
-     * Get the value of Id.
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set the value of Id.
-     *
-     * @param int $id
-     *
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of Parent.
-     *
-     * @return Node
-     */
-    public function getParent()
+    public function getParent(): ?Node
     {
         return $this->parent;
     }
 
-    /**
-     * Set the value of Parent.
-     *
-     * @param Node $parent
-     *
-     * @return self
-     */
-    public function setParent(Node $parent)
+    public function setParent(?Node $parent): self
     {
         $this->parent = $parent;
 
         return $this;
     }
 
-    /**
-     * Remove parent.
-     *
-     * @return self
-     */
-    public function removeParent()
+    public function removeParent(): self
     {
         $this->parent = null;
 
         return $this;
     }
 
-    /**
-     * Get the value of Children.
-     *
-     * @return Node[]
-     */
-    public function getChildren()
+    public function getChildren(): Collection
     {
         return $this->children;
     }
 
-    /**
-     * Set the value of Children.
-     *
-     * @param Node[] $children
-     *
-     * @return self
-     */
-    public function setChildren($children)
+    public function setChildren(Collection $children): self
     {
         $this->children = $children;
 
         return $this;
     }
 
-    /**
-     * Remove a child.
-     *
-     * @param Node[] $child
-     *
-     * @return self
-     */
-    public function removeChild($child)
+    public function removeChild(Node $child): self
     {
         $this->children->removeElement($child);
 
         return $this;
     }
 
-    /**
-     * Clear the value of Children.
-     *
-     * @return self
-     */
-    public function removeChildren()
+    public function removeChildren(): self
     {
         $this->children->clear();
 
         return $this;
     }
 
-    /**
-     * Get the value of Class.
-     *
-     * @return string Object class
-     */
-    public function getClassName()
+    public function getClassName(): ?string
     {
         return $this->className;
     }
 
-    /**
-     * Set the value of Class.
-     *
-     * @param string $className
-     *
-     * @return self
-     */
-    public function setClassName($className)
+    public function setClassName(?string $className): self
     {
         $this->className = $className;
 
         return $this;
     }
 
-    /**
-     * Get the value of Path.
-     *
-     * @return string
-     */
-    public function getPath()
+    public function getPath(): ?string
     {
         return $this->path;
     }
 
-    /**
-     * Set the value of Path.
-     *
-     * @param string $path
-     *
-     * @return self
-     */
-    public function setPath($path)
+    public function setPath(?string $path): self
     {
         $this->path = $path;
 
         return $this;
     }
 
-    /**
-     * Get the value of Level.
-     *
-     * @return int
-     */
-    public function getLevel()
+    public function getLevel(): ?int
     {
         return $this->level;
     }
 
-    /**
-     * Set the value of Level.
-     *
-     * @param int $level
-     *
-     * @return self
-     */
-    public function setLevel($level)
+    public function setLevel(?int $level): self
     {
         $this->level = $level;
 
         return $this;
     }
 
-    /**
-     * Get the value of Slug.
-     *
-     * @return string
-     */
-    public function getSlug()
+    public function getSlug(): string
     {
         return $this->slug;
     }
 
-    /**
-     * Set the value of Slug.
-     *
-     * @param string $slug
-     *
-     * @return self
-     */
-    public function setSlug($slug)
+    public function setSlug(string $slug): self
     {
         $this->slug = $slug;
 
         return $this;
     }
 
-    /**
-     * Get the value of Node Name.
-     *
-     * @return string
-     */
-    public function getNodeName()
+    public function getNodeName(): string
     {
         return $this->nodeName;
     }
 
-    /**
-     * Set the value of Node Name.
-     *
-     * @param string $nodeName
-     *
-     * @return self
-     */
-    public function setNodeName($nodeName)
+    public function setNodeName(string $nodeName): self
     {
         $this->nodeName = $nodeName;
 
         return $this;
     }
 
-    /**
-     * Get the value of Locale.
-     *
-     * @return string
-     */
-    public function getLocale()
+    public function getLocale(): ?string
     {
         return $this->locale;
     }
 
-    /**
-     * Set the value of Locale.
-     *
-     * @param string $locale
-     *
-     * @return self
-     */
-    public function setLocale($locale)
+    public function setLocale(?string $locale): self
     {
         $this->locale = $locale;
 
         return $this;
     }
 
-    /**
-     * Get the value of Class Id.
-     *
-     * @return int Object Id
-     */
-    public function getClassId()
+    public function getClassId(): ?int
     {
         return $this->classId;
     }
 
-    /**
-     * Set the value of Class Id.
-     *
-     * @param int $classId Object Id
-     *
-     * @return self
-     */
-    public function setClassId($classId)
+    public function setClassId(?int $classId): self
     {
         $this->classId = $classId;
 
         return $this;
     }
 
-    /**
-     * Get the value of Managed.
-     *
-     * @return bool
-     */
-    public function getManaged()
+    public function getManaged(): bool
     {
         return $this->managed;
     }
 
-    /**
-     * Set the value of Managed.
-     *
-     * @param bool $managed
-     *
-     * @return self
-     */
-    public function setManaged($managed)
+    public function setManaged(bool $managed): self
     {
         $this->managed = $managed;
 

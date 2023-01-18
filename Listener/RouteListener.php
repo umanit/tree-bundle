@@ -1,43 +1,19 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\Listener;
+namespace Umanit\TreeBundle\Listener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Umanit\Bundle\TreeBundle\Model\TreeNodeInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Umanit\TreeBundle\Entity\Node;
+use Umanit\TreeBundle\Model\TreeNodeInterface;
 
 class RouteListener
 {
-    /**
-     * @var array Configuration, which controller to call by class
-     */
-    protected $nodeTypes;
-
-    /**
-     * @var string Default locale
-     */
-    protected $defaultLocale;
-
-    /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
-     * Constructor.
-     *
-     * @param Registry $doctrine      Doctrine service
-     * @param array    $nodeTypes     Configuration, which controller to call by class
-     * @param string   $defaultLocale Default locale
-     */
     public function __construct(
-        Registry $doctrine,
-        array $nodeTypes,
-        $defaultLocale
+        protected Registry $doctrine,
+        protected array $nodeTypes,
+        protected string $defaultLocale
     ) {
-        $this->doctrine      = $doctrine;
-        $this->nodeTypes     = $nodeTypes;
-        $this->defaultLocale = $defaultLocale;
     }
 
     /**
@@ -46,13 +22,13 @@ class RouteListener
      * Look for a path in database that match the route, get the object related to
      * this one and returns it (if needed)
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
-        $path       = $event->getRequest()->get('path');
-        $locale     = $event->getRequest()->getLocale();
-        $repository = $this->doctrine->getRepository('UmanitTreeBundle:Node');
+        $path = $event->getRequest()->getPathInfo();
+        $locale = $event->getRequest()->getLocale();
+        $repository = $this->doctrine->getRepository(Node::class);
 
         // Root node
         if ($path === '/' || $path === '') {
@@ -64,7 +40,7 @@ class RouteListener
 
         if ($node) {
             // Search for the entity related to the node
-            $repo   = $this->doctrine->getRepository($node->getClassName());
+            $repo = $this->doctrine->getRepository($node->getClassName());
             $entity = $repo->find($node->getClassId());
 
             if ($entity) {

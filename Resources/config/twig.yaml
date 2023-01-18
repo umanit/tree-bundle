@@ -1,0 +1,3 @@
+twig:
+    globals:
+        umanit_tree_admin_layout: '%umanit_tree.admin_layout%'

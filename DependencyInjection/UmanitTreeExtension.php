@@ -1,12 +1,12 @@
 <?php
 
-namespace Umanit\Bundle\TreeBundle\DependencyInjection;
+namespace Umanit\TreeBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -29,16 +29,35 @@ class UmanitTreeExtension extends Extension implements PrependExtensionInterface
         $this->setConfigAsParameters($container, $config, $rootName);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
+        $loader->load('services.yaml');
+
+        $container->prependExtensionConfig('doctrine', [
+            'orm' => [
+                'entity_managers' => [
+                    'umanit_tree' => [
+                        'connection' => 'default',
+                        'mappings'   => [
+                            'UmanitTree' => [
+                                'is_bundle' => false,
+                                'type'      => 'annotation',
+                                'dir'       => \dirname(__DIR__).'/Entity',
+                                'prefix'    => 'Umanit\TreeBundle\Entity',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**
      * Add config keys as parameters
+     *
      * @param ContainerBuilder $container
-     * @param array $params
-     * @param string $parent
+     * @param array            $params
+     * @param string           $parent
      */
-    private function setConfigAsParameters(ContainerBuilder &$container, array $params, $parent)
+    private function setConfigAsParameters(ContainerBuilder $container, array $params, $parent)
     {
         foreach ($params as $key => $value) {
             $name = $parent.'.'.$key;
@@ -52,17 +71,14 @@ class UmanitTreeExtension extends Extension implements PrependExtensionInterface
 
     /**
      * {@inheritdoc}
+     *
      * @param ContainerBuilder $container
      */
     public function prepend(ContainerBuilder $container)
     {
-        $bundles = $container->getParameter('kernel.bundles');
-        // Conditionnaly load sonata_admin.yml
-        if (isset($bundles['SonataAdminBundle'])) {
+        if ($container->hasExtension('sonata_admin')) {
             $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-            $loader->load('sonata_admin.yml');
+            $loader->load('sonata_admin.yaml');
         }
     }
-
-
 }
