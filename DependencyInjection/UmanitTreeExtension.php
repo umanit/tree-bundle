@@ -30,24 +30,6 @@ class UmanitTreeExtension extends Extension implements PrependExtensionInterface
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yaml');
-
-        $container->prependExtensionConfig('doctrine', [
-            'orm' => [
-                'entity_managers' => [
-                    'umanit_tree' => [
-                        'connection' => 'default',
-                        'mappings'   => [
-                            'UmanitTree' => [
-                                'is_bundle' => false,
-                                'type'      => 'annotation',
-                                'dir'       => \dirname(__DIR__).'/Entity',
-                                'prefix'    => 'Umanit\TreeBundle\Entity',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
     }
 
     /**
@@ -80,5 +62,31 @@ class UmanitTreeExtension extends Extension implements PrependExtensionInterface
             $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
             $loader->load('sonata_admin.yaml');
         }
+
+        /*
+         * We use a custom entity manager for the bundle to allow integration with umanit/block-bundle
+         *
+         * J'utilise un entity manager dédié par endroits car sinon ça vide les blocs de la page edito...
+         * à cause du fait que l'UnitOfWork clear toutes les propriétés sauf la collectionDeletions
+         * entre deux transactions. BlockBundle faisant un DELETE puis un INSERT des nodes, j'ai un DELETE
+         * supplémentaire qui se jour dans le tour d'UnitOfWork impliqué dans ce listener qui vide donc les
+         * blocs définitivement.
+         */
+        $container->prependExtensionConfig('doctrine', [
+            'orm' => [
+                'entity_managers' => [
+                    'umanit_tree' => [
+                        'connection' => 'default',
+                        'mappings'   => [
+                            'UmanitTree' => [
+                                'type'   => 'attribute',
+                                'dir'    => \dirname(__DIR__).'/Entity',
+                                'prefix' => 'Umanit\TreeBundle\Entity',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
     }
 }
