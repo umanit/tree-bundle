@@ -36,12 +36,12 @@ class SeoMetadata
     #[ORM\Column(name: 'seo_url', type: 'string', length: 511, nullable: true)]
     protected ?string $url = null;
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
 
@@ -72,7 +72,7 @@ class SeoMetadata
         return $this;
     }
 
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
     }
