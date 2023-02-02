@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixes erroneous changes to constructor in all three events
+- Fixes erroneous changes to constructor in `NodeUpdatedEvent` and `NodeBeforeUpdateEvent`
 
 ## [1.0.2] - 2023-01-26
 
