@@ -12,7 +12,7 @@ class NodeParentRegisterEvent extends Event
 {
     public const NAME = 'umanit.node.parent_register';
 
-    public function __construct(private TreeNodeInterface $entity, private array $parents)
+    public function __construct(private TreeNodeInterface $entity)
     {
     }
 

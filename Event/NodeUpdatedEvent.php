@@ -12,7 +12,7 @@ class NodeUpdatedEvent extends Event
 {
     public const NAME = 'umanit.node.updated';
 
-    public function __construct(private TreeNodeInterface $entity, private array $parents)
+    public function __construct(private TreeNodeInterface $entity)
     {
     }
 
