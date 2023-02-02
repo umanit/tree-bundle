@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2023-02-02
+
 ### Fixed
 
 - Fixes erroneous changes to constructor in `NodeUpdatedEvent` and `NodeBeforeUpdateEvent`
@@ -53,7 +55,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Last release of v0.
 
-[Unreleased]: https://github.com/umanit/tree-bundle/compare/1.0.2...HEAD
+[Unreleased]: https://github.com/umanit/tree-bundle/compare/1.0.3...HEAD
+
+[1.0.3]: https://github.com/umanit/tree-bundle/compare/1.0.2...1.0.3
 
 [1.0.2]: https://github.com/umanit/tree-bundle/compare/1.0.1...1.0.2
 
