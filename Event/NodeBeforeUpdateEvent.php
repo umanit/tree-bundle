@@ -12,7 +12,7 @@ class NodeBeforeUpdateEvent extends Event
 {
     public const NAME = 'umanit.node.before_update';
 
-    public function __construct(private TreeNodeInterface $entity, private array $parents)
+    public function __construct(private TreeNodeInterface $entity)
     {
     }
 
