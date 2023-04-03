@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Adds a return to a setter in `SeoMetadata` to comply with return type declaration
+
 ## [1.0.3] - 2023-02-02
 
 ### Fixed
