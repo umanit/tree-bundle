@@ -51,20 +51,34 @@ services:
             - '@router'
             - '@request_stack'
 
-    Umanit\TreeBundle\Controller\DefaultController:
+    umanit_tree.controller.defaultcontroller:
+        class: Umanit\TreeBundle\Controller\DefaultController
         arguments:
             - '@doctrine'
             - '@umanit.tree.router'
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: 'controller.service_arguments' }
+        autoconfigure: true
+
+    Umanit\TreeBundle\Controller\DefaultController:
+        alias: umanit_tree.controller.defaultcontroller
+        public: true
+
+    umanit.tree.controller.menu_admincontroller:
+        class: Umanit\TreeBundle\Controller\MenuAdminController
+        arguments:
+            - '@doctrine'
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: 'controller.service_arguments' }
         autoconfigure: true
 
     Umanit\TreeBundle\Controller\MenuAdminController:
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: 'controller.service_arguments' }
-        autoconfigure: true
+        alias: umanit.tree.controller.menu_admincontroller
+        public: true
 
     Umanit\TreeBundle\Command\InitializeCommand:
         autowire: true
