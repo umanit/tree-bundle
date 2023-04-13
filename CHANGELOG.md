@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixes wrong typing on `SeoTrait->getSeoMetadata()` parameter and `SeoTrait->setSeoMetadata()` return value
+  (allowing null value to comply with property type declaration)
+
 ## [1.0.4] - 2023-04-03
 
 ### Fixed

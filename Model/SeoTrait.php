@@ -16,12 +16,12 @@ trait SeoTrait
     #[ORM\Embedded(class: SeoMetadata::class, columnPrefix: false)]
     protected ?SeoMetadata $seoMetadata = null;
 
-    public function getSeoMetadata(): SeoMetadata
+    public function getSeoMetadata(): ?SeoMetadata
     {
         return $this->seoMetadata;
     }
 
-    public function setSeoMetadata(SeoMetadata $seoMetadata): self
+    public function setSeoMetadata(?SeoMetadata $seoMetadata): self
     {
         $this->seoMetadata = $seoMetadata;
 
