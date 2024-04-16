@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.7] - 2024-04-16
+
 ### Fixed
 
 - Return value of `NodeHistoryRepository->getByPath()` changed from `Node` to `NodeHistory`
@@ -78,7 +80,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Last release of v0.
 
-[Unreleased]: https://github.com/umanit/tree-bundle/compare/1.0.6...HEAD
+[Unreleased]: https://github.com/umanit/tree-bundle/compare/1.0.7...HEAD
+
+[1.0.7]: https://github.com/umanit/tree-bundle/compare/1.0.6...1.0.7
 
 [1.0.6]: https://github.com/umanit/tree-bundle/compare/1.0.5...1.0.6
 
