@@ -4,6 +4,7 @@ namespace Umanit\TreeBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Umanit\TreeBundle\Entity\Node;
+use Umanit\TreeBundle\Entity\NodeHistory;
 use Umanit\TreeBundle\Model\TreeNodeInterface;
 
 class NodeHistoryRepository extends EntityRepository
@@ -17,10 +18,10 @@ class NodeHistoryRepository extends EntityRepository
      *
      * @return Node|null
      */
-    public function getByPath(string $path, string $locale = TreeNodeInterface::UNKNOWN_LOCALE): ?Node
+    public function getByPath(string $path, string $locale = TreeNodeInterface::UNKNOWN_LOCALE): ?NodeHistory
     {
         if ($path[0] !== '/') {
-            $path = '/'.$path;
+            $path = '/' . $path;
         }
 
         $qb = $this
