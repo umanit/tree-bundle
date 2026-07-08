@@ -18,7 +18,7 @@ class UmanitTreeExtension extends Extension implements PrependExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -39,7 +39,7 @@ class UmanitTreeExtension extends Extension implements PrependExtensionInterface
      * @param array            $params
      * @param string           $parent
      */
-    private function setConfigAsParameters(ContainerBuilder $container, array $params, $parent)
+    private function setConfigAsParameters(ContainerBuilder $container, array $params, string $parent): void
     {
         foreach ($params as $key => $value) {
             $name = $parent.'.'.$key;
@@ -56,7 +56,7 @@ class UmanitTreeExtension extends Extension implements PrependExtensionInterface
      *
      * @param ContainerBuilder $container
      */
-    public function prepend(ContainerBuilder $container)
+    public function prepend(ContainerBuilder $container): void
     {
         if ($container->hasExtension('sonata_admin')) {
             $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

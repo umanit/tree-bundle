@@ -2,8 +2,10 @@
 
 namespace Umanit\TreeBundle\Doctrine\Listener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PostRemoveEventArgs;
+use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Umanit\TreeBundle\Entity\Node;
 use Umanit\TreeBundle\Entity\NodeHistory;
 
@@ -23,12 +25,7 @@ class DoctrineNodeHistoryListener
         $this->locale = $locale;
     }
 
-    /**
-     * Add a tree node to object if instanceof TreeNodeInterface.
-     *
-     * @param LifecycleEventArgs $args
-     */
-    public function postPersist(LifecycleEventArgs $args): void
+    public function postPersist(PostPersistEventArgs $args): void
     {
         $entity = $args->getObject();
 
@@ -37,13 +34,7 @@ class DoctrineNodeHistoryListener
         }
     }
 
-    /**
-     * Modify the tree node object if instanceof TreeNodeInterface
-     * and the node is updated.
-     *
-     * @param LifecycleEventArgs $args
-     */
-    public function postUpdate(LifecycleEventArgs $args): void
+    public function postUpdate(PostUpdateEventArgs $args): void
     {
         $entity = $args->getObject();
 
@@ -52,12 +43,7 @@ class DoctrineNodeHistoryListener
         }
     }
 
-    /**
-     * Delete all NodeHistory.
-     *
-     * @param LifecycleEventArgs $args
-     */
-    public function postRemove(LifecycleEventArgs $args): void
+    public function postRemove(PostRemoveEventArgs $args): void
     {
         $entity = $args->getObject();
 
@@ -66,11 +52,6 @@ class DoctrineNodeHistoryListener
         }
     }
 
-    /**
-     * Deletes all treenodes related to an entity.
-     *
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args): void
     {
         $manager = $args->getObjectManager();
@@ -98,7 +79,7 @@ class DoctrineNodeHistoryListener
                 ;
 
                 $manager->persist($nodeHistory);
-                $manager->flush($nodeHistory);
+                $manager->flush();
 
                 return;
             }

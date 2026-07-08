@@ -51,13 +51,13 @@ LEFT OUTER JOIN treebundle_link l ON mt.link_id = l.id
 order by path_priority
 SQL;
 
-        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addRootEntityFromClassMetadata($this->getClassMetadata()->name, 'mt');
         $rsm->addJoinedEntityFromClassMetadata(Link::class, 'l', 'mt', 'link', ['id' => 'address_id']);
 
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
 
-        $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('identifier', $identifier);
 
         return $query->getResult(Query::HYDRATE_ARRAY);
@@ -107,13 +107,13 @@ LEFT OUTER JOIN treebundle_link l ON mt.link_id = l.id
 order by path_priority
 SQL;
 
-        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addRootEntityFromClassMetadata($this->getClassMetadata()->name, 'mt');
         $rsm->addJoinedEntityFromClassMetadata(Link::class, 'l', 'mt', 'link', ['id' => 'address_id']);
 
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
 
-        $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
         $query->setParameter('identifier', $identifier);
 
         return $query->getResult();
@@ -143,7 +143,7 @@ WHERE parent_id $selectSQL
 ORDER BY priority
 SQL;
 
-        $query = $this->_em->getConnection()->prepare($sql);
+        $query = $this->getEntityManager()->getConnection()->prepare($sql);
 
         if ($parentId != null) {
             $query->bindValue('parent_id', $parentId);
@@ -213,7 +213,7 @@ SQL;
 
         $sql = strtr($sql, ['%CASE%' => $case]);
 
-        return $this->_em->getConnection()->executeStatement($sql, $paramSQL);
+        return $this->getEntityManager()->getConnection()->executeStatement($sql, $paramSQL);
     }
 
     /**
@@ -253,7 +253,7 @@ LEFT OUTER JOIN treebundle_link l ON mt.link_id = l.id
 order by path_priority
 SQL;
 
-        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
         $rsm->addEntityResult($this->getClassMetadata()->name, 'mt');
 
         foreach ($this->getClassMetadata()->fieldNames as $col => $field) {
@@ -264,7 +264,7 @@ SQL;
 
         $sql = strtr($sql, ['%SELECT%' => $rsm->generateSelectClause()]);
 
-        $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
 
         $query->setParameter('locale', $locale);
 
