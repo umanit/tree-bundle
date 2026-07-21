@@ -64,7 +64,7 @@ class NodeRepository extends MaterializedPathRepository
      */
     public function getByPath(string $path, string $locale = TreeNodeInterface::UNKNOWN_LOCALE): ?Node
     {
-        if ('' === (string) $path || $path[0] !== '/') {
+        if ($path[0] !== '/') {
             $path = '/'.$path;
         }
 
