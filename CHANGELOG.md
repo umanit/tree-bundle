@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-07-22
+
+### Added
+
+- Add return types void to load(), prepend(), setConfigAsParameters()
+- Add TreeBuilder return type to Configuration::getConfigTreeBuilder()
+
+### Fixed
+
+- Fix EntityManager::flush($entity) → flush() in
+  DoctrineNodeHistoryListener: the entity argument was removed in ORM 3.0
+
+### Changed
+
+- Bump php constraint to ^8.2
+- Widen symfony/framework-bundle to ^5.4|^6.0|^7.0
+- Widen doctrine/doctrine-bundle to ^2.7|^3.0
+- Widen doctrine/orm to ^2.13|^3.0
+- Replace deprecated psr-0 autoload with psr-4, remove target-dir
+- Replace removed Doctrine\ORM\Event\LifecycleEventArgs with specific
+  event classes (PostPersistEventArgs, PostUpdateEventArgs,
+  PreRemoveEventArgs, PostRemoveEventArgs) in DoctrineTreeNodeListener
+  and DoctrineNodeHistoryListener — LifecycleEventArgs was removed in
+  doctrine/orm 3.0
+
 ## [1.0.7] - 2024-04-16
 
 ### Fixed
@@ -80,7 +105,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Last release of v0.
 
-[Unreleased]: https://github.com/umanit/tree-bundle/compare/1.0.7...HEAD
+[Unreleased]: https://github.com/umanit/tree-bundle/compare/2.0.0...HEAD
+
+[2.0.0]: https://github.com/umanit/tree-bundle/compare/1.0.7...2.0.0
 
 [1.0.7]: https://github.com/umanit/tree-bundle/compare/1.0.6...1.0.7
 
