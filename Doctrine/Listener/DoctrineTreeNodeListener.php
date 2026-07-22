@@ -2,8 +2,10 @@
 
 namespace Umanit\TreeBundle\Doctrine\Listener;
 
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\Event\PostPersistEventArgs;
+use Doctrine\ORM\Event\PostUpdateEventArgs;
+use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Umanit\TreeBundle\Helper\NodeHelper;
 use Umanit\TreeBundle\Model\TreeNodeInterface;
 
@@ -21,12 +23,7 @@ class DoctrineTreeNodeListener
         $this->nodeHelper = $nodeHelper;
     }
 
-    /**
-     * Add a tree node to object if instanceof TreeNodeInterface.
-     *
-     * @param LifecycleEventArgs $args
-     */
-    public function postPersist(LifecycleEventArgs $args): void
+    public function postPersist(PostPersistEventArgs $args): void
     {
         $entity = $args->getObject();
 
@@ -35,13 +32,7 @@ class DoctrineTreeNodeListener
         }
     }
 
-    /**
-     * Modify the tree node object if instanceof TreeNodeInterface
-     * and the node is updated.
-     *
-     * @param LifecycleEventArgs $args
-     */
-    public function postUpdate(LifecycleEventArgs $args): void
+    public function postUpdate(PostUpdateEventArgs $args): void
     {
         $entity = $args->getObject();
 
@@ -50,12 +41,7 @@ class DoctrineTreeNodeListener
         }
     }
 
-    /**
-     * Register all the nodes that will need to be remove.
-     *
-     * @param LifecycleEventArgs $args
-     */
-    public function preRemove(LifecycleEventArgs $args): void
+    public function preRemove(PreRemoveEventArgs $args): void
     {
         $entity = $args->getObject();
 
@@ -64,11 +50,6 @@ class DoctrineTreeNodeListener
         }
     }
 
-    /**
-     * Deletes all treenodes related to an entity.
-     *
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args): void
     {
         $nodesToUpdate = $this->nodesToUpdate;

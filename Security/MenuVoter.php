@@ -14,12 +14,12 @@ class MenuVoter implements VoterInterface
     {
     }
 
-    protected function supports($attribute, $subject)
+    protected function supports($attribute, $subject): bool
     {
         return $attribute === self::MENU_ADMIN;
     }
 
-    public function vote(TokenInterface $token, $subject, array $attributes)
+    public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         $user = $token->getUser();
 

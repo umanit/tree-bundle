@@ -169,7 +169,7 @@ class NodeRepository extends MaterializedPathRepository
         $nodeConditions = [];
         foreach ($parents as $parent) {
             if ($parent instanceof TreeNodeInterface) {
-                $className = $this->_em->getClassMetadata($parent::class)->getName();
+                $className = $this->getEntityManager()->getClassMetadata($parent::class)->getName();
                 $locale = $parent->getLocale();
 
                 if (!isset($parentConditions[$className])) {
