@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-07-27
+
+### Fixed
+
+- `MenuAdminController`: replace the removed `SensioFrameworkExtraBundle` `IsGranted` attribute with
+  `Symfony\Component\Security\Http\Attribute\IsGranted`.
+- `NodeRepository::getByPath()`: guard against an empty path before checking `$path[0]`, avoiding an error on empty
+  string.
+
+### Changed
+
+- `InitializeCommand`/`RefreshNodesCommand`: replace the no-longer-read `protected static $defaultName` with
+  `#[AsCommand(name: ...)]` — Symfony Console 7.4's `Command::__construct()` no longer reads the static property, so
+  these commands ended up with an empty name.
+
 ## [2.0.0] - 2026-07-22
 
 ### Added
@@ -105,7 +120,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Last release of v0.
 
-[Unreleased]: https://github.com/umanit/tree-bundle/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/umanit/tree-bundle/compare/2.0.1...HEAD
+
+[2.0.1]: https://github.com/umanit/tree-bundle/compare/2.0.0...2.0.1
 
 [2.0.0]: https://github.com/umanit/tree-bundle/compare/1.0.7...2.0.0
 
