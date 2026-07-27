@@ -127,7 +127,7 @@ abstract class AbstractMenu
     #[ORM\PreUpdate]
     public function update()
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTime();
     }
 
     public function getUpdatedAt(): ?\DateTimeInterface

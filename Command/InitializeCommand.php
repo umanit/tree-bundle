@@ -3,16 +3,16 @@
 namespace Umanit\TreeBundle\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Umanit\TreeBundle\Entity\Node;
 use Umanit\TreeBundle\Model\TreeNodeInterface;
 
+#[AsCommand(name: 'umanit:tree:initialize')]
 class InitializeCommand extends Command
 {
-    protected static $defaultName = 'umanit:tree:initialize';
-
     private ?string $rootClass;
     private EntityManagerInterface $em;
 
