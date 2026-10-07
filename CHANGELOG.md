@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-10-07
+
 ### Fixed
 
 - Expose the `menus` Twig global through a `GlobalsInterface` extension (`MenuGlobalsExtension`) instead of calling
@@ -86,7 +88,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Last release of v0.
 
-[Unreleased]: https://github.com/umanit/tree-bundle/compare/1.0.7...HEAD
+[Unreleased]: https://github.com/umanit/tree-bundle/compare/1.0.8...HEAD
+
+[1.0.8]: https://github.com/umanit/tree-bundle/compare/1.0.7...1.0.8
 
 [1.0.7]: https://github.com/umanit/tree-bundle/compare/1.0.6...1.0.7
 
