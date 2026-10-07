@@ -2,10 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres
+to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [2.0.2] - 2026-10-07
 
 ### Fixed
 
@@ -32,13 +34,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add return types void to load(), prepend(), setConfigAsParameters()
-- Add TreeBuilder return type to Configuration::getConfigTreeBuilder()
+- Add return types void to load (), prepend (), setConfigAsParameters ()
+- Add TreeBuilder return type to Configuration::getConfigTreeBuilder ()
 
 ### Fixed
 
-- Fix EntityManager::flush($entity) → flush() in
-  DoctrineNodeHistoryListener: the entity argument was removed in ORM 3.0
+- Fix EntityManager::flush ($entity) → flush () in DoctrineNodeHistoryListener: the entity argument was removed in ORM
+  3.0
 
 ### Changed
 
@@ -47,11 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Widen doctrine/doctrine-bundle to ^2.7|^3.0
 - Widen doctrine/orm to ^2.13|^3.0
 - Replace deprecated psr-0 autoload with psr-4, remove target-dir
-- Replace removed Doctrine\ORM\Event\LifecycleEventArgs with specific
-  event classes (PostPersistEventArgs, PostUpdateEventArgs,
-  PreRemoveEventArgs, PostRemoveEventArgs) in DoctrineTreeNodeListener
-  and DoctrineNodeHistoryListener — LifecycleEventArgs was removed in
-  doctrine/orm 3.0
+- Replace removed Doctrine\ORM\Event\LifecycleEventArgs with specific event classes (PostPersistEventArgs,
+  PostUpdateEventArgs, PreRemoveEventArgs, PostRemoveEventArgs) in DoctrineTreeNodeListener and
+  DoctrineNodeHistoryListener — LifecycleEventArgs was removed in doctrine/orm 3.0
 
 ## [1.0.7] - 2024-04-16
 
@@ -69,8 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixes wrong typing on `SeoTrait->getSeoMetadata()` parameter and `SeoTrait->setSeoMetadata()` return value
-  (allowing null value to comply with property type declaration)
+- Fixes wrong typing on `SeoTrait->getSeoMetadata()` parameter and `SeoTrait->setSeoMetadata()` return value (allowing
+  null value to comply with property type declaration)
 
 ## [1.0.4] - 2023-04-03
 
@@ -126,7 +126,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Last release of v0.
 
-[Unreleased]: https://github.com/umanit/tree-bundle/compare/2.0.1...HEAD
+[Unreleased]: https://github.com/umanit/tree-bundle/compare/2.0.2...HEAD
+
+[2.0.2]: https://github.com/umanit/tree-bundle/compare/2.0.1...2.0.2
 
 [2.0.1]: https://github.com/umanit/tree-bundle/compare/2.0.0...2.0.1
 
