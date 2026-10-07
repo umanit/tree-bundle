@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Expose the `menus` Twig global through a `GlobalsInterface` extension (`MenuGlobalsExtension`) instead of calling
+  `Environment::addGlobal()` on `kernel.request`, which threw a `LogicException` when Twig was already initialized.
+  `MenuInjectorSubscriber` is removed.
+
 ## [1.0.7] - 2024-04-16
 
 ### Fixed

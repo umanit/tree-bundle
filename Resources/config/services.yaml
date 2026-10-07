@@ -217,15 +217,16 @@ services:
             - '@doctrine.orm.entity_manager'
             - '%umanit_tree.menu_entity_class%'
 
-    # Menu injector
-    umanit.tree.event_subscriber.menu_injector_subscriber:
-        alias: Umanit\TreeBundle\EventSubscriber\MenuInjectorSubscriber
+    # Menu globals for twig
+    umanit.tree.twig.extension.menu_globals:
+        alias: Umanit\TreeBundle\Twig\Extension\MenuGlobalsExtension
         public: true
-    Umanit\TreeBundle\EventSubscriber\MenuInjectorSubscriber:
+    Umanit\TreeBundle\Twig\Extension\MenuGlobalsExtension:
         arguments:
-            - '@twig'
+            - '@request_stack'
             - '@umanit.tree.meny.menu_menu_builder'
-        tags: ['kernel.event_subscriber']
+        tags:
+            - { name: 'twig.extension' }
 
     # Menu builder for sonata
     umanit.tree.event_subscriber.sonata_menu_builder_subscriber:
